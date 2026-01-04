@@ -2,63 +2,100 @@ spring:
   application:
     name: auth-service
 
-  # Полностью отключаем Spring Cloud
+  # ✅ ПОЛНОСТЬЮ ОТКЛЮЧАЕМ EUREKA И CLOUD
   cloud:
     config:
       enabled: false
       import-check:
         enabled: false
-    discovery:
-      enabled: false
-    # ✅ ОТКЛЮЧАЕМ SERVICE REGISTRY
-    service-registry:
-      auto-registration:
-        enabled: false
 
+  # ✅ PostgreSQL Configuration
   datasource:
     url: jdbc:postgresql://localhost:5432/order_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+    # Connection Pool Configuration
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
+  # ✅ JPA / Hibernate Configuration
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
 
+# ✅ Server Configuration
 server:
   port: 8081
+  servlet:
+    context-path: /
+  error:
+    include-message: always
+    include-binding-errors: always
 
-# JWT Configuration
+# ✅ JWT Configuration
 jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-  expiration: 900000
+  secret: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"  # BASE64 encoded
+  access-token-expiration: 900000      # 15 minutes (in milliseconds)
+  refresh-token-expiration: 604800000  # 7 days (in milliseconds)
 
-# ✅ ПОЛНОСТЬЮ ОТКЛЮЧАЕМ EUREKA
+# ✅ EUREKA Disabled (не используется в этой архитектуре)
 eureka:
   client:
     enabled: false
     register-with-eureka: false
     fetch-registry: false
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    prefer-ip-address: false
 
-# Swagger UI
 springdoc:
   api-docs:
     path: /v3/api-docs
+    version: OPENAPI_3_1  # ✅ ДОБАВИТЬ СЮДА (правильное место)
   swagger-ui:
     path: /swagger-ui.html
+    enabled: true
+    show-common-extensions: true
+    tags-sorter: alpha
+  use-fqn: true
 
-# Actuator endpoints
+# ✅ Actuator Configuration
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+
+# ✅ Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.ecommerce.auth: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/auth-service.log
+    max-size: 10MB
+    max-history: 10

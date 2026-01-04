@@ -2,9 +2,11 @@ package com.ecommerce.auth.security;
 
 import com.ecommerce.auth.entity.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -15,52 +17,67 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
-    private Long expiration;
+    @Value("${jwt.access-token-expiration}")
+    private Long accessTokenExpiration;
+
+    @Value("${jwt.refresh-token-expiration}")
+    private Long refreshTokenExpiration;
 
     /**
-     * Генерация Access Token для User entity (используется в AuthService)
+     * Генерация access token для User
      */
     public String generateAccessToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());
         claims.put("email", user.getEmail());
         claims.put("role", user.getRole().name());
-        return createToken(claims, user.getUsername(), expiration);
+
+        return createToken(claims, user.getUsername(), accessTokenExpiration);
     }
 
     /**
-     * Генерация Refresh Token для User entity (используется в AuthService)
+     * Генерация refresh token для User
      */
     public String generateRefreshToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());
-        claims.put("type", "refresh");
-        return createToken(claims, user.getUsername(), 604800000L); // 7 дней
+        claims.put("tokenType", "refresh");
+
+        return createToken(claims, user.getUsername(), refreshTokenExpiration);
     }
 
     /**
-     * Генерация токена для UserDetails (универсальный метод)
+     * Генерация access token для UserDetails
      */
-    public String generateToken(UserDetails userDetails) {
-        return createToken(new HashMap<>(), userDetails.getUsername(), expiration);
+    public String generateAccessToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        if (userDetails instanceof User user) {
+            claims.put("userId", user.getId());
+            claims.put("email", user.getEmail());
+            claims.put("role", user.getRole().name());
+        }
+        return createToken(claims, userDetails.getUsername(), accessTokenExpiration);
     }
 
     /**
-     * Создание токена с кастомными claims
+     * Создание JWT токена
      */
     private String createToken(Map<String, Object> claims, String subject, Long expiration) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expiration);
+
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .issuedAt(now)
+                .expiration(expiryDate)
                 .signWith(getSignKey())
                 .compact();
     }
@@ -73,7 +90,7 @@ public class JwtUtil {
     }
 
     /**
-     * Извлечение любого claim из токена
+     * Извлечение конкретного claim
      */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
@@ -81,7 +98,7 @@ public class JwtUtil {
     }
 
     /**
-     * Извлечение всех claims из токена
+     * Извлечение всех claims
      */
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
@@ -92,36 +109,38 @@ public class JwtUtil {
     }
 
     /**
-     * Проверка валидности токена (только по expiration)
-     */
-    public boolean isTokenValid(String token) {
-        try {
-            return !isTokenExpired(token);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
-     * Проверка валидности токена с проверкой username (для Filter)
-     */
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-    }
-
-    /**
-     * Проверка истёк ли токен
+     * Проверка истечения токена
      */
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
     /**
-     * Извлечение даты истечения токена
+     * Извлечение даты истечения
      */
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    /**
+     * Валидация JWT токена
+     */
+    public boolean validateToken(String token) {
+        try {
+            extractAllClaims(token);
+            return !isTokenExpired(token);
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Валидация токена для конкретного пользователя
+     */
+    public boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     /**

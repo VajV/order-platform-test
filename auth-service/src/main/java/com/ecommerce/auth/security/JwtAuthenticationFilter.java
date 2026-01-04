@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,26 +16,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
+/**
+ * JWT Authentication Filter
+ * Извлекает и валидирует JWT токен из Authorization заголовка
+ */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil; // ✅ ИЗМЕНЕНО: JwtService → JwtUtil
+    private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
-
-    private static final List<String> PUBLIC_PATHS = List.of(
-            "/api/auth/register",
-            "/api/auth/login",
-            "/api/auth/refresh",
-            "/api/auth/logout",
-            "/actuator/health",
-            "/actuator/info",
-            "/actuator/metrics",
-            "/swagger-ui",
-            "/v3/api-docs"
-    );
 
     @Override
     protected void doFilterInternal(
@@ -43,45 +36,53 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-
-        if (isPublicPath(path)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
+        // Извлечение Authorization заголовка
         final String authHeader = request.getHeader("Authorization");
 
+        // Проверка наличия Bearer токена
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
+            // Извлечение JWT токена (удаляем "Bearer " префикс)
             final String jwt = authHeader.substring(7);
+
+            // Извлечение username из токена
             final String username = jwtUtil.extractUsername(jwt);
 
+            // Если username есть и аутентификация еще не установлена
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                // Загрузка пользователя из БД
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (jwtUtil.isTokenValid(jwt, userDetails)) {
+                // ✅ ИСПРАВЛЕНО: используем validateToken(token, userDetails)
+                if (jwtUtil.validateToken(jwt, userDetails)) {
+
+                    // Создание Authentication объекта
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
                             userDetails.getAuthorities()
                     );
+
+                    // Установка деталей запроса
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    // Установка аутентификации в SecurityContext
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                    log.debug("User '{}' authenticated successfully", username);
+                } else {
+                    log.warn("Invalid JWT token for user '{}'", username);
                 }
             }
         } catch (Exception e) {
-            logger.error("JWT validation error: " + e.getMessage());
+            log.error("Cannot set user authentication: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private boolean isPublicPath(String path) {
-        return PUBLIC_PATHS.stream().anyMatch(path::startsWith);
     }
 }

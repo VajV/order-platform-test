@@ -10,10 +10,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
+/**
+ * User Entity - реализует Spring Security UserDetails
+ * ✅ FIX: Полная реализация методов UserDetails
+ * ✅ FIX: @CreationTimestamp и @UpdateTimestamp для автоматической инициализации дат
+ * ✅ FIX: Role enum определен внутри класса
+ * ✅ FIX: @Builder.Default для boolean полей
+ */
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(name = "idx_username", columnList = "username"),
+        @Index(name = "idx_email", columnList = "email")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,27 +35,37 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 50)
     private String username;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(name = "full_name")
+    @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role = Role.ROLE_USER;
+    private Role role;
 
-    @Column(name = "enabled", nullable = false)
+    @Column(nullable = false)
+    @Builder.Default  // ✅ ДОБАВЛЕНО!
     private boolean enabled = true;
 
-    @Column(name = "account_non_locked", nullable = false)
+    @Column(nullable = false)
+    @Builder.Default  // ✅ ДОБАВЛЕНО!
     private boolean accountNonLocked = true;
+
+    @Column(nullable = false)
+    @Builder.Default  // ✅ ДОБАВЛЕНО!
+    private boolean accountNonExpired = true;
+
+    @Column(nullable = false)
+    @Builder.Default  // ✅ ДОБАВЛЕНО!
+    private boolean credentialsNonExpired = true;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -58,4 +78,75 @@ public class User implements UserDetails {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
-    @Over
+    // ============================================================
+    // UserDetails Implementation Methods
+    // ============================================================
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(
+                new SimpleGrantedAuthority(role.name())
+        );
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return accountNonExpired;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    // ============================================================
+    // Role Enum
+    // ============================================================
+
+    public enum Role {
+        ROLE_USER,
+        ROLE_ADMIN,
+        ROLE_MANAGER
+    }
+
+    // ============================================================
+    // Utility Methods
+    // ============================================================
+
+    /**
+     * Factory method для создания нового пользователя при регистрации
+     */
+    public static User createNewUser(String username, String email, String password, String fullName) {
+        return User.builder()
+                .username(username)
+                .email(email)
+                .password(password)
+                .fullName(fullName)
+                .role(Role.ROLE_USER)
+                .enabled(true)
+                .accountNonLocked(true)
+                .accountNonExpired(true)
+                .credentialsNonExpired(true)
+                .build();
+    }
+}

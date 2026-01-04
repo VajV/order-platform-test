@@ -11,4 +11,3 @@ public record UserDto(
         LocalDateTime createdAt,
         LocalDateTime lastLoginAt
 ) {}
-
