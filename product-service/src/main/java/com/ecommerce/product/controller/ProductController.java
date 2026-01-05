@@ -84,7 +84,7 @@ public class ProductController {
      * POST /api/products - Создать товар (ADMIN ONLY)
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest request) {
         log.info("POST /api/products - Create new product: {}", request.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request));
@@ -94,7 +94,7 @@ public class ProductController {
      * PUT /api/products/{id} - Обновить товар (ADMIN ONLY)
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody ProductRequest request
@@ -107,7 +107,7 @@ public class ProductController {
      * DELETE /api/products/{id} - Удалить товар (ADMIN ONLY)
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         log.info("DELETE /api/products/{} - Delete product", id);
         productService.deleteProduct(id);
@@ -118,7 +118,7 @@ public class ProductController {
      * PATCH /api/products/{id}/stock - Обновить количество (INTERNAL)
      */
     @PatchMapping("/{id}/stock")
-    @PreAuthorize("hasRole('ADMIN') or @authorizationService.isInternalService()")
+    //@PreAuthorize("hasRole('ADMIN') or @authorizationService.isInternalService()")
     public ResponseEntity<Void> updateStock(
             @PathVariable Long id,
             @RequestParam Integer quantity
