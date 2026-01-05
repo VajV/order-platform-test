@@ -8,19 +8,34 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
         </processorPath>
         <module name="order-processing-platform.order-service.main" />
-        <module name="order-processing-platform.product-service.main" />
-        <module name="order-processing-platform.user-service.main" />
-        <module name="order-processing-platform.api-gateway.main" />
-        <module name="order-processing-platform.api-gateway.test" />
-        <module name="order-processing-platform.notification-service.main" />
         <module name="order-processing-platform.notification-service.test" />
-        <module name="order-processing-platform.product-service.test" />
         <module name="order-processing-platform.auth-service.main" />
         <module name="order-processing-platform.auth-service.test" />
+        <module name="order-processing-platform.user-service.main" />
+        <module name="order-processing-platform.api-gateway.main" />
         <module name="order-processing-platform.user-service.test" />
         <module name="order-processing-platform.inventory-service.test" />
+        <module name="order-processing-platform.api-gateway.test" />
+        <module name="order-processing-platform.notification-service.main" />
         <module name="order-processing-platform.order-service.test" />
         <module name="order-processing-platform.inventory-service.main" />
+      </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <option name="mapstruct.defaultComponentModel" value="spring" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mapstruct/mapstruct-processor/1.5.5.Final/897f6f115930b936287bef552bf5fe28cc64717d/mapstruct-processor-1.5.5.Final.jar" />
+        </processorPath>
+        <module name="order-processing-platform.product-service.main" />
+      </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <option name="mapstruct.defaultComponentModel" value="spring" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
+        </processorPath>
+        <module name="order-processing-platform.product-service.test" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="17" />
