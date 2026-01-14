@@ -1,5 +1,5 @@
 plugins {
-    id("org.springframework.boot")
+    id("org.springframework.boot") version "3.2.1"
     id("io.spring.dependency-management") version "1.1.4"
     java
 }
@@ -40,12 +40,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test:6.2.1")
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-tasks.withType<Jar> {
-    manifest {
-        attributes["Main-Class"] = "com.ecommerce.auth.AuthServiceApplication"
-    }
+tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+    archiveFileName.set("auth-service.jar")
+    mainClass.set("com.ecommerce.auth.AuthServiceApplication")
 }

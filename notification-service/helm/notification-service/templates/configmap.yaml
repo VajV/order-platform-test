@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "notification-service.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "notification-service.labels" . | nindent 4 }}
+data:
+  application.yml: |
+    spring:
+      kafka:
+        bootstrap-servers: {{ .Values.env.kafkaBootstrapServers }}
+        consumer:
+          group-id: notification-service
+      redis:
+        host: {{ .Values.env.redisHost }}
+        port: {{ .Values.env.redisPort }}
+    
+    notification:
+      rate-limit:
+        max-per-hour: {{ .Values.env.rateLimitMaxPerHour }}
+        window-seconds: {{ .Values.env.rateLimitWindowSeconds }}

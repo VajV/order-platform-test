@@ -11,6 +11,7 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         maven(url = "https://repo.spring.io/release")
+        maven(url = "https://packages.confluent.io/maven/")
     }
 }
 

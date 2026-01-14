@@ -1,0 +1,14 @@
+apiVersion: v2
+name: notification-service
+description: Notification Service Helm Chart for Order Processing Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - notification
+  - kafka
+  - mongodb
+  - redis
+maintainers:
+  - name: E-Commerce Team
+    email: team@ecommerce.com

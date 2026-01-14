@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "UserCreatedEvent",
+  "namespace": "com.ecommerce.user.events",
+  "fields": [
+    {"name": "userId", "type": "long"},
+    {"name": "email", "type": "string"},
+    {"name": "firstName", "type": "string"},
+    {"name": "lastName", "type": "string"},
+    {"name": "roles", "type": {"type": "array", "items": "string"}},
+    {"name": "createdAt", "type": "string"}
+  ]
+}
