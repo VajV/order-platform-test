@@ -5,21 +5,18 @@ spring:
   application:
     name: notification-service
 
-  # ✅ MongoDB
   data:
     mongodb:
-      uri: mongodb://${MONGODB_USERNAME:admin}:${MONGODB_PASSWORD:mongo123}@${MONGODB_HOST:localhost}:${MONGODB_PORT:27017}/${MONGODB_DATABASE:notifications}?authSource=admin
+      uri: mongodb://${MONGODB_USERNAME:admin}:${MONGODB_PASSWORD:mongo123}@${MONGODB_HOST:mongodb}:${MONGODB_PORT:27017}/${MONGODB_DATABASE:notifications}?authSource=admin
       auto-index-creation: true
 
-    # ✅ Redis
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
       timeout: 2000ms
 
-  # ✅ Kafka
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:29092}
     consumer:
       group-id: notification-service
       auto-offset-reset: earliest
@@ -30,7 +27,6 @@ spring:
     listener:
       concurrency: 3
 
-  # ✅ Mail (mock для dev)
   mail:
     host: smtp.gmail.com
     port: 587
@@ -43,7 +39,6 @@ spring:
           starttls:
             enable: false
 
-# ✅ Management
 management:
   endpoints:
     web:
@@ -54,9 +49,8 @@ management:
       show-details: always
   health:
     mail:
-      enabled: false  # Отключить mail health check
+      enabled: false
 
-# ✅ Rate Limiting
 notification:
   rate-limit:
     max-per-hour: 10

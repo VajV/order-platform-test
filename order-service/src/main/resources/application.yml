@@ -5,9 +5,8 @@ spring:
   application:
     name: order-service
 
-  # ✅ PostgreSQL - подключение к общей БД ecommerce
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ecommerce}
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:ecommerce}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres123}
     driver-class-name: org.postgresql.Driver
@@ -15,10 +14,17 @@ spring:
       maximum-pool-size: 20
       minimum-idle: 5
 
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    baseline-version: 0
+    validate-on-migrate: true
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate  # Таблицы уже созданы
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
@@ -26,9 +32,8 @@ spring:
           batch_size: 20
         order_inserts: true
 
-  # ✅ Kafka
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:29092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -44,14 +49,12 @@ spring:
       ack-mode: manual_immediate
       concurrency: 3
 
-  # ✅ Security
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8081}
+          issuer-uri: ${JWT_ISSUER_URI:http://auth-service:8087}
 
-# ✅ Management
 management:
   endpoints:
     web:
@@ -61,7 +64,6 @@ management:
     health:
       show-details: always
 
-# ✅ Swagger
 springdoc:
   api-docs:
     path: /v3/api-docs

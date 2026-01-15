@@ -7,17 +7,14 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
-    @Mapping(source = "category.id", target = "categoryId")
-    @Mapping(source = "category.name", target = "categoryName")
-    @Mapping(source = "rating", target = "rating")
-    @Mapping(source = "reviewCount", target = "reviewCount")
+    // ✅ Автоматический маппинг (MapStruct сам найдёт одинаковые поля)
     ProductResponse toResponse(Product product);
 
+    // ✅ Игнорируем только те поля, которые не нужно заполнять из request
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "category", ignore = true)
-    @Mapping(target = "rating", ignore = true)
-    @Mapping(target = "reviewCount", ignore = true)
+    @Mapping(target = "rating", constant = "0.0")
+    @Mapping(target = "reviewCount", constant = "0")
     Product toEntity(ProductRequest request);
 }

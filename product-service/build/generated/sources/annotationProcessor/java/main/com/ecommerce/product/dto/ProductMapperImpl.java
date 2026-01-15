@@ -1,15 +1,12 @@
 package com.ecommerce.product.dto;
 
-import com.ecommerce.product.entity.Category;
 import com.ecommerce.product.entity.Product;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-14T14:10:21+0300",
+    date = "2026-01-15T17:12:30+0300",
     comments = "version: 1.5.5.Final, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.5.jar, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -21,37 +18,23 @@ public class ProductMapperImpl implements ProductMapper {
             return null;
         }
 
-        Long categoryId = null;
-        String categoryName = null;
-        Double rating = null;
-        Integer reviewCount = null;
-        Long id = null;
-        String name = null;
-        String description = null;
-        BigDecimal price = null;
-        Integer stock = null;
-        String imageUrl = null;
-        boolean active = false;
-        LocalDateTime createdAt = null;
-        LocalDateTime updatedAt = null;
+        ProductResponse.ProductResponseBuilder productResponse = ProductResponse.builder();
 
-        categoryId = productCategoryId( product );
-        categoryName = productCategoryName( product );
-        rating = product.getRating();
-        reviewCount = product.getReviewCount();
-        id = product.getId();
-        name = product.getName();
-        description = product.getDescription();
-        price = product.getPrice();
-        stock = product.getStock();
-        imageUrl = product.getImageUrl();
-        active = product.isActive();
-        createdAt = product.getCreatedAt();
-        updatedAt = product.getUpdatedAt();
+        productResponse.id( product.getId() );
+        productResponse.name( product.getName() );
+        productResponse.description( product.getDescription() );
+        productResponse.price( product.getPrice() );
+        productResponse.stock( product.getStock() );
+        productResponse.categoryId( product.getCategoryId() );
+        productResponse.categoryName( product.getCategoryName() );
+        productResponse.imageUrl( product.getImageUrl() );
+        productResponse.active( product.getActive() );
+        productResponse.rating( product.getRating() );
+        productResponse.reviewCount( product.getReviewCount() );
+        productResponse.createdAt( product.getCreatedAt() );
+        productResponse.updatedAt( product.getUpdatedAt() );
 
-        ProductResponse productResponse = new ProductResponse( id, name, description, price, stock, categoryId, categoryName, imageUrl, rating, reviewCount, active, createdAt, updatedAt );
-
-        return productResponse;
+        return productResponse.build();
     }
 
     @Override
@@ -66,39 +49,13 @@ public class ProductMapperImpl implements ProductMapper {
         product.description( request.getDescription() );
         product.price( request.getPrice() );
         product.stock( request.getStock() );
+        product.categoryId( request.getCategoryId() );
         product.imageUrl( request.getImageUrl() );
         product.active( request.isActive() );
 
+        product.rating( (double) 0.0 );
+        product.reviewCount( 0 );
+
         return product.build();
-    }
-
-    private Long productCategoryId(Product product) {
-        if ( product == null ) {
-            return null;
-        }
-        Category category = product.getCategory();
-        if ( category == null ) {
-            return null;
-        }
-        Long id = category.getId();
-        if ( id == null ) {
-            return null;
-        }
-        return id;
-    }
-
-    private String productCategoryName(Product product) {
-        if ( product == null ) {
-            return null;
-        }
-        Category category = product.getCategory();
-        if ( category == null ) {
-            return null;
-        }
-        String name = category.getName();
-        if ( name == null ) {
-            return null;
-        }
-        return name;
     }
 }

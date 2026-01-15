@@ -5,59 +5,36 @@ spring:
   application:
     name: product-service
 
-  cloud:
-    config:
-      enabled: false
+  data:
+    mongodb:
+      uri: mongodb://${MONGODB_USERNAME:admin}:${MONGODB_PASSWORD:mongo123}@${MONGODB_HOST:mongodb}:${MONGODB_PORT:27017}/${MONGODB_DATABASE:products}?authSource=admin
+      auto-index-creation: true
 
-  # ✅ PostgreSQL - подключение к общей БД ecommerce
-  datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ecommerce}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:postgres123}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-
-  jpa:
-    hibernate:
-      ddl-auto: validate  # Таблицы уже созданы
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-
-  # ✅ Kafka
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:29092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: product-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 
-# ✅ JWT (для Spring Security)
-jwt:
-  secret: ${JWT_SECRET:MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890}
-
-# ✅ Management
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: always
-
-# ✅ Swagger
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-    enabled: true
 
 logging:
   level:
     root: INFO
     com.ecommerce.product: DEBUG
+    org.springframework.data.mongodb: DEBUG
+    org.springframework.kafka: WARN

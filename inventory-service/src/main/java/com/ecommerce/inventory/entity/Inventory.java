@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "inventory")
@@ -16,30 +17,26 @@ import java.time.LocalDateTime;
 public class Inventory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)  // ← ИСПРАВЛЕНО: UUID вместо IDENTITY
+    private UUID id;  // ← ИСПРАВЛЕНО: UUID вместо Long
 
-    @Column(nullable = false, unique = true)
-    private String productId;
+    @Column(name = "product_id", nullable = false, unique = true)
+    private UUID productId;  // ← ИСПРАВЛЕНО: UUID вместо String
 
-    @Column(nullable = false)
+    @Column(name = "total_quantity", nullable = false)
     @Builder.Default
     private Integer totalQuantity = 0;
 
-    @Column(nullable = false)
+    @Column(name = "reserved_quantity", nullable = false)
     @Builder.Default
     private Integer reservedQuantity = 0;
 
     @Version
     @Builder.Default
-    private Integer version = 0;
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Long version = 0L;  // ← ИСПРАВЛЕНО: Long вместо Integer (для оптимистичных блокировок)
 
     @UpdateTimestamp
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     /**

@@ -1,20 +1,38 @@
 package com.ecommerce.product.dto;
 
+import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record ProductResponse(
-        Long id,
-        String name,
-        String description,
-        BigDecimal price,
-        Integer stock,
-        Long categoryId,
-        String categoryName,
-        String imageUrl,
-        Double rating,
-        Integer reviewCount,
-        boolean active,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) {}
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProductResponse {
+
+    private String id;  // ← String вместо Long
+
+    private String name;
+
+    private String description;
+
+    private BigDecimal price;
+
+    private Integer stock;
+
+    private String categoryId;  // ← String вместо Long
+
+    private String categoryName;
+
+    private String imageUrl;
+
+    private Boolean active;
+
+    private Double rating;
+
+    private Integer reviewCount;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+}

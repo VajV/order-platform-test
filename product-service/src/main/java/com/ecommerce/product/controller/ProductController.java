@@ -36,7 +36,7 @@ public class ProductController {
      * GET /api/products/{id} - Получить товар по ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable String id) {  // ← String вместо Long
         log.info("GET /api/products/{} - Get product by id", id);
         return ResponseEntity.ok(productService.getProductById(id));
     }
@@ -45,7 +45,7 @@ public class ProductController {
      * GET /api/products/category/{categoryId} - Товары по категории
      */
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<ProductResponse>> getByCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<List<ProductResponse>> getByCategory(@PathVariable String categoryId) {  // ← String вместо Long
         log.info("GET /api/products/category/{} - Get products by category", categoryId);
         return ResponseEntity.ok(productService.getProductsByCategory(categoryId));
     }
@@ -96,7 +96,7 @@ public class ProductController {
     @PutMapping("/{id}")
     //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> updateProduct(
-            @PathVariable Long id,
+            @PathVariable String id,  // ← String вместо Long
             @Valid @RequestBody ProductRequest request
     ) {
         log.info("PUT /api/products/{} - Update product", id);
@@ -108,7 +108,7 @@ public class ProductController {
      */
     @DeleteMapping("/{id}")
     //@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable String id) {  // ← String вместо Long
         log.info("DELETE /api/products/{} - Delete product", id);
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
@@ -120,7 +120,7 @@ public class ProductController {
     @PatchMapping("/{id}/stock")
     //@PreAuthorize("hasRole('ADMIN') or @authorizationService.isInternalService()")
     public ResponseEntity<Void> updateStock(
-            @PathVariable Long id,
+            @PathVariable String id,  // ← String вместо Long
             @RequestParam Integer quantity
     ) {
         log.info("PATCH /api/products/{}/stock - Update stock by: {}", id, quantity);

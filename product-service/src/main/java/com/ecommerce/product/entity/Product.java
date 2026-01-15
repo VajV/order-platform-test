@@ -1,18 +1,16 @@
 package com.ecommerce.product.entity;
 
-import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.index.Indexed;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "products", indexes = {
-        @Index(name = "idx_product_name", columnList = "name"),
-        @Index(name = "idx_product_category", columnList = "category_id"),
-        @Index(name = "idx_product_active", columnList = "active")
-})
+@Document(collection = "products")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,46 +19,51 @@ import java.time.LocalDateTime;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;  // MongoDB использует String для ID
 
-    @Column(nullable = false, length = 200)
+    @Indexed
+    @Field("name")
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Field("description")
     private String description;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Field("price")
     private BigDecimal price;
 
-    @Column(nullable = false)
+    @Field("stock")
     @Builder.Default
     private Integer stock = 0;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    // Вместо @ManyToOne используем просто categoryId
+    @Indexed
+    @Field("category_id")
+    private String categoryId;
 
-    @Column(name = "image_url", length = 500)
+    @Field("category_name")
+    private String categoryName;  // Денормализация для быстрого доступа
+
+    @Field("image_url")
     private String imageUrl;
 
-    @Column(nullable = false)
+    @Indexed
+    @Field("active")
     @Builder.Default
-    private boolean active = true;
+    private Boolean active = true;
 
-    @Column(nullable = false)
+    @Field("rating")
     @Builder.Default
     private Double rating = 0.0;
 
-    @Column(nullable = false)
+    @Field("review_count")
     @Builder.Default
     private Integer reviewCount = 0;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreatedDate
+    @Field("created_at")
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
+    @LastModifiedDate
+    @Field("updated_at")
     private LocalDateTime updatedAt;
 }

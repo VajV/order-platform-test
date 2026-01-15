@@ -5,30 +5,30 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ProductRequest {
 
         @NotBlank(message = "Product name is required")
-        @Size(min = 3, max = 200, message = "Name must be between 3 and 200 characters")
+        @Size(max = 200, message = "Name must not exceed 200 characters")
         private String name;
 
         @Size(max = 1000, message = "Description must not exceed 1000 characters")
         private String description;
 
         @NotNull(message = "Price is required")
-        @Positive(message = "Price must be positive")
+        @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
         private BigDecimal price;
 
         @NotNull(message = "Stock is required")
-        @PositiveOrZero(message = "Stock must be positive or zero")
+        @Min(value = 0, message = "Stock must be at least 0")
         private Integer stock;
 
         @NotNull(message = "Category ID is required")
-        @Positive(message = "Category ID must be positive")
-        private Long categoryId;
+        private String categoryId;  // ← String вместо Long
 
+        @Size(max = 500, message = "Image URL must not exceed 500 characters")
         private String imageUrl;
 
         @Builder.Default

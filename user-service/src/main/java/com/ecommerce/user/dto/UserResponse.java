@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;  // ← ИЗМЕНЕНО с Set на List
 
 @Data
 @NoArgsConstructor
@@ -17,7 +17,7 @@ public class UserResponse {
     private String email;
     private String firstName;
     private String lastName;
-    private Set<String> roles;
+    private List<String> roles;  // ← ИЗМЕНЕНО с Set<String> на List<String>
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Boolean isActive;

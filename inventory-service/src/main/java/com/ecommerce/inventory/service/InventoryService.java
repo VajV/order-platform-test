@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -17,28 +19,31 @@ import org.springframework.transaction.annotation.Transactional;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
-    private final InventoryMapper inventoryMapper;  // ← Spring внедрит через @Component
+    private final InventoryMapper inventoryMapper;
 
     @Transactional
     public InventoryResponse createInventory(InventoryRequest request) {
         log.info("Creating inventory for product: {}", request.getProductId());
 
-        if (inventoryRepository.existsByProductId(request.getProductId())) {
+        // ✅ ИСПРАВЛЕНО: Преобразуем String -> UUID
+        UUID productId = UUID.fromString(request.getProductId());
+
+        if (inventoryRepository.existsByProductId(productId)) {
             throw new InventoryException(
-                    String.format("Inventory already exists for product %s", request.getProductId()),
+                    String.format("Inventory already exists for product %s", productId),
                     "INVENTORY_ALREADY_EXISTS"
             );
         }
 
         Inventory inventory = Inventory.builder()
-                .productId(request.getProductId())
+                .productId(productId)  // ✅ Теперь UUID
                 .totalQuantity(request.getTotalQuantity())
                 .reservedQuantity(0)
                 .build();
 
         Inventory saved = inventoryRepository.save(inventory);
         log.info("Inventory created successfully for product: {} with id: {}",
-                request.getProductId(), saved.getId());
+                productId, saved.getId());
 
         return inventoryMapper.toResponse(saved);
     }
@@ -46,7 +51,9 @@ public class InventoryService {
     public InventoryResponse getInventory(String productId) {
         log.debug("Fetching inventory for product: {}", productId);
 
-        return inventoryRepository.findByProductId(productId)
+        UUID uuid = UUID.fromString(productId);  // ✅ String -> UUID
+
+        return inventoryRepository.findByProductId(uuid)
                 .map(inventoryMapper::toResponse)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Inventory not found for product %s", productId),
@@ -56,7 +63,9 @@ public class InventoryService {
 
     @Transactional
     public Inventory getInventoryLockedForUpdate(String productId) {
-        return inventoryRepository.findByProductIdWithLock(productId)
+        UUID uuid = UUID.fromString(productId);  // ✅ String -> UUID
+
+        return inventoryRepository.findByProductIdWithLock(uuid)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Inventory not found for product %s", productId),
                         "INVENTORY_NOT_FOUND"

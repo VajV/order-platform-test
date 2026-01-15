@@ -1,6 +1,160 @@
-version: '3.9'
-
 services:
+  # ========================================
+  # INFRASTRUCTURE
+  # ========================================
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: ecommerce
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-databases.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - order-platform-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ecommerce"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: mongo123
+      MONGO_INITDB_DATABASE: notifications
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - order-platform-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - order-platform-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_logs:/var/lib/zookeeper/log
+    networks:
+      - order-platform-network
+    healthcheck:
+      test: echo stat | nc localhost 2181
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - order-platform-network
+    healthcheck:
+      test: kafka-broker-api-versions --bootstrap-server kafka:29092 || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 40s
+    restart: unless-stopped
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.0
+    container_name: schema-registry
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8082:8082"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8082
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
+      SCHEMA_REGISTRY_DEBUG: "true"
+    networks:
+      - order-platform-network
+    healthcheck:
+      test: curl -f http://localhost:8082/subjects || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+      - schema-registry
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: order-platform
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8082
+      DYNAMIC_CONFIG_ENABLED: "true"
+    networks:
+      - order-platform-network
+    restart: unless-stopped
+
   # ========================================
   # MICROSERVICES
   # ========================================
@@ -12,7 +166,15 @@ services:
       - "8080:8080"
     environment:
       REDIS_HOST: redis
+      REDIS_PORT: 6379
       JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
+      # Роуты к микросервисам
+      USER_SERVICE_URL: http://user-service:8081
+      AUTH_SERVICE_URL: http://auth-service:8087
+      PRODUCT_SERVICE_URL: http://product-service:8084
+      ORDER_SERVICE_URL: http://order-service:8083
+      INVENTORY_SERVICE_URL: http://inventory-service:8085
+      NOTIFICATION_SERVICE_URL: http://notification-service:8086
     depends_on:
       redis:
         condition: service_healthy
@@ -24,16 +186,22 @@ services:
     build: ./auth-service
     container_name: auth-service
     ports:
-      - "8082:8082"
+      - "8087:8087"
     environment:
+      SPRING_APPLICATION_NAME: auth-service
+      SERVER_PORT: 8087
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ecommerce
       DB_USER: postgres
       DB_PASSWORD: postgres123
       JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_URL: http://schema-registry:8082
     depends_on:
       postgres:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     networks:
       - order-platform-network
@@ -45,11 +213,12 @@ services:
     ports:
       - "8081:8081"
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ecommerce
-      DB_USER: postgres
-      DB_PASSWORD: postgres123
+      SPRING_APPLICATION_NAME: user-service
+      SERVER_PORT: 8081
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
       JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
@@ -68,15 +237,18 @@ services:
     ports:
       - "8084:8084"
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ecommerce
-      DB_USER: postgres
-      DB_PASSWORD: postgres123
+      SPRING_APPLICATION_NAME: product-service
+      SERVER_PORT: 8084
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_DATABASE: products
+      MONGODB_USERNAME: admin
+      MONGODB_PASSWORD: mongo123
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_URL: http://schema-registry:8082
       JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
     depends_on:
-      postgres:
+      mongodb:
         condition: service_healthy
       kafka:
         condition: service_healthy
@@ -90,13 +262,17 @@ services:
     ports:
       - "8083:8083"
     environment:
+      SPRING_APPLICATION_NAME: order-service
+      SERVER_PORT: 8083
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ecommerce
       DB_USER: postgres
       DB_PASSWORD: postgres123
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      JWT_ISSUER_URI: http://auth-service:8082
+      SCHEMA_REGISTRY_URL: http://schema-registry:8082
+      JWT_ISSUER_URI: http://auth-service:8087
+      JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
     depends_on:
       postgres:
         condition: service_healthy
@@ -112,14 +288,18 @@ services:
     ports:
       - "8085:8085"
     environment:
+      SPRING_APPLICATION_NAME: inventory-service
+      SERVER_PORT: 8085
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ecommerce
       DB_USER: postgres
       DB_PASSWORD: postgres123
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_URL: http://schema-registry:8082
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
     depends_on:
       postgres:
         condition: service_healthy
@@ -137,12 +317,15 @@ services:
     ports:
       - "8086:8086"
     environment:
+      SPRING_APPLICATION_NAME: notification-service
+      SERVER_PORT: 8086
       MONGODB_HOST: mongodb
       MONGODB_PORT: 27017
       MONGODB_DATABASE: notifications
       MONGODB_USERNAME: admin
       MONGODB_PASSWORD: mongo123
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_URL: http://schema-registry:8082
       REDIS_HOST: redis
       REDIS_PORT: 6379
     depends_on:
@@ -156,6 +339,14 @@ services:
       - order-platform-network
     restart: unless-stopped
 
+volumes:
+  postgres_data:
+  mongo_data:
+  redis_data:
+  zookeeper_data:
+  zookeeper_logs:
+  kafka_data:
+
 networks:
   order-platform-network:
-    external: true
+    driver: bridge

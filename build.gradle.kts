@@ -19,8 +19,8 @@ subprojects {
     apply(plugin = "io.spring.dependency-management")
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21  // ✅ Java 21!
+        targetCompatibility = JavaVersion.VERSION_21  // ✅ Java 21!
     }
 
     tasks.withType<JavaCompile> {
@@ -37,13 +37,11 @@ subprojects {
     }
 
     dependencies {
-        // Lombok для всех модулей
         compileOnly("org.projectlombok:lombok")
         annotationProcessor("org.projectlombok:lombok")
         testCompileOnly("org.projectlombok:lombok")
         testAnnotationProcessor("org.projectlombok:lombok")
 
-        // Testing для всех модулей
         testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
 

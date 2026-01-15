@@ -2,14 +2,18 @@ package com.ecommerce.user.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.Set;
+
+import java.util.List;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateRolesRequest {
-    @NotEmpty(message = "Роли не должны быть пусты")
-    private Set<String> roleNames;
+
+    @NotEmpty(message = "Roles list cannot be empty")
+    private List<String> roles;
 }

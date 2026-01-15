@@ -30,7 +30,7 @@ public class User {
     @Column(nullable = false, length = 255)
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false)  // ← ИСПРАВЛЕНО: маппинг на password_hash
     private String passwordHash;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
@@ -57,5 +57,18 @@ public class User {
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    // ✅ ДОБАВИТЬ методы для совместимости с UserService
+    public void setPassword(String password) {
+        this.passwordHash = password;
+    }
+
+    public void setActive(boolean active) {
+        this.isActive = active;
+    }
+
+    public boolean isActive() {
+        return this.isActive != null && this.isActive;
     }
 }

@@ -1,12 +1,10 @@
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
-WORKDIR /app
+VOLUME /tmp
 
-COPY build/libs/inventory-service*.jar app.jar
+ARG JAR_FILE=build/libs/*.jar
+COPY ${JAR_FILE} app.jar
 
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring
+EXPOSE 8084
 
-EXPOSE 8085
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]

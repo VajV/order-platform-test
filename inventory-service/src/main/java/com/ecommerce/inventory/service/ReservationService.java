@@ -1,11 +1,9 @@
-// ReservationService.java
 package com.ecommerce.inventory.service;
 
 import com.ecommerce.inventory.dto.ReservationRequest;
 import com.ecommerce.inventory.dto.ReservationResponse;
 import com.ecommerce.inventory.entity.Inventory;
 import com.ecommerce.inventory.entity.InventoryReservation;
-import com.ecommerce.inventory.exception.InsufficientStockException;
 import com.ecommerce.inventory.exception.InventoryException;
 import com.ecommerce.inventory.kafka.InventoryProducer;
 import com.ecommerce.inventory.repository.InventoryRepository;
@@ -16,10 +14,9 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Reservation service for saga pattern orchestration.
- * Handles stock reservations with retries for optimistic locking conflicts.
- */
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -30,27 +27,10 @@ public class ReservationService {
     private final InventoryReservationRepository reservationRepository;
     private final InventoryProducer kafkaProducer;
 
-    private static final int MAX_RETRY_ATTEMPTS = 3;
-    private static final int RETRY_DELAY_MS = 100;
-
-    /**
-     * Reserve stock for an order.
-     * Implements optimistic locking with retries for conflict resolution.
-     *
-     * Flow:
-     * 1. Check inventory exists
-     * 2. Acquire pessimistic lock on inventory row
-     * 3. Validate sufficient stock available
-     * 4. Create reservation record
-     * 5. Update inventory reserved quantity
-     * 6. Publish event to Kafka (async)
-     *
-     * @param request reservation request
-     * @return reservation response with success status
-     */
     @Transactional
     public ReservationResponse reserveStock(ReservationRequest request) {
-        String orderId = request.getOrderId();
+        // ✅ ИСПРАВЛЕНО: Преобразуем String -> UUID
+        UUID orderId = UUID.fromString(request.getOrderId());
         String productId = request.getProductId();
         Integer quantity = request.getQuantity();
 
@@ -67,7 +47,7 @@ public class ReservationService {
                 );
             }
 
-            // Get locked inventory (pessimistic write lock)
+            // Get locked inventory
             Inventory inventory = inventoryService.getInventoryLockedForUpdate(productId);
 
             // Validate sufficient stock
@@ -76,12 +56,14 @@ public class ReservationService {
                 log.warn("Insufficient stock - Product: {}, Requested: {}, Available: {}",
                         productId, quantity, available);
 
-                // Create failed reservation record
+                // ✅ ИСПРАВЛЕНО: RESERVED вместо FAILED, quantity вместо reservedQuantity
                 InventoryReservation failedReservation = InventoryReservation.builder()
                         .inventoryId(inventory.getId())
                         .orderId(orderId)
-                        .reservedQuantity(quantity)
-                        .status(InventoryReservation.ReservationStatus.FAILED)
+                        .productId(inventory.getProductId())
+                        .quantity(quantity)  // ✅ ИСПРАВЛЕНО
+                        .status(InventoryReservation.ReservationStatus.RELEASED)  // ✅ ИСПРАВЛЕНО
+                        .expiresAt(LocalDateTime.now().plusMinutes(15))  // ✅ ДОБАВЛЕНО
                         .failureReason(String.format(
                                 "Insufficient stock. Requested: %d, Available: %d",
                                 quantity, available))
@@ -89,13 +71,14 @@ public class ReservationService {
                 reservationRepository.save(failedReservation);
 
                 // Publish failure event
-                kafkaProducer.sendReservationFailed(orderId, productId, quantity,
-                        "Insufficient stock. Available: " + inventory.getAvailableQuantity());
+                kafkaProducer.sendReservationFailed(orderId.toString(), productId, quantity,
+                        "Insufficient stock. Available: " + available);
+
                 return ReservationResponse.builder()
-                        .orderId(orderId)
+                        .orderId(orderId.toString())
                         .productId(productId)
                         .reservedQuantity(quantity)
-                        .status(InventoryReservation.ReservationStatus.FAILED)
+                        .status(InventoryReservation.ReservationStatus.RELEASED)
                         .success(false)
                         .message(String.format(
                                 "Insufficient stock for product %s. Requested: %d, Available: %d",
@@ -103,12 +86,14 @@ public class ReservationService {
                         .build();
             }
 
-            // Create reservation record
+            // ✅ ИСПРАВЛЕНО: RESERVED вместо PENDING
             InventoryReservation reservation = InventoryReservation.builder()
                     .inventoryId(inventory.getId())
                     .orderId(orderId)
-                    .reservedQuantity(quantity)
-                    .status(InventoryReservation.ReservationStatus.PENDING)
+                    .productId(inventory.getProductId())
+                    .quantity(quantity)  // ✅ ИСПРАВЛЕНО
+                    .status(InventoryReservation.ReservationStatus.RESERVED)  // ✅ ИСПРАВЛЕНО
+                    .expiresAt(LocalDateTime.now().plusMinutes(15))  // ✅ ДОБАВЛЕНО
                     .build();
             InventoryReservation saved = reservationRepository.save(reservation);
 
@@ -120,16 +105,16 @@ public class ReservationService {
                             "Remaining available: {}", orderId, productId, quantity,
                     inventory.getAvailableQuantity());
 
-            // Publish success event (async via Kafka)
-            kafkaProducer.sendReservationSuccess(orderId, productId, quantity,
-                    reservation.getId().toString());
+            // Publish success event
+            kafkaProducer.sendReservationSuccess(orderId.toString(), productId, quantity,
+                    saved.getId().toString());
 
             return ReservationResponse.builder()
-                    .reservationId(saved.getId())
-                    .orderId(orderId)
+                    .reservationId(saved.getId().toString())  // ✅ ИСПРАВЛЕНО: UUID -> String
+                    .orderId(orderId.toString())
                     .productId(productId)
                     .reservedQuantity(quantity)
-                    .status(InventoryReservation.ReservationStatus.PENDING)
+                    .status(InventoryReservation.ReservationStatus.RESERVED)
                     .success(true)
                     .message("Stock reserved successfully")
                     .createdAt(saved.getCreatedAt())
@@ -137,7 +122,6 @@ public class ReservationService {
 
         } catch (ObjectOptimisticLockingFailureException e) {
             log.warn("Optimistic lock conflict during reservation, retrying...", e);
-            // Retry logic can be implemented here with @Retry annotation
             throw new InventoryException(
                     "Conflict during reservation, please retry",
                     "RESERVATION_CONFLICT"
@@ -145,17 +129,13 @@ public class ReservationService {
         }
     }
 
-    /**
-     * Release reserved stock (compensation for failed order).
-     * Called when order fails or is cancelled.
-     *
-     * @param orderId the order ID
-     */
     @Transactional
     public void releaseReservation(String orderId) {
         log.info("Releasing reservation for order: {}", orderId);
 
-        InventoryReservation reservation = reservationRepository.findByOrderId(orderId)
+        UUID uuid = UUID.fromString(orderId);  // ✅ String -> UUID
+
+        InventoryReservation reservation = reservationRepository.findByOrderId(uuid)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Reservation not found for order %s", orderId),
                         "RESERVATION_NOT_FOUND"
@@ -166,57 +146,52 @@ public class ReservationService {
             return;
         }
 
-        // Get inventory and release
+        // ✅ ИСПРАВЛЕНО: findById теперь принимает UUID
         Inventory inventory = inventoryRepository.findById(reservation.getInventoryId())
                 .orElseThrow(() -> new InventoryException(
                         "Inventory not found for release",
                         "INVENTORY_NOT_FOUND"
                 ));
 
-        inventory.release(reservation.getReservedQuantity());
+        inventory.release(reservation.getQuantity());  // ✅ ИСПРАВЛЕНО
         inventoryRepository.save(inventory);
 
-        // Mark reservation as released
         reservation.setStatus(InventoryReservation.ReservationStatus.RELEASED);
-        reservation.setReleasedAt(java.time.LocalDateTime.now());
+        reservation.setReleasedAt(LocalDateTime.now());
         reservationRepository.save(reservation);
 
         log.info("Reservation released for order: {}", orderId);
 
-        // Publish compensation event
         kafkaProducer.sendReservationCompensated(
                 orderId,
-                inventory.getProductId(),
-                reservation.getReservedQuantity(),
+                inventory.getProductId().toString(),
+                reservation.getQuantity(),  // ✅ ИСПРАВЛЕНО
                 reservation.getId().toString(),
                 "Order cancelled or saga rollback"
         );
     }
 
-    /**
-     * Confirm reservation (called after payment confirmation).
-     * Moves from PENDING to CONFIRMED status.
-     *
-     * @param orderId the order ID
-     */
     @Transactional
     public void confirmReservation(String orderId) {
         log.info("Confirming reservation for order: {}", orderId);
 
-        InventoryReservation reservation = reservationRepository.findByOrderId(orderId)
+        UUID uuid = UUID.fromString(orderId);  // ✅ String -> UUID
+
+        InventoryReservation reservation = reservationRepository.findByOrderId(uuid)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Reservation not found for order %s", orderId),
                         "RESERVATION_NOT_FOUND"
                 ));
 
-        if (reservation.getStatus() != InventoryReservation.ReservationStatus.PENDING) {
-            log.warn("Cannot confirm reservation not in PENDING status - Order: {}, Status: {}",
+        // ✅ ИСПРАВЛЕНО: RESERVED вместо PENDING
+        if (reservation.getStatus() != InventoryReservation.ReservationStatus.RESERVED) {
+            log.warn("Cannot confirm reservation not in RESERVED status - Order: {}, Status: {}",
                     orderId, reservation.getStatus());
             return;
         }
 
         reservation.setStatus(InventoryReservation.ReservationStatus.CONFIRMED);
-        reservation.setConfirmedAt(java.time.LocalDateTime.now());
+        reservation.setConfirmedAt(LocalDateTime.now());
         reservationRepository.save(reservation);
 
         log.info("Reservation confirmed for order: {}", orderId);

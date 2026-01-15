@@ -1,50 +1,47 @@
 package com.ecommerce.user.kafka;
 
-import com.ecommerce.user.entity.User;
 import com.ecommerce.user.events.UserCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class UserEventProducer {
-    private static final String TOPIC = "user.created";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
     private final KafkaTemplate<String, UserCreatedEvent> kafkaTemplate;
 
-    public void publishUserCreated(User user) {
-        UserCreatedEvent event = UserCreatedEvent.newBuilder()
-                .setUserId(user.getId())
-                .setEmail(user.getEmail())
-                .setFirstName(user.getFirstName())
-                .setLastName(user.getLastName())
-                .setRoles(user.getRoles().stream()
-                        .map(role -> role.getName().toString())  // ✅ ИСПРАВЛЕНО
-                        .collect(Collectors.toList()))
-                .setCreatedAt(user.getCreatedAt().format(FORMATTER))
+    @Value("${kafka.topic.user-created:user.created}")
+    private String userCreatedTopic;
+
+    public void sendUserCreatedEvent(Long userId, String email, String firstName, String lastName, java.util.List<String> roles) {
+        // ✅ Используем Lombok @Builder вместо Avro newBuilder()
+        UserCreatedEvent event = UserCreatedEvent.builder()
+                .userId(userId)
+                .email(email)
+                .firstName(firstName)
+                .lastName(lastName)
+                .roles(roles)
+                .createdAt(LocalDateTime.now())
                 .build();
 
+        log.info("Sending UserCreatedEvent: {}", event);
+
         CompletableFuture<SendResult<String, UserCreatedEvent>> future =
-                kafkaTemplate.send(TOPIC, user.getEmail(), event);
+                kafkaTemplate.send(userCreatedTopic, userId.toString(), event);
 
         future.whenComplete((result, ex) -> {
-            if (ex == null) {
-                log.info("✅ User created event sent: userId={}, topic={}, partition={}, offset={}",
-                        user.getId(),
-                        TOPIC,
-                        result.getRecordMetadata().partition(),
-                        result.getRecordMetadata().offset());
+            if (ex != null) {
+                log.error("Failed to send UserCreatedEvent: {}", event, ex);
             } else {
-                log.error("❌ Failed to send user created event: userId={}", user.getId(), ex);
+                log.info("UserCreatedEvent sent successfully: {}", result.getRecordMetadata());
             }
         });
     }

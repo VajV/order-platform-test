@@ -1,13 +1,15 @@
 package com.ecommerce.product.entity;
 
-import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.index.Indexed;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "categories")
+@Document(collection = "categories")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,24 +18,25 @@ import java.time.LocalDateTime;
 public class Category {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;  // MongoDB использует String для ID
 
-    @Column(nullable = false, length = 100, unique = true)
+    @Indexed(unique = true)
+    @Field("name")
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Field("description")
     private String description;
 
-    @Column(nullable = false)
+    @Indexed
+    @Field("active")
     @Builder.Default
-    private boolean active = true;
+    private Boolean active = true;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreatedDate
+    @Field("created_at")
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
+    @LastModifiedDate
+    @Field("updated_at")
     private LocalDateTime updatedAt;
 }

@@ -1,16 +1,7 @@
 plugins {
-    id("org.springframework.boot") version "3.2.1"
-    id("io.spring.dependency-management") version "1.1.4"
-    id("java")
-}
-
-group = "com.ecommerce"
-version = "0.0.1-SNAPSHOT"
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
+    java
 }
 
 dependencies {
@@ -28,7 +19,7 @@ dependencies {
     // Swagger (OpenAPI)
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
 
-    // ✅ ДОБАВЛЕНА ЭТА ЗАВИСИМОСТЬ (ДЛЯ /actuator/health)
+    // Actuator
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

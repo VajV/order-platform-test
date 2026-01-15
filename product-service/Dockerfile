@@ -1,12 +1,10 @@
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
-WORKDIR /app
+VOLUME /tmp
 
-COPY build/libs/product-service*.jar app.jar
-
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring
+ARG JAR_FILE=build/libs/*.jar
+COPY ${JAR_FILE} app.jar
 
 EXPOSE 8084
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]

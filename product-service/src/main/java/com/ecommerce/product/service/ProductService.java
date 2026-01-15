@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -34,7 +32,7 @@ public class ProductService {
      */
     public List<ProductResponse> getAllProducts() {
         log.info("Fetching all active products");
-        List<Product> products = productRepository.findAllActive();
+        List<Product> products = productRepository.findByActiveTrueOrderByCreatedAtDesc();
         log.debug("Found {} active products", products.size());
 
         return products.stream()
@@ -45,7 +43,7 @@ public class ProductService {
     /**
      * Получить товар по ID
      */
-    public ProductResponse getProductById(Long id) {
+    public ProductResponse getProductById(String id) {  // ← String вместо Long
         log.info("Fetching product with id: {}", id);
 
         Product product = productRepository.findByIdAndActiveTrue(id)
@@ -61,13 +59,13 @@ public class ProductService {
     /**
      * Получить товары по категории
      */
-    public List<ProductResponse> getProductsByCategory(Long categoryId) {
+    public List<ProductResponse> getProductsByCategory(String categoryId) {  // ← String вместо Long
         log.info("Fetching products for category id: {}", categoryId);
 
         // Проверяем существование категории
         validateCategoryExists(categoryId);
 
-        List<Product> products = productRepository.findByCategory(categoryId);
+        List<Product> products = productRepository.findByCategoryIdAndActiveTrue(categoryId);
         log.debug("Found {} products in category {}", products.size(), categoryId);
 
         return products.stream()
@@ -112,7 +110,7 @@ public class ProductService {
     public List<ProductResponse> getTopRatedProducts() {
         log.info("Fetching top rated products");
 
-        List<Product> products = productRepository.findTopRatedProducts();
+        List<Product> products = productRepository.findTop10ByActiveTrueOrderByRatingDesc();
         log.debug("Found {} top rated products", products.size());
 
         return products.stream()
@@ -123,7 +121,6 @@ public class ProductService {
     /**
      * Создать новый товар (только ADMIN)
      */
-    @Transactional
     public ProductResponse createProduct(ProductRequest request) {
         log.info("Creating new product: {}", request.getName());
 
@@ -134,17 +131,20 @@ public class ProductService {
                     return new InvalidProductException("Category not found with id: " + request.getCategoryId());
                 });
 
-        // Создание товара
+        // Создание товара (MongoDB - денормализация)
         Product product = Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .price(request.getPrice())
                 .stock(request.getStock())
-                .category(category)
+                .categoryId(category.getId())  // ← Сохраняем ID категории
+                .categoryName(category.getName())  // ← Денормализация
                 .imageUrl(request.getImageUrl())
                 .active(request.isActive())
                 .rating(0.0)
                 .reviewCount(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         Product savedProduct = productRepository.save(product);
@@ -159,8 +159,7 @@ public class ProductService {
     /**
      * Обновить товар (только ADMIN)
      */
-    @Transactional
-    public ProductResponse updateProduct(Long id, ProductRequest request) {
+    public ProductResponse updateProduct(String id, ProductRequest request) {  // ← String вместо Long
         log.info("Updating product with id: {}", id);
 
         // Находим существующий товар
@@ -182,9 +181,11 @@ public class ProductService {
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
-        product.setCategory(category);
+        product.setCategoryId(category.getId());
+        product.setCategoryName(category.getName());
         product.setImageUrl(request.getImageUrl());
         product.setActive(request.isActive());
+        product.setUpdatedAt(LocalDateTime.now());
 
         Product updatedProduct = productRepository.save(product);
         log.info("Product updated successfully: {}", updatedProduct.getId());
@@ -198,8 +199,7 @@ public class ProductService {
     /**
      * Удалить товар (только ADMIN) - soft delete
      */
-    @Transactional
-    public void deleteProduct(Long id) {
+    public void deleteProduct(String id) {  // ← String вместо Long
         log.info("Deleting product with id: {}", id);
 
         Product product = productRepository.findById(id)
@@ -210,6 +210,7 @@ public class ProductService {
 
         // Soft delete - помечаем как неактивный
         product.setActive(false);
+        product.setUpdatedAt(LocalDateTime.now());
         productRepository.save(product);
 
         log.info("Product marked as inactive (soft deleted): {}", id);
@@ -221,8 +222,7 @@ public class ProductService {
     /**
      * Обновить количество товара (INTERNAL - вызывается из order-service)
      */
-    @Transactional
-    public void updateStock(Long id, Integer quantity) {
+    public void updateStock(String id, Integer quantity) {  // ← String вместо Long
         log.info("Updating stock for product {}: reduce by {}", id, quantity);
 
         Product product = productRepository.findById(id)
@@ -243,6 +243,7 @@ public class ProductService {
 
         // Уменьшаем количество
         product.setStock(product.getStock() - quantity);
+        product.setUpdatedAt(LocalDateTime.now());
         productRepository.save(product);
 
         log.info("Stock updated successfully for product {}. New stock: {}", id, product.getStock());
@@ -251,40 +252,12 @@ public class ProductService {
         publishStockUpdatedEvent(product);
     }
 
-    /**
-     * Резервирование товара (для будущей реализации)
-     */
-    @Transactional
-    public void reserveStock(Long id, Integer quantity) {
-        log.info("Reserving stock for product {}: {}", id, quantity);
-
-        // TODO: Реализовать отдельную таблицу reservations
-        // TODO: Создать запись о резервировании
-        // TODO: Установить timeout для резервирования (например, 10 минут)
-
-        log.warn("Stock reservation not implemented yet");
-    }
-
-    /**
-     * Отменить резервирование (для будущей реализации)
-     */
-    @Transactional
-    public void cancelReservation(Long reservationId) {
-        log.info("Cancelling reservation: {}", reservationId);
-
-        // TODO: Найти резервирование
-        // TODO: Вернуть товар на склад
-        // TODO: Удалить запись о резервировании
-
-        log.warn("Reservation cancellation not implemented yet");
-    }
-
     // ========== PRIVATE HELPER METHODS ==========
 
     /**
      * Проверка существования категории
      */
-    private void validateCategoryExists(Long categoryId) {
+    private void validateCategoryExists(String categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
             log.error("Category not found with id: {}", categoryId);
             throw new InvalidProductException("Category not found with id: " + categoryId);
@@ -319,7 +292,7 @@ public class ProductService {
                 .productName(product.getName())
                 .price(product.getPrice())
                 .stock(product.getStock())
-                .status(product.isActive() ? "active" : "inactive")
+                .status(product.getActive() ? "active" : "inactive")
                 .timestamp(LocalDateTime.now())
                 .source("product-service")
                 .build();

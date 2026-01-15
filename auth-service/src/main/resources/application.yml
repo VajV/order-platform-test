@@ -9,9 +9,8 @@ spring:
     config:
       enabled: false
 
-  # ✅ PostgreSQL - подключение к общей БД ecommerce
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ecommerce}
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:ecommerce}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres123}
     driver-class-name: org.postgresql.Driver
@@ -28,18 +27,15 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
-# ✅ JWT
 jwt:
   secret: ${JWT_SECRET:MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890}
   access-token-expiration: 900000
   refresh-token-expiration: 604800000
 
-# ✅ Eureka - ОТКЛЮЧИТЬ
 eureka:
   client:
     enabled: false
 
-# ✅ Swagger
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -47,7 +43,6 @@ springdoc:
     path: /swagger-ui.html
     enabled: true
 
-# ✅ Management
 management:
   endpoints:
     web:
