@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,8 +17,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * JWT Authentication Filter
- * Извлекает и валидирует JWT токен из Authorization заголовка
+ * JWT Authentication Filter.
+ *
+ * Извлекает JWT из заголовка Authorization и устанавливает SecurityContext.
+ * Вызывается ДО остальных фильтров для каждого запроса.
  */
 @Slf4j
 @Component
@@ -29,60 +30,50 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
+
     @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
-
-        // Извлечение Authorization заголовка
-        final String authHeader = request.getHeader("Authorization");
-
-        // Проверка наличия Bearer токена
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         try {
-            // Извлечение JWT токена (удаляем "Bearer " префикс)
-            final String jwt = authHeader.substring(7);
+            String jwt = extractJwtFromRequest(request);
 
-            // Извлечение username из токена
-            final String username = jwtUtil.extractUsername(jwt);
+            if (jwt != null && jwtUtil.validateToken(jwt)) {
+                String username = jwtUtil.extractUsername(jwt);
 
-            // Если username есть и аутентификация еще не установлена
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                // Загрузка пользователя из БД
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // ✅ ИСПРАВЛЕНО: используем validateToken(token, userDetails)
-                if (jwtUtil.validateToken(jwt, userDetails)) {
-
-                    // Создание Authentication объекта
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-
-                    // Установка деталей запроса
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                    // Установка аутентификации в SecurityContext
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-
-                    log.debug("User '{}' authenticated successfully", username);
-                } else {
-                    log.warn("Invalid JWT token for user '{}'", username);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.debug("JWT authentication successful for user: {}", username);
                 }
             }
         } catch (Exception e) {
-            log.error("Cannot set user authentication: {}", e.getMessage());
+            log.warn("JWT authentication failed: {}", e.getMessage());
+            // Не выбрасываем исключение, даём JwtExceptionFilter его обработать
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * Извлекает JWT из заголовка Authorization.
+     * Ожидается формат: "Bearer {token}"
+     */
+    private String extractJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (bearerToken != null && bearerToken.startsWith(BEARER_PREFIX)) {
+            return bearerToken.substring(BEARER_PREFIX.length());
+        }
+        return null;
     }
 }

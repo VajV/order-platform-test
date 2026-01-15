@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,9 +26,14 @@ import java.util.List;
 
 /**
  * Spring Security Configuration
- * ✅ FIX: Добавлен AuthenticationManager bean
- * ✅ FIX: Добавлен CORS конфигуратор
- * ✅ FIX: Добавлен JwtExceptionFilter для обработки JWT ошибок
+ *
+ * ✅ FEATURES:
+ * - JWT-based stateless authentication
+ * - CORS configured for dev frontends
+ * - BCrypt password encoding (strength 12)
+ * - Custom JWT filters
+ * - DaoAuthenticationProvider explicitly registered
+ * - CSRF disabled (JWT doesn't need it)
  */
 @Configuration
 @EnableWebSecurity
@@ -41,21 +47,34 @@ public class SecurityBeans {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // CORS конфигурация
+                // ============================================================
+                // CORS Configuration
+                // ============================================================
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // CSRF отключен (используется JWT, а не session)
+                // ============================================================
+                // CSRF Disabled (stateless JWT auth)
+                // ============================================================
                 .csrf(csrf -> csrf.disable())
 
-                // Authorization конфигурация
+                // ============================================================
+                // Authentication Provider (ВАЖНО!)
+                // ============================================================
+                .authenticationProvider(authenticationProvider())
+
+                // ============================================================
+                // Authorization Configuration
+                // ============================================================
                 .authorizeHttpRequests(auth -> auth
-                        // Публичные эндпоинты (без токена)
+                        // Public endpoints (no token required)
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
                                 "/api/auth/refresh",
                                 "/api/auth/logout",
                                 "/actuator/health",
+                                "/actuator/health/liveness",
+                                "/actuator/health/readiness",
                                 "/actuator/info",
                                 "/actuator/metrics",
                                 "/v3/api-docs/**",
@@ -63,16 +82,21 @@ public class SecurityBeans {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        // Все остальные запросы требуют аутентификации
+                        // All other endpoints require authentication
                         .anyRequest().authenticated()
                 )
 
-                // Session management - STATELESS для JWT
+                // ============================================================
+                // Session Management (STATELESS for JWT)
+                // ============================================================
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // Добавление JWT фильтров (порядок ВАЖЕН!)
+                // ============================================================
+                // JWT Filters (ORDER IS IMPORTANT!)
+                // Exception filter FIRST, then Authentication filter
+                // ============================================================
                 .addFilterBefore(jwtExceptionFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -81,38 +105,44 @@ public class SecurityBeans {
 
     /**
      * CORS Configuration Source
+     *
+     * Разрешает запросы с локальных dev серверов (localhost:3000, 4200, 5173).
+     * Для production измени на свои домены!
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Разрешенные источники
+        // Allowed origins (localhost for dev)
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",      // React dev server
-                "http://localhost:4200",      // Angular dev server
-                "http://localhost:5173",      // Vite dev server
+                "http://localhost:3000",      // React dev
+                "http://localhost:4200",      // Angular dev
+                "http://localhost:5173",      // Vite dev
                 "http://127.0.0.1:3000",
                 "http://127.0.0.1:4200",
                 "http://127.0.0.1:5173"
         ));
 
-        // Разрешенные HTTP методы
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        // Allowed HTTP methods
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
 
-        // Разрешенные заголовки
+        // Allowed headers (all)
         configuration.setAllowedHeaders(List.of("*"));
 
-        // Expose headers для клиента
+        // Headers exposed to client
         configuration.setExposedHeaders(Arrays.asList(
                 "Authorization",
                 "X-Total-Count",
-                "X-Page-Count"
+                "X-Page-Count",
+                "X-Page-Number"
         ));
 
-        // Разрешить credentials (cookies)
+        // Allow credentials (cookies/tokens)
         configuration.setAllowCredentials(true);
 
-        // Max age для preflight requests (1 час)
+        // Max age for preflight (1 hour)
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -123,7 +153,9 @@ public class SecurityBeans {
 
     /**
      * Authentication Manager Bean
-     * ✅ FIX: Был отсутствует - теперь добавлен
+     *
+     * Требуется для AuthService.login() где используется
+     * authenticationManager.authenticate(token)
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -132,6 +164,10 @@ public class SecurityBeans {
 
     /**
      * Password Encoder Bean
+     *
+     * BCrypt с strength 12 (default 10).
+     * Больше strength = медленнее = безопаснее.
+     * Для production рекомендуется 12+.
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -139,13 +175,17 @@ public class SecurityBeans {
     }
 
     /**
-     * Authentication Provider Bean
+     * DAO Authentication Provider Bean
+     *
+     * Использует UserDetailsService и PasswordEncoder для аутентификации.
+     * ✅ ВАЖНО: Явно зарегистрирован в securityFilterChain()
      */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        // Сравнивает пароли: passwordEncoder.matches(rawPassword, encodedPassword)
+        return provider;
     }
 }

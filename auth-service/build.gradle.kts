@@ -1,46 +1,32 @@
 plugins {
-    id("org.springframework.boot") version "3.2.1"
-    id("io.spring.dependency-management") version "1.1.4"
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
     java
 }
 
-group = "com.ecommerce"
-version = "0.0.1-SNAPSHOT"
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
 dependencies {
-    // Spring Boot Starters
-    implementation("org.springframework.boot:spring-boot-starter-web:3.2.0")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.0")
-    implementation("org.springframework.boot:spring-boot-starter-security:3.2.0")
-    implementation("org.springframework.boot:spring-boot-starter-validation:3.2.0")
-    implementation("org.springframework.boot:spring-boot-starter-actuator:3.2.0")
+    // Spring Boot Starters (версии управляются через Spring Boot BOM)
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    // PostgreSQL Driver
-    runtimeOnly("org.postgresql:postgresql:42.7.1")
+    // PostgreSQL
+    runtimeOnly("org.postgresql:postgresql")
 
-    // JWT (JJWT 0.12.x - новый API)
+    // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
 
-    // Lombok
-    compileOnly("org.projectlombok:lombok:1.18.30")
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
-
-    // Springdoc OpenAPI (Swagger 3.0)
+    // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
-    // Testing
-    testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.0")
-    testImplementation("org.springframework.security:spring-security-test:6.2.1")
+    // Testing - БЕЗ явных версий!
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-    archiveFileName.set("auth-service.jar")
-    mainClass.set("com.ecommerce.auth.AuthServiceApplication")
+tasks.test {
+    useJUnitPlatform()
 }
