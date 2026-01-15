@@ -83,7 +83,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void testSendNotification_RateLimitExceeded() {
+    void testSendNotification_RateLimitExceeded() throws Exception {
         // Given
         when(rateLimiter.allowRequest(anyString())).thenReturn(false);
 
@@ -96,7 +96,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void testSendNotification_TemplateNotFound() {
+    void testSendNotification_TemplateNotFound() throws Exception {
         // Given
         when(rateLimiter.allowRequest(anyString())).thenReturn(true);
         when(templateRepository.findByEventTypeAndEnabled("order.created", true))

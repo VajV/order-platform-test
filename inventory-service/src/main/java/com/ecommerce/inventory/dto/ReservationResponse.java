@@ -1,4 +1,3 @@
-// ReservationResponse.java
 package com.ecommerce.inventory.dto;
 
 import com.ecommerce.inventory.entity.InventoryReservation;
@@ -9,16 +8,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * Response DTO for reservation result.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ReservationResponse {
 
-    private Long reservationId;
+    private String reservationId;  // ✅ String вместо Long
     private String orderId;
     private String productId;
     private Integer reservedQuantity;

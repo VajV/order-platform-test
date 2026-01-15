@@ -2,11 +2,9 @@ package com.ecommerce.inventory.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "inventory")
@@ -17,11 +15,11 @@ import java.util.UUID;
 public class Inventory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)  // ← ИСПРАВЛЕНО: UUID вместо IDENTITY
-    private UUID id;  // ← ИСПРАВЛЕНО: UUID вместо Long
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;  // ✅ String (UUID as String)
 
     @Column(name = "product_id", nullable = false, unique = true)
-    private UUID productId;  // ← ИСПРАВЛЕНО: UUID вместо String
+    private String productId;  // ✅ String
 
     @Column(name = "total_quantity", nullable = false)
     @Builder.Default
@@ -33,7 +31,7 @@ public class Inventory {
 
     @Version
     @Builder.Default
-    private Long version = 0L;  // ← ИСПРАВЛЕНО: Long вместо Integer (для оптимистичных блокировок)
+    private Long version = 0L;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)

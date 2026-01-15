@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,8 +23,7 @@ public class InventoryService {
     public InventoryResponse createInventory(InventoryRequest request) {
         log.info("Creating inventory for product: {}", request.getProductId());
 
-        // ✅ ИСПРАВЛЕНО: Преобразуем String -> UUID
-        UUID productId = UUID.fromString(request.getProductId());
+        String productId = request.getProductId();  // ✅ Уже String
 
         if (inventoryRepository.existsByProductId(productId)) {
             throw new InventoryException(
@@ -36,7 +33,7 @@ public class InventoryService {
         }
 
         Inventory inventory = Inventory.builder()
-                .productId(productId)  // ✅ Теперь UUID
+                .productId(productId)
                 .totalQuantity(request.getTotalQuantity())
                 .reservedQuantity(0)
                 .build();
@@ -51,9 +48,7 @@ public class InventoryService {
     public InventoryResponse getInventory(String productId) {
         log.debug("Fetching inventory for product: {}", productId);
 
-        UUID uuid = UUID.fromString(productId);  // ✅ String -> UUID
-
-        return inventoryRepository.findByProductId(uuid)
+        return inventoryRepository.findByProductId(productId)  // ✅ String
                 .map(inventoryMapper::toResponse)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Inventory not found for product %s", productId),
@@ -63,9 +58,7 @@ public class InventoryService {
 
     @Transactional
     public Inventory getInventoryLockedForUpdate(String productId) {
-        UUID uuid = UUID.fromString(productId);  // ✅ String -> UUID
-
-        return inventoryRepository.findByProductIdWithLock(uuid)
+        return inventoryRepository.findByProductIdWithLock(productId)  // ✅ String
                 .orElseThrow(() -> new InventoryException(
                         String.format("Inventory not found for product %s", productId),
                         "INVENTORY_NOT_FOUND"

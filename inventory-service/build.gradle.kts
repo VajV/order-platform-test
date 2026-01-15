@@ -37,6 +37,8 @@ dependencies {
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     // Testing
+    testImplementation("com.h2database:h2")
+    testRuntimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.testcontainers:testcontainers:1.19.3")
