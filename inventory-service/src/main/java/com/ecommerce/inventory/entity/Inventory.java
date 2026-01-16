@@ -6,7 +6,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "inventory")
@@ -17,86 +16,101 @@ import java.util.UUID;
 public class Inventory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)  // ← ИСПРАВЛЕНО: UUID вместо IDENTITY
-    private UUID id;  // ← ИСПРАВЛЕНО: UUID вместо Long
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "product_id", nullable = false, unique = true)
-    private UUID productId;  // ← ИСПРАВЛЕНО: UUID вместо String
+    private Long productId;
 
-    @Column(name = "total_quantity", nullable = false)
+    @Column(name = "quantity_available", nullable = false)
     @Builder.Default
-    private Integer totalQuantity = 0;
+    private Long quantityAvailable = 0L;
 
-    @Column(name = "reserved_quantity", nullable = false)
+    @Column(name = "quantity_reserved", nullable = false)
     @Builder.Default
-    private Integer reservedQuantity = 0;
+    private Long quantityReserved = 0L;
 
-    @Version
-    @Builder.Default
-    private Long version = 0L;  // ← ИСПРАВЛЕНО: Long вместо Integer (для оптимистичных блокировок)
+    @Column(name = "reorder_level")
+    private Long reorderLevel;
+
+    @Column(name = "warehouse_location")
+    private String warehouseLocation;
+
+    @Column(name = "last_restocked_at")
+    private LocalDateTime lastRestockedAt;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Version
+    @Column(name = "version")
+    @Builder.Default
+    private Long version = 0L;
+
     /**
      * Получить доступное количество (не зарезервированное)
      */
-    public Integer getAvailableQuantity() {
-        return totalQuantity - reservedQuantity;
+    public Long getAvailableQuantity() {
+        return quantityAvailable - quantityReserved;
     }
 
     /**
      * Проверить что доступно достаточно товара
      */
-    public boolean hasAvailableQuantity(Integer quantity) {
+    public boolean hasAvailableQuantity(Long quantity) {
         return getAvailableQuantity() >= quantity;
     }
 
     /**
      * Зарезервировать товар
      */
-    public void reserve(Integer quantity) {
+    public void reserve(Long quantity) {
         if (!hasAvailableQuantity(quantity)) {
             throw new IllegalStateException(
-                    String.format("Insufficient stock for product %s. Available: %d, Requested: %d",
+                    String.format("Insufficient stock for product %d. Available: %d, Requested: %d",
                             productId, getAvailableQuantity(), quantity)
             );
         }
-        this.reservedQuantity += quantity;
+        this.quantityReserved += quantity;
     }
 
     /**
      * Освободить резерв (компенсация или подтверждение заказа)
      */
-    public void release(Integer quantity) {
-        if (this.reservedQuantity < quantity) {
+    public void release(Long quantity) {
+        if (this.quantityReserved < quantity) {
             throw new IllegalStateException(
-                    String.format("Cannot release %d items. Only %d reserved for product %s",
-                            quantity, this.reservedQuantity, productId)
+                    String.format("Cannot release %d items. Only %d reserved for product %d",
+                            quantity, this.quantityReserved, productId)
             );
         }
-        this.reservedQuantity -= quantity;
+        this.quantityReserved -= quantity;
     }
 
     /**
      * Подтвердить заказ - уменьшить общее количество и освободить резерв
      */
-    public void confirm(Integer quantity) {
-        if (this.reservedQuantity < quantity) {
+    public void confirm(Long quantity) {
+        if (this.quantityReserved < quantity) {
             throw new IllegalStateException("Reserved quantity is less than confirmation quantity");
         }
-        this.totalQuantity -= quantity;
-        this.reservedQuantity -= quantity;
+        this.quantityAvailable -= quantity;
+        this.quantityReserved -= quantity;
     }
 
     /**
      * Добавить товар на склад
      */
-    public void addStock(Integer quantity) {
+    public void addStock(Long quantity) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be positive");
         }
-        this.totalQuantity += quantity;
+        this.quantityAvailable += quantity;
+        this.lastRestockedAt = LocalDateTime.now();
     }
 }
