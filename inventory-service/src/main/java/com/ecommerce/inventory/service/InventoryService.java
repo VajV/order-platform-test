@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,8 +23,7 @@ public class InventoryService {
     public InventoryResponse createInventory(InventoryRequest request) {
         log.info("Creating inventory for product: {}", request.getProductId());
 
-        // ✅ ИСПРАВЛЕНО: Преобразуем String -> UUID
-        UUID productId = UUID.fromString(request.getProductId());
+        Long productId = Long.parseLong(request.getProductId());
 
         if (inventoryRepository.existsByProductId(productId)) {
             throw new InventoryException(
@@ -36,9 +33,9 @@ public class InventoryService {
         }
 
         Inventory inventory = Inventory.builder()
-                .productId(productId)  // ✅ Теперь UUID
-                .totalQuantity(request.getTotalQuantity())
-                .reservedQuantity(0)
+                .productId(productId)
+                .quantityAvailable(request.getTotalQuantity().longValue())
+                .quantityReserved(0L)
                 .build();
 
         Inventory saved = inventoryRepository.save(inventory);
@@ -51,9 +48,9 @@ public class InventoryService {
     public InventoryResponse getInventory(String productId) {
         log.debug("Fetching inventory for product: {}", productId);
 
-        UUID uuid = UUID.fromString(productId);  // ✅ String -> UUID
+        Long id = Long.parseLong(productId);
 
-        return inventoryRepository.findByProductId(uuid)
+        return inventoryRepository.findByProductId(id)
                 .map(inventoryMapper::toResponse)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Inventory not found for product %s", productId),
@@ -63,9 +60,9 @@ public class InventoryService {
 
     @Transactional
     public Inventory getInventoryLockedForUpdate(String productId) {
-        UUID uuid = UUID.fromString(productId);  // ✅ String -> UUID
+        Long id = Long.parseLong(productId);
 
-        return inventoryRepository.findByProductIdWithLock(uuid)
+        return inventoryRepository.findByProductIdWithLock(id)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Inventory not found for product %s", productId),
                         "INVENTORY_NOT_FOUND"
@@ -77,7 +74,7 @@ public class InventoryService {
         log.info("Updating inventory quantity for product: {} to: {}", productId, newQuantity);
 
         Inventory inventory = getInventoryLockedForUpdate(productId);
-        inventory.setTotalQuantity(newQuantity);
+        inventory.setQuantityAvailable(newQuantity.longValue());
         Inventory updated = inventoryRepository.save(inventory);
 
         log.info("Inventory updated for product: {}", productId);
