@@ -43,6 +43,11 @@ subprojects {
         testAnnotationProcessor("org.projectlombok:lombok")
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+        implementation("net.logstash.logback:logstash-logback-encoder:7.4")
+
+        // SLF4J (обычно уже есть через Spring Boot)
+        implementation("org.slf4j:slf4j-api")
     }
 
     tasks.named<BootJar>("bootJar") {

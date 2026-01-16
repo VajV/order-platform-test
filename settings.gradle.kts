@@ -24,5 +24,6 @@ include(
     "product-service",
     "inventory-service",
     "order-service",
-    "notification-service"
+    "notification-service",
+    "shared-service"
 )
