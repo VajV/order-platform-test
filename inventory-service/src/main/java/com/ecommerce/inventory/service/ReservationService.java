@@ -95,7 +95,7 @@ public class ReservationService {
                     saved.getId().toString());
 
             return ReservationResponse.builder()
-                    .reservationId(saved.getId().toString())
+                    .reservationId(saved.getId())
                     .orderId(orderId.toString())
                     .productId(productId)
                     .reservedQuantity(quantity)
