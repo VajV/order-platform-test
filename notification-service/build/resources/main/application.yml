@@ -43,13 +43,17 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
   health:
-    mail:
-      enabled: false
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
 
 notification:
   rate-limit:

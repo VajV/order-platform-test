@@ -6,9 +6,9 @@ spring:
   # DEFAULT DATASOURCE (для dev без профиля)
   # ============================================================
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/ecommerce  # ✅
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres123}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
@@ -25,9 +25,9 @@ spring:
 
   flyway:
     enabled: true
-    locations: classpath:db/migration
     baseline-on-migrate: true
-    validate-on-migrate: true
+    validate-on-migrate: false  # ← ДОБАВИТЬ
+    out-of-order: true
 
   lifecycle:
     timeout-per-shutdown-phase: 30s
@@ -46,12 +46,14 @@ management:
         include: health,info,metrics,prometheus
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always
       probes:
         enabled: true
-  metrics:
-    export:
-      prometheus: {}
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
 
 logging:
   level:

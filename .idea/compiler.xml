@@ -10,8 +10,10 @@
         <module name="order-processing-platform.notification-service.test" />
         <module name="order-processing-platform.product-service.test" />
         <module name="order-processing-platform.auth-service.main" />
+        <module name="order-processing-platform.shared-service.test" />
         <module name="order-processing-platform.auth-service.test" />
         <module name="order-processing-platform.api-gateway.main" />
+        <module name="order-processing-platform.shared-service.main" />
         <module name="order-processing-platform.user-service.test" />
         <module name="order-processing-platform.inventory-service.test" />
         <module name="order-processing-platform.api-gateway.test" />
