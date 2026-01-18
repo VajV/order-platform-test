@@ -180,7 +180,7 @@ dependencies {
 
 ## 📈 РЕЗУЛЬТАТЫ
 
-### Созданные файлы тестов:
+### Unit-тесты (Service layer):
 
 | Сервис | Файл | Тестов |
 |--------|------|--------|
@@ -190,6 +190,24 @@ dependencies {
 | inventory-service | `InventoryServiceTest.java` | 9 |
 | api-gateway | `JwtValidationGatewayFilterFactoryTest.java` | 6 |
 | auth-service | `AuthServiceTest.java` (существовал) | 9 |
+
+### Controller-тесты (@WebMvcTest):
+
+| Сервис | Файл | Тестов |
+|--------|------|--------|
+| order-service | `OrderControllerTest.java` | 10 |
+| product-service | `ProductControllerTest.java` | 12 |
+| user-service | `UserControllerTest.java` | 8 |
+
+### Integration-тесты (Testcontainers):
+
+| Сервис | Файл | Статус |
+|--------|------|--------|
+| order-service | `OrderIntegrationTest.java` | ✅ Создан |
+| user-service | `UserIntegrationTest.java` | ✅ Включён |
+| notification-service | `KafkaIntegrationTest.java` | ✅ Включён |
+| notification-service | `MongoDBIntegrationTest.java` | ✅ Включён |
+| notification-service | `RedisIntegrationTest.java` | ✅ Включён |
 
 ### Созданные конфигурационные файлы:
 

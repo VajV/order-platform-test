@@ -18,8 +18,12 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// TODO: Интеграционный тест требует Docker и Testcontainers. Включить после настройки CI/CD.
-@org.junit.jupiter.api.Disabled("Requires Docker and Testcontainers - enable in CI/CD pipeline")
+/**
+ * Интеграционный тест для MongoDB в Notification Service.
+ * Тестирует сохранение и поиск шаблонов уведомлений.
+ * 
+ * Требования: Docker должен быть запущен.
+ */
 @SpringBootTest(classes = com.ecommerce.notification.NotificationServiceApplication.class)
 @Testcontainers
 @ActiveProfiles("test")
@@ -36,6 +40,12 @@ class MongoDBIntegrationTest {
     @DynamicPropertySource
     static void mongoProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", mongodb::getReplicaSetUrl);
+        
+        // Отключаем Vault и внешние зависимости
+        registry.add("spring.cloud.vault.enabled", () -> "false");
+        registry.add("spring.config.import", () -> "");
+        registry.add("spring.kafka.bootstrap-servers", () -> "localhost:9092");
+        registry.add("spring.data.redis.host", () -> "localhost");
     }
 
     @Test
