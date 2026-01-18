@@ -16,10 +16,10 @@ import java.util.List;
 @Component
 public class JwtUtil {
 
-    @Value("${spring.security.jwt.secret:your-256-bit-secret-key-change-this-in-production}")
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("${spring.security.jwt.expiration:900000}")
+    @Value("${jwt.expiration:900000}")
     private long jwtExpiration;
 
     private SecretKey getSigningKey() {

@@ -7,9 +7,9 @@ services:
     image: postgres:15-alpine
     container_name: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
-      POSTGRES_DB: ecommerce
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -18,7 +18,7 @@ services:
     networks:
       - order-platform-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ecommerce"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,9 +28,9 @@ services:
     image: mongo:7
     container_name: mongodb
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: mongo123
-      MONGO_INITDB_DATABASE: notifications
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     ports:
       - "27017:27017"
     volumes:
@@ -155,6 +155,20 @@ services:
       - order-platform-network
     restart: unless-stopped
 
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_TOKEN}
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - order-platform-network
+    restart: unless-stopped
+
   # ========================================
   # MICROSERVICES
   # ========================================
@@ -167,7 +181,9 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
+      JWT_SECRET: ${JWT_SECRET}
+      VAULT_URI: ${VAULT_URI}
+      VAULT_TOKEN: ${VAULT_TOKEN}
       # Роуты к микросервисам
       USER_SERVICE_URL: http://user-service:8081
       AUTH_SERVICE_URL: http://auth-service:8087
@@ -192,10 +208,12 @@ services:
       SERVER_PORT: 8087
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ecommerce
-      DB_USER: postgres
-      DB_PASSWORD: postgres123
-      JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
+      DB_NAME: ${AUTH_DB_NAME}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      VAULT_URI: ${VAULT_URI}
+      VAULT_TOKEN: ${VAULT_TOKEN}
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
     depends_on:
@@ -215,13 +233,16 @@ services:
     environment:
       SPRING_APPLICATION_NAME: user-service
       SERVER_PORT: 8081
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${USER_DB_NAME}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
-      JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
+      JWT_SECRET: ${JWT_SECRET}
+      VAULT_URI: ${VAULT_URI}
+      VAULT_TOKEN: ${VAULT_TOKEN}
     depends_on:
       postgres:
         condition: service_healthy
@@ -239,16 +260,18 @@ services:
     environment:
       SPRING_APPLICATION_NAME: product-service
       SERVER_PORT: 8084
-      MONGODB_HOST: mongodb
-      MONGODB_PORT: 27017
-      MONGODB_DATABASE: products
-      MONGODB_USERNAME: admin
-      MONGODB_PASSWORD: mongo123
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${PRODUCT_DB_NAME}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
-      JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
+      JWT_SECRET: ${JWT_SECRET}
+      VAULT_URI: ${VAULT_URI}
+      VAULT_TOKEN: ${VAULT_TOKEN}
     depends_on:
-      mongodb:
+      postgres:
         condition: service_healthy
       kafka:
         condition: service_healthy
@@ -266,13 +289,14 @@ services:
       SERVER_PORT: 8083
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ecommerce
-      DB_USER: postgres
-      DB_PASSWORD: postgres123
+      DB_NAME: ${ORDER_DB_NAME}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
       JWT_ISSUER_URI: http://auth-service:8087
-      JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
+      VAULT_URI: ${VAULT_URI}
+      VAULT_TOKEN: ${VAULT_TOKEN}
     depends_on:
       postgres:
         condition: service_healthy
@@ -292,14 +316,15 @@ services:
       SERVER_PORT: 8085
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ecommerce
-      DB_USER: postgres
-      DB_PASSWORD: postgres123
+      DB_NAME: ${INVENTORY_DB_NAME}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      JWT_SECRET: MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890
+      VAULT_URI: ${VAULT_URI}
+      VAULT_TOKEN: ${VAULT_TOKEN}
     depends_on:
       postgres:
         condition: service_healthy
@@ -321,13 +346,15 @@ services:
       SERVER_PORT: 8086
       MONGODB_HOST: mongodb
       MONGODB_PORT: 27017
-      MONGODB_DATABASE: notifications
-      MONGODB_USERNAME: admin
-      MONGODB_PASSWORD: mongo123
+      MONGODB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGODB_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      VAULT_URI: ${VAULT_URI}
+      VAULT_TOKEN: ${VAULT_TOKEN}
     depends_on:
       mongodb:
         condition: service_healthy

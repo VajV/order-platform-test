@@ -1,16 +1,16 @@
 package com.ecommerce.product.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Document(collection = "products")
+@Entity
+@Table(name = "products")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,51 +19,46 @@ import java.time.LocalDateTime;
 public class Product {
 
     @Id
-    private String id;  // MongoDB использует String для ID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Indexed
-    @Field("name")
+    @Column(nullable = false, length = 200)
     private String name;
 
-    @Field("description")
+    @Column(length = 1000)
     private String description;
 
-    @Field("price")
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal price;
 
-    @Field("stock")
+    @Column(nullable = false)
     @Builder.Default
     private Integer stock = 0;
 
-    // Вместо @ManyToOne используем просто categoryId
-    @Indexed
-    @Field("category_id")
-    private String categoryId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
-    @Field("category_name")
-    private String categoryName;  // Денормализация для быстрого доступа
-
-    @Field("image_url")
+    @Column(name = "image_url", length = 500)
     private String imageUrl;
 
-    @Indexed
-    @Field("active")
+    @Column(nullable = false)
     @Builder.Default
     private Boolean active = true;
 
-    @Field("rating")
+    @Column(nullable = false)
     @Builder.Default
     private Double rating = 0.0;
 
-    @Field("review_count")
+    @Column(name = "review_count", nullable = false)
     @Builder.Default
     private Integer reviewCount = 0;
 
     @CreatedDate
-    @Field("created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Field("updated_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }

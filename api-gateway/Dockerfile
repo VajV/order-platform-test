@@ -1,10 +1,14 @@
 FROM eclipse-temurin:21-jre-alpine
 
-VOLUME /tmp
+WORKDIR /app
 
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
+# Copy only the bootJar (not the -plain.jar)
+COPY build/libs/api-gateway.jar app.jar
 
-EXPOSE 8084
+# Security: run as non-root user
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

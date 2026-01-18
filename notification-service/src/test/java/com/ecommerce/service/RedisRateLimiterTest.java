@@ -14,6 +14,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class RedisRateLimiterTest {
@@ -29,7 +30,8 @@ class RedisRateLimiterTest {
 
     @BeforeEach
     void setUp() {
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        // Lenient stubbing to avoid UnnecessaryStubbingException in tests that don't use opsForValue
+        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         ReflectionTestUtils.setField(rateLimiter, "maxPerHour", 10);
         ReflectionTestUtils.setField(rateLimiter, "windowSeconds", 3600L);
     }

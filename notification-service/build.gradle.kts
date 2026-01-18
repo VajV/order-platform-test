@@ -6,6 +6,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.cloud:spring-cloud-starter-vault-config")
 
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
@@ -28,6 +29,9 @@ dependencies {
 
     // Logging
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
+
+    // Prometheus
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     // Testing
     testImplementation("org.springframework.kafka:spring-kafka-test")

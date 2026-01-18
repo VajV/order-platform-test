@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ProductResponse {
 
-    private String id;  // ← String вместо Long
+    private Long id;
 
     private String name;
 
@@ -20,7 +20,7 @@ public class ProductResponse {
 
     private Integer stock;
 
-    private String categoryId;  // ← String вместо Long
+    private Long categoryId;
 
     private String categoryName;
 

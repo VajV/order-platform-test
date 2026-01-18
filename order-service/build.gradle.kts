@@ -14,11 +14,13 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.cloud:spring-cloud-starter-vault-config")
 
-    // Database & Flyway (с явными версиями)
-    implementation("org.flywaydb:flyway-core:10.4.1")
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.4.1")
-    runtimeOnly("org.postgresql:postgresql")
+    // Database: PostgreSQL + Flyway
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.postgresql:postgresql")
+    implementation("org.flywaydb:flyway-core:10.10.0")
+    implementation("org.flywaydb:flyway-database-postgresql:10.10.0")
 
     // Observability
     implementation("io.micrometer:micrometer-registry-prometheus")

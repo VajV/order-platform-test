@@ -11,9 +11,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.cloud:spring-cloud-starter-vault-config")
 
-    // PostgreSQL
-    runtimeOnly("org.postgresql:postgresql")
+    // Database: PostgreSQL + Flyway
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.postgresql:postgresql")
+    implementation("org.flywaydb:flyway-core:10.10.0")
+    implementation("org.flywaydb:flyway-database-postgresql:10.10.0")
 
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
@@ -22,6 +26,9 @@ dependencies {
 
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+
+    // Prometheus
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     // Testing - БЕЗ явных версий!
     testImplementation("org.springframework.boot:spring-boot-starter-test")

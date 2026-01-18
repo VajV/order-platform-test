@@ -7,6 +7,8 @@ plugins {
 dependencies {
     // API Gateway & WebFlux
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
+    implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
+    implementation("org.springframework.cloud:spring-cloud-starter-vault-config")
 
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
@@ -21,14 +23,9 @@ dependencies {
 
     // Actuator
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.0")
-    }
 }
 
 tasks.test {

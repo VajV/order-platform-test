@@ -1,0 +1,1188 @@
+2026-01-17 06:43:26,327 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Starting ApiGatewayApplication using Java 21.0.7 with PID 11580 (C:\dev\order-processing-platform\api-gateway\build\classes\java\main started by Kukyo in C:\dev\order-processing-platform)
+2026-01-17 06:43:26,327 DEBUG com.ecommerce.gateway.ApiGatewayApplication [main] Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-01-17 06:43:26,328 INFO com.ecommerce.gateway.ApiGatewayApplication [main] No active profile set, falling back to 1 default profile: "default"
+2026-01-17 06:43:27,044 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-17 06:43:27,047 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-17 06:43:27,068 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 10 ms. Found 0 Redis repository interfaces.
+2026-01-17 06:43:27,191 INFO org.springframework.cloud.context.scope.GenericScope [main] BeanFactory id=8703dc99-e08d-37f9-96b4-344c594f513c
+2026-01-17 06:43:27,415 INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory [main] ✅ JWT конфигурация валидна (длина: 42)
+2026-01-17 06:43:27,938 DEBUG org.springframework.cloud.gateway.config.GatewayProperties [main] Routes supplied from Gateway Properties: [RouteDefinition{id='auth-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/auth/**}}], filters=[FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1}}, FilterDefinition{name='RequestLogging', args={}}, FilterDefinition{name='CircuitBreaker', args={name=authServiceCircuitBreaker, fallback=forward:/auth/fallback}}], uri=http://auth-service:8087, order=0, metadata={}}, RouteDefinition{id='user-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/users/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://user-service:8081, order=0, metadata={}}, RouteDefinition{id='product-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/products/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://product-service:8084, order=0, metadata={}}, RouteDefinition{id='order-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/orders/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}}}], uri=http://order-service:8083, order=0, metadata={}}, RouteDefinition{id='inventory-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/inventory/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://inventory-service:8085, order=0, metadata={}}, RouteDefinition{id='notification-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/notifications/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}}}], uri=http://notification-service:8086, order=0, metadata={}}]
+2026-01-17 06:43:28,065 WARN org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext [main] Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'routeDefinitionRouteLocator' defined in class path resource [org/springframework/cloud/gateway/config/GatewayAutoConfiguration.class]: Unsatisfied dependency expressed through method 'routeDefinitionRouteLocator' parameter 1: Error creating bean with name 'requestRateLimiterGatewayFilterFactory' defined in class path resource [org/springframework/cloud/gateway/config/GatewayAutoConfiguration.class]: Unsatisfied dependency expressed through method 'requestRateLimiterGatewayFilterFactory' parameter 1: No qualifying bean of type 'org.springframework.cloud.gateway.filter.ratelimit.KeyResolver' available: expected single matching bean but found 2: ipKeyResolver,userIdKeyResolver
+2026-01-17 06:43:28,087 INFO org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger [main] 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-01-17 06:43:28,099 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [main] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 1 of method requestRateLimiterGatewayFilterFactory in org.springframework.cloud.gateway.config.GatewayAutoConfiguration required a single bean, but 2 were found:
+	- ipKeyResolver: defined by method 'ipKeyResolver' in class path resource [com/ecommerce/gateway/config/GatewayConfig.class]
+	- userIdKeyResolver: defined by method 'userIdKeyResolver' in class path resource [com/ecommerce/gateway/config/GatewayConfig.class]
+
+This may be due to missing parameter name information
+
+Action:
+
+Consider marking one of the beans as @Primary, updating the consumer to accept multiple beans, or using @Qualifier to identify the bean that should be consumed
+
+Ensure that your compiler is configured to use the '-parameters' flag.
+You may need to update both your build tool settings as well as your IDE.
+(See https://github.com/spring-projects/spring-framework/wiki/Upgrading-to-Spring-Framework-6.x#parameter-name-retention)
+
+
+2026-01-17 06:45:42,487 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Starting ApiGatewayApplication using Java 21.0.7 with PID 18412 (C:\dev\order-processing-platform\api-gateway\build\classes\java\main started by Kukyo in C:\dev\order-processing-platform)
+2026-01-17 06:45:42,488 DEBUG com.ecommerce.gateway.ApiGatewayApplication [main] Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-01-17 06:45:42,488 INFO com.ecommerce.gateway.ApiGatewayApplication [main] No active profile set, falling back to 1 default profile: "default"
+2026-01-17 06:45:43,094 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-17 06:45:43,095 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-17 06:45:43,114 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+2026-01-17 06:45:43,213 INFO org.springframework.cloud.context.scope.GenericScope [main] BeanFactory id=8703dc99-e08d-37f9-96b4-344c594f513c
+2026-01-17 06:45:43,378 INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory [main] ✅ JWT конфигурация валидна (длина: 42)
+2026-01-17 06:45:43,803 DEBUG org.springframework.cloud.gateway.config.GatewayProperties [main] Routes supplied from Gateway Properties: [RouteDefinition{id='auth-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/auth/**}}], filters=[FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1}}, FilterDefinition{name='RequestLogging', args={}}, FilterDefinition{name='CircuitBreaker', args={name=authServiceCircuitBreaker, fallback=forward:/auth/fallback}}], uri=http://auth-service:8087, order=0, metadata={}}, RouteDefinition{id='user-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/users/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://user-service:8081, order=0, metadata={}}, RouteDefinition{id='product-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/products/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://product-service:8084, order=0, metadata={}}, RouteDefinition{id='order-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/orders/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}}}], uri=http://order-service:8083, order=0, metadata={}}, RouteDefinition{id='inventory-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/inventory/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://inventory-service:8085, order=0, metadata={}}, RouteDefinition{id='notification-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/notifications/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}}}], uri=http://notification-service:8086, order=0, metadata={}}]
+2026-01-17 06:45:43,935 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [After]
+2026-01-17 06:45:43,935 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Before]
+2026-01-17 06:45:43,935 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Between]
+2026-01-17 06:45:43,935 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Cookie]
+2026-01-17 06:45:43,935 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Header]
+2026-01-17 06:45:43,936 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Host]
+2026-01-17 06:45:43,936 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Method]
+2026-01-17 06:45:43,936 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Path]
+2026-01-17 06:45:43,936 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Query]
+2026-01-17 06:45:43,936 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [ReadBody]
+2026-01-17 06:45:43,936 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [RemoteAddr]
+2026-01-17 06:45:43,936 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-01-17 06:45:43,936 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Weight]
+2026-01-17 06:45:43,936 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-01-17 06:45:44,125 INFO org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver [main] Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-01-17 06:45:44,390 INFO org.springframework.boot.web.embedded.netty.NettyWebServer [main] Netty started on port 8080
+2026-01-17 06:45:44,410 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying {_genkey_0=/auth/**} to Path
+2026-01-17 06:45:44,425 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:45:44,435 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:45:44,438 ERROR org.springframework.cloud.gateway.route.CachingRouteLocator [main] Refresh routes error !!!
+java.lang.IllegalArgumentException: Unable to find GatewayFilterFactory with name RequestLogging
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.loadGatewayFilters(RouteDefinitionRouteLocator.java:145)
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.getFilters(RouteDefinitionRouteLocator.java:192)
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.convertToRoute(RouteDefinitionRouteLocator.java:132)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onNext(FluxMap.java:106)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.tryEmitScalar(FluxFlatMap.java:492)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.onNext(FluxFlatMap.java:424)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.drain(FluxMergeSequential.java:439)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.innerComplete(FluxMergeSequential.java:335)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialInner.onSubscribe(FluxMergeSequential.java:559)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8777)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onNext(FluxMergeSequential.java:237)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onSubscribe(FluxMergeSequential.java:198)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8777)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onNext(FluxMergeSequential.java:237)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onSubscribe(FluxMergeSequential.java:198)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.Mono.subscribeWith(Mono.java:4578)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4478)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4414)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4386)
+	at org.springframework.cloud.gateway.route.CachingRouteLocator.onApplicationEvent(CachingRouteLocator.java:102)
+	at org.springframework.cloud.gateway.route.CachingRouteLocator.onApplicationEvent(CachingRouteLocator.java:41)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:171)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:149)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:451)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:384)
+	at org.springframework.cloud.gateway.route.RouteRefreshListener.reset(RouteRefreshListener.java:73)
+	at org.springframework.cloud.gateway.route.RouteRefreshListener.onApplicationEvent(RouteRefreshListener.java:50)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:171)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:149)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:451)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:384)
+	at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:982)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:628)
+	at org.springframework.boot.web.reactive.context.ReactiveWebServerApplicationContext.refresh(ReactiveWebServerApplicationContext.java:66)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:762)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:464)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:334)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1358)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1347)
+	at com.ecommerce.gateway.ApiGatewayApplication.main(ApiGatewayApplication.java:10)
+2026-01-17 06:45:44,442 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying {_genkey_0=/auth/**} to Path
+2026-01-17 06:45:44,443 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:45:44,444 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:45:44,446 WARN org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext [main] Exception encountered during context initialization - cancelling refresh attempt: java.lang.IllegalArgumentException: Unable to find GatewayFilterFactory with name RequestLogging
+2026-01-17 06:45:46,548 INFO org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger [main] 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-01-17 06:45:46,568 ERROR org.springframework.boot.SpringApplication [main] Application run failed
+java.lang.IllegalArgumentException: Unable to find GatewayFilterFactory with name RequestLogging
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.loadGatewayFilters(RouteDefinitionRouteLocator.java:145)
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.getFilters(RouteDefinitionRouteLocator.java:192)
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.convertToRoute(RouteDefinitionRouteLocator.java:132)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onNext(FluxMap.java:106)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.tryEmitScalar(FluxFlatMap.java:492)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.onNext(FluxFlatMap.java:424)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.drain(FluxMergeSequential.java:439)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.innerComplete(FluxMergeSequential.java:335)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialInner.onSubscribe(FluxMergeSequential.java:559)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8777)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onNext(FluxMergeSequential.java:237)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onSubscribe(FluxMergeSequential.java:198)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8777)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onNext(FluxMergeSequential.java:237)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onSubscribe(FluxMergeSequential.java:198)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.InternalFluxOperator.subscribe(InternalFluxOperator.java:68)
+	at reactor.core.publisher.FluxDefer.subscribe(FluxDefer.java:54)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8777)
+	at reactor.core.publisher.Flux.blockLast(Flux.java:2755)
+	at org.springframework.cloud.gateway.filter.WeightCalculatorWebFilter.lambda$onApplicationEvent$0(WeightCalculatorWebFilter.java:140)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory$DependencyObjectProvider.ifAvailable(DefaultListableBeanFactory.java:2126)
+	at org.springframework.cloud.gateway.filter.WeightCalculatorWebFilter.onApplicationEvent(WeightCalculatorWebFilter.java:140)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:171)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:149)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:451)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:384)
+	at org.springframework.cloud.gateway.route.RouteRefreshListener.reset(RouteRefreshListener.java:73)
+	at org.springframework.cloud.gateway.route.RouteRefreshListener.onApplicationEvent(RouteRefreshListener.java:50)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:171)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:149)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:451)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:384)
+	at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:982)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:628)
+	at org.springframework.boot.web.reactive.context.ReactiveWebServerApplicationContext.refresh(ReactiveWebServerApplicationContext.java:66)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:762)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:464)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:334)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1358)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1347)
+	at com.ecommerce.gateway.ApiGatewayApplication.main(ApiGatewayApplication.java:10)
+	Suppressed: java.lang.Exception: #block terminated with an error
+		at reactor.core.publisher.BlockingSingleSubscriber.blockingGet(BlockingSingleSubscriber.java:103)
+		at reactor.core.publisher.Flux.blockLast(Flux.java:2756)
+		... 24 common frames omitted
+2026-01-17 06:48:06,919 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Starting ApiGatewayApplication using Java 21.0.7 with PID 14312 (C:\dev\order-processing-platform\api-gateway\build\classes\java\main started by Kukyo in C:\dev\order-processing-platform)
+2026-01-17 06:48:06,920 DEBUG com.ecommerce.gateway.ApiGatewayApplication [main] Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-01-17 06:48:06,921 INFO com.ecommerce.gateway.ApiGatewayApplication [main] No active profile set, falling back to 1 default profile: "default"
+2026-01-17 06:48:07,617 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-17 06:48:07,620 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-17 06:48:07,656 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 10 ms. Found 0 Redis repository interfaces.
+2026-01-17 06:48:07,796 INFO org.springframework.cloud.context.scope.GenericScope [main] BeanFactory id=be25c570-68de-3b0f-abd2-17bd8a33712e
+2026-01-17 06:48:08,136 INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory [main] ✅ JWT конфигурация валидна (длина: 42)
+2026-01-17 06:48:08,607 DEBUG org.springframework.cloud.gateway.config.GatewayProperties [main] Routes supplied from Gateway Properties: [RouteDefinition{id='auth-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/auth/**}}], filters=[FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1}}, FilterDefinition{name='RequestLogging', args={}}, FilterDefinition{name='CircuitBreaker', args={name=authServiceCircuitBreaker, fallback=forward:/auth/fallback}}], uri=http://auth-service:8087, order=0, metadata={}}, RouteDefinition{id='user-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/users/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://user-service:8081, order=0, metadata={}}, RouteDefinition{id='product-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/products/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://product-service:8084, order=0, metadata={}}, RouteDefinition{id='order-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/orders/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}}}], uri=http://order-service:8083, order=0, metadata={}}, RouteDefinition{id='inventory-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/inventory/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://inventory-service:8085, order=0, metadata={}}, RouteDefinition{id='notification-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/notifications/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}}}], uri=http://notification-service:8086, order=0, metadata={}}]
+2026-01-17 06:48:08,726 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [After]
+2026-01-17 06:48:08,726 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Before]
+2026-01-17 06:48:08,726 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Between]
+2026-01-17 06:48:08,726 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Cookie]
+2026-01-17 06:48:08,726 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Header]
+2026-01-17 06:48:08,726 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Host]
+2026-01-17 06:48:08,726 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Method]
+2026-01-17 06:48:08,726 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Path]
+2026-01-17 06:48:08,726 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Query]
+2026-01-17 06:48:08,726 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [ReadBody]
+2026-01-17 06:48:08,727 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [RemoteAddr]
+2026-01-17 06:48:08,727 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-01-17 06:48:08,727 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Weight]
+2026-01-17 06:48:08,727 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-01-17 06:48:08,888 INFO org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver [main] Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-01-17 06:48:09,138 INFO org.springframework.boot.web.embedded.netty.NettyWebServer [main] Netty started on port 8080
+2026-01-17 06:48:09,158 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying {_genkey_0=/auth/**} to Path
+2026-01-17 06:48:09,169 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:48:09,180 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:48:09,181 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {} to RequestLogging
+2026-01-17 06:48:09,185 ERROR org.springframework.cloud.gateway.route.CachingRouteLocator [main] Refresh routes error !!!
+java.lang.IllegalArgumentException: Unable to find GatewayFilterFactory with name CircuitBreaker
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.loadGatewayFilters(RouteDefinitionRouteLocator.java:145)
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.getFilters(RouteDefinitionRouteLocator.java:192)
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.convertToRoute(RouteDefinitionRouteLocator.java:132)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onNext(FluxMap.java:106)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.tryEmitScalar(FluxFlatMap.java:492)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.onNext(FluxFlatMap.java:424)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.drain(FluxMergeSequential.java:439)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.innerComplete(FluxMergeSequential.java:335)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialInner.onSubscribe(FluxMergeSequential.java:559)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8777)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onNext(FluxMergeSequential.java:237)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onSubscribe(FluxMergeSequential.java:198)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8777)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onNext(FluxMergeSequential.java:237)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onSubscribe(FluxMergeSequential.java:198)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.Mono.subscribeWith(Mono.java:4578)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4478)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4414)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4386)
+	at org.springframework.cloud.gateway.route.CachingRouteLocator.onApplicationEvent(CachingRouteLocator.java:102)
+	at org.springframework.cloud.gateway.route.CachingRouteLocator.onApplicationEvent(CachingRouteLocator.java:41)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:171)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:149)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:451)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:384)
+	at org.springframework.cloud.gateway.route.RouteRefreshListener.reset(RouteRefreshListener.java:73)
+	at org.springframework.cloud.gateway.route.RouteRefreshListener.onApplicationEvent(RouteRefreshListener.java:50)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:171)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:149)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:451)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:384)
+	at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:982)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:628)
+	at org.springframework.boot.web.reactive.context.ReactiveWebServerApplicationContext.refresh(ReactiveWebServerApplicationContext.java:66)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:762)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:464)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:334)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1358)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1347)
+	at com.ecommerce.gateway.ApiGatewayApplication.main(ApiGatewayApplication.java:10)
+2026-01-17 06:48:09,190 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying {_genkey_0=/auth/**} to Path
+2026-01-17 06:48:09,190 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:48:09,192 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:48:09,193 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {} to RequestLogging
+2026-01-17 06:48:09,193 WARN org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext [main] Exception encountered during context initialization - cancelling refresh attempt: java.lang.IllegalArgumentException: Unable to find GatewayFilterFactory with name CircuitBreaker
+2026-01-17 06:48:11,274 INFO org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger [main] 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-01-17 06:48:11,287 ERROR org.springframework.boot.SpringApplication [main] Application run failed
+java.lang.IllegalArgumentException: Unable to find GatewayFilterFactory with name CircuitBreaker
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.loadGatewayFilters(RouteDefinitionRouteLocator.java:145)
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.getFilters(RouteDefinitionRouteLocator.java:192)
+	at org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator.convertToRoute(RouteDefinitionRouteLocator.java:132)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onNext(FluxMap.java:106)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.tryEmitScalar(FluxFlatMap.java:492)
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.onNext(FluxFlatMap.java:424)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.drain(FluxMergeSequential.java:439)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.innerComplete(FluxMergeSequential.java:335)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialInner.onSubscribe(FluxMergeSequential.java:559)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8777)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onNext(FluxMergeSequential.java:237)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onSubscribe(FluxMergeSequential.java:198)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8777)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onNext(FluxMergeSequential.java:237)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+	at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+	at reactor.core.publisher.FluxMergeSequential$MergeSequentialMain.onSubscribe(FluxMergeSequential.java:198)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+	at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+	at reactor.core.publisher.InternalFluxOperator.subscribe(InternalFluxOperator.java:68)
+	at reactor.core.publisher.FluxDefer.subscribe(FluxDefer.java:54)
+	at reactor.core.publisher.Flux.subscribe(Flux.java:8777)
+	at reactor.core.publisher.Flux.blockLast(Flux.java:2755)
+	at org.springframework.cloud.gateway.filter.WeightCalculatorWebFilter.lambda$onApplicationEvent$0(WeightCalculatorWebFilter.java:140)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory$DependencyObjectProvider.ifAvailable(DefaultListableBeanFactory.java:2126)
+	at org.springframework.cloud.gateway.filter.WeightCalculatorWebFilter.onApplicationEvent(WeightCalculatorWebFilter.java:140)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:171)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:149)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:451)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:384)
+	at org.springframework.cloud.gateway.route.RouteRefreshListener.reset(RouteRefreshListener.java:73)
+	at org.springframework.cloud.gateway.route.RouteRefreshListener.onApplicationEvent(RouteRefreshListener.java:50)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:171)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:149)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:451)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:384)
+	at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:982)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:628)
+	at org.springframework.boot.web.reactive.context.ReactiveWebServerApplicationContext.refresh(ReactiveWebServerApplicationContext.java:66)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:762)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:464)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:334)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1358)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1347)
+	at com.ecommerce.gateway.ApiGatewayApplication.main(ApiGatewayApplication.java:10)
+	Suppressed: java.lang.Exception: #block terminated with an error
+		at reactor.core.publisher.BlockingSingleSubscriber.blockingGet(BlockingSingleSubscriber.java:103)
+		at reactor.core.publisher.Flux.blockLast(Flux.java:2756)
+		... 24 common frames omitted
+2026-01-17 06:50:17,344 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Starting ApiGatewayApplication using Java 21.0.7 with PID 35020 (C:\dev\order-processing-platform\api-gateway\build\classes\java\main started by Kukyo in C:\dev\order-processing-platform)
+2026-01-17 06:50:17,345 DEBUG com.ecommerce.gateway.ApiGatewayApplication [main] Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-01-17 06:50:17,346 INFO com.ecommerce.gateway.ApiGatewayApplication [main] No active profile set, falling back to 1 default profile: "default"
+2026-01-17 06:50:18,050 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-17 06:50:18,052 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-17 06:50:18,068 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 8 ms. Found 0 Redis repository interfaces.
+2026-01-17 06:50:18,162 INFO org.springframework.cloud.context.scope.GenericScope [main] BeanFactory id=8703dc99-e08d-37f9-96b4-344c594f513c
+2026-01-17 06:50:18,330 INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory [main] ✅ JWT конфигурация валидна (длина: 42)
+2026-01-17 06:50:18,762 DEBUG org.springframework.cloud.gateway.config.GatewayProperties [main] Routes supplied from Gateway Properties: [RouteDefinition{id='auth-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/auth/**}}], filters=[FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1}}], uri=http://auth-service:8087, order=0, metadata={}}, RouteDefinition{id='user-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/users/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://user-service:8081, order=0, metadata={}}, RouteDefinition{id='product-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/products/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://product-service:8084, order=0, metadata={}}, RouteDefinition{id='order-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/orders/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}}}], uri=http://order-service:8083, order=0, metadata={}}, RouteDefinition{id='inventory-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/inventory/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://inventory-service:8085, order=0, metadata={}}, RouteDefinition{id='notification-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/notifications/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}}}], uri=http://notification-service:8086, order=0, metadata={}}]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [After]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Before]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Between]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Cookie]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Header]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Host]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Method]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Path]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Query]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [ReadBody]
+2026-01-17 06:50:18,922 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [RemoteAddr]
+2026-01-17 06:50:18,923 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-01-17 06:50:18,923 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Weight]
+2026-01-17 06:50:18,923 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-01-17 06:50:19,092 INFO org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver [main] Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-01-17 06:50:19,341 INFO org.springframework.boot.web.embedded.netty.NettyWebServer [main] Netty started on port 8080
+2026-01-17 06:50:19,359 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying {_genkey_0=/auth/**} to Path
+2026-01-17 06:50:19,367 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:50:19,378 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:50:19,379 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: auth-service
+2026-01-17 06:50:19,379 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying {_genkey_0=/api/users/**} to Path
+2026-01-17 06:50:19,381 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:50:19,382 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {} to JwtValidation
+2026-01-17 06:50:19,382 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 06:50:19,383 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: user-service
+2026-01-17 06:50:19,383 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying {_genkey_0=/api/products/**} to Path
+2026-01-17 06:50:19,384 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:50:19,385 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {} to JwtValidation
+2026-01-17 06:50:19,385 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 06:50:19,386 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: product-service
+2026-01-17 06:50:19,386 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying {_genkey_0=/api/orders/**} to Path
+2026-01-17 06:50:19,386 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:50:19,387 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {} to JwtValidation
+2026-01-17 06:50:19,387 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}} to RequestRateLimiter
+2026-01-17 06:50:19,389 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: order-service
+2026-01-17 06:50:19,389 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying {_genkey_0=/api/inventory/**} to Path
+2026-01-17 06:50:19,389 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:50:19,390 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {} to JwtValidation
+2026-01-17 06:50:19,390 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 06:50:19,391 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: inventory-service
+2026-01-17 06:50:19,391 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying {_genkey_0=/api/notifications/**} to Path
+2026-01-17 06:50:19,392 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:50:19,392 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {} to JwtValidation
+2026-01-17 06:50:19,392 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 06:50:19,394 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: notification-service
+2026-01-17 06:50:19,397 DEBUG org.springframework.cloud.gateway.filter.GatewayMetricsFilter [main] New routes count: 6
+2026-01-17 06:50:19,398 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Started ApiGatewayApplication in 2.506 seconds (process running for 2.9)
+2026-01-17 06:50:25,127 WARN org.springframework.boot.actuate.data.redis.RedisReactiveHealthIndicator [boundedElastic-1] Redis health check failed
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.translateException(LettuceConnectionFactory.java:1805)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1736)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getNativeConnection(LettuceConnectionFactory.java:1538)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.lambda$getConnection$0(LettuceConnectionFactory.java:1518)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.doInLock(LettuceConnectionFactory.java:1478)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getConnection(LettuceConnectionFactory.java:1515)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getSharedReactiveConnection(LettuceConnectionFactory.java:1224)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:1099)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:130)
+	at reactor.core.publisher.MonoSupplier.call(MonoSupplier.java:67)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: io.lettuce.core.RedisConnectionException: Unable to connect to redis/<unresolved>:6379
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:78)
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:56)
+	at io.lettuce.core.AbstractRedisClient.getConnection(AbstractRedisClient.java:350)
+	at io.lettuce.core.RedisClient.connect(RedisClient.java:215)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.lambda$getConnection$1(StandaloneConnectionProvider.java:112)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.getConnection(StandaloneConnectionProvider.java:112)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1734)
+	... 16 common frames omitted
+Caused by: java.net.UnknownHostException: Failed to resolve 'redis' [A(1), AAAA(28)] after 6 queries 
+	at io.netty.resolver.dns.DnsResolveContext.finishResolve(DnsResolveContext.java:1097)
+	at io.netty.resolver.dns.DnsResolveContext.tryToFinishResolve(DnsResolveContext.java:1044)
+	at io.netty.resolver.dns.DnsResolveContext.query(DnsResolveContext.java:432)
+	at io.netty.resolver.dns.DnsResolveContext.access$700(DnsResolveContext.java:66)
+	at io.netty.resolver.dns.DnsResolveContext$2.operationComplete(DnsResolveContext.java:500)
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+	at io.netty.resolver.dns.DnsQueryContext.finishFailure(DnsQueryContext.java:348)
+	at io.netty.resolver.dns.DnsQueryContext$5.run(DnsQueryContext.java:290)
+	at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98)
+	at io.netty.util.concurrent.ScheduledFutureTask.run(ScheduledFutureTask.java:153)
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173)
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	... 1 common frames omitted
+Caused by: io.netty.resolver.dns.DnsNameResolverTimeoutException: [28577: /192.168.1.1:53] DefaultDnsQuestion(redis. IN A) query '28577' via UDP timed out after 5000 milliseconds (no stack trace available)
+2026-01-17 06:53:05,135 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Starting ApiGatewayApplication using Java 21.0.7 with PID 14856 (C:\dev\order-processing-platform\api-gateway\build\classes\java\main started by Kukyo in C:\dev\order-processing-platform)
+2026-01-17 06:53:05,135 DEBUG com.ecommerce.gateway.ApiGatewayApplication [main] Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-01-17 06:53:05,136 INFO com.ecommerce.gateway.ApiGatewayApplication [main] No active profile set, falling back to 1 default profile: "default"
+2026-01-17 06:53:05,722 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-17 06:53:05,724 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-17 06:53:05,740 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 8 ms. Found 0 Redis repository interfaces.
+2026-01-17 06:53:05,845 INFO org.springframework.cloud.context.scope.GenericScope [main] BeanFactory id=8703dc99-e08d-37f9-96b4-344c594f513c
+2026-01-17 06:53:06,024 INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory [main] ✅ JWT конфигурация валидна (длина: 42)
+2026-01-17 06:53:06,504 DEBUG org.springframework.cloud.gateway.config.GatewayProperties [main] Routes supplied from Gateway Properties: [RouteDefinition{id='auth-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/auth/**}}], filters=[FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1}}], uri=http://auth-service:8087, order=0, metadata={}}, RouteDefinition{id='user-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/users/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://user-service:8081, order=0, metadata={}}, RouteDefinition{id='product-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/products/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://product-service:8084, order=0, metadata={}}, RouteDefinition{id='order-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/orders/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}}}], uri=http://order-service:8083, order=0, metadata={}}, RouteDefinition{id='inventory-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/inventory/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://inventory-service:8085, order=0, metadata={}}, RouteDefinition{id='notification-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/notifications/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}}}], uri=http://notification-service:8086, order=0, metadata={}}]
+2026-01-17 06:53:06,671 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [After]
+2026-01-17 06:53:06,671 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Before]
+2026-01-17 06:53:06,671 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Between]
+2026-01-17 06:53:06,671 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Cookie]
+2026-01-17 06:53:06,671 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Header]
+2026-01-17 06:53:06,671 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Host]
+2026-01-17 06:53:06,671 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Method]
+2026-01-17 06:53:06,672 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Path]
+2026-01-17 06:53:06,672 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Query]
+2026-01-17 06:53:06,672 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [ReadBody]
+2026-01-17 06:53:06,672 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [RemoteAddr]
+2026-01-17 06:53:06,672 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-01-17 06:53:06,672 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Weight]
+2026-01-17 06:53:06,672 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-01-17 06:53:06,872 INFO org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver [main] Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-01-17 06:53:07,140 INFO org.springframework.boot.web.embedded.netty.NettyWebServer [main] Netty started on port 8080
+2026-01-17 06:53:07,160 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying {_genkey_0=/auth/**} to Path
+2026-01-17 06:53:07,170 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:53:07,179 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:53:07,181 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: auth-service
+2026-01-17 06:53:07,181 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying {_genkey_0=/api/users/**} to Path
+2026-01-17 06:53:07,182 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:53:07,183 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {} to JwtValidation
+2026-01-17 06:53:07,184 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 06:53:07,185 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: user-service
+2026-01-17 06:53:07,185 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying {_genkey_0=/api/products/**} to Path
+2026-01-17 06:53:07,185 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:53:07,186 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {} to JwtValidation
+2026-01-17 06:53:07,187 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 06:53:07,187 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: product-service
+2026-01-17 06:53:07,187 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying {_genkey_0=/api/orders/**} to Path
+2026-01-17 06:53:07,188 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:53:07,189 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {} to JwtValidation
+2026-01-17 06:53:07,189 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}} to RequestRateLimiter
+2026-01-17 06:53:07,190 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: order-service
+2026-01-17 06:53:07,190 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying {_genkey_0=/api/inventory/**} to Path
+2026-01-17 06:53:07,190 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:53:07,191 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {} to JwtValidation
+2026-01-17 06:53:07,192 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 06:53:07,193 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: inventory-service
+2026-01-17 06:53:07,193 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying {_genkey_0=/api/notifications/**} to Path
+2026-01-17 06:53:07,193 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 06:53:07,194 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {} to JwtValidation
+2026-01-17 06:53:07,194 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 06:53:07,195 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: notification-service
+2026-01-17 06:53:07,198 DEBUG org.springframework.cloud.gateway.filter.GatewayMetricsFilter [main] New routes count: 6
+2026-01-17 06:53:07,199 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Started ApiGatewayApplication in 2.364 seconds (process running for 2.765)
+2026-01-17 06:53:13,008 WARN org.springframework.boot.actuate.data.redis.RedisReactiveHealthIndicator [boundedElastic-1] Redis health check failed
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.translateException(LettuceConnectionFactory.java:1805)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1736)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getNativeConnection(LettuceConnectionFactory.java:1538)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.lambda$getConnection$0(LettuceConnectionFactory.java:1518)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.doInLock(LettuceConnectionFactory.java:1478)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getConnection(LettuceConnectionFactory.java:1515)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getSharedReactiveConnection(LettuceConnectionFactory.java:1224)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:1099)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:130)
+	at reactor.core.publisher.MonoSupplier.call(MonoSupplier.java:67)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: io.lettuce.core.RedisConnectionException: Unable to connect to redis/<unresolved>:6379
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:78)
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:56)
+	at io.lettuce.core.AbstractRedisClient.getConnection(AbstractRedisClient.java:350)
+	at io.lettuce.core.RedisClient.connect(RedisClient.java:215)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.lambda$getConnection$1(StandaloneConnectionProvider.java:112)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.getConnection(StandaloneConnectionProvider.java:112)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1734)
+	... 16 common frames omitted
+Caused by: java.net.UnknownHostException: Failed to resolve 'redis' [A(1), AAAA(28)] after 6 queries 
+	at io.netty.resolver.dns.DnsResolveContext.finishResolve(DnsResolveContext.java:1097)
+	at io.netty.resolver.dns.DnsResolveContext.tryToFinishResolve(DnsResolveContext.java:1044)
+	at io.netty.resolver.dns.DnsResolveContext.query(DnsResolveContext.java:432)
+	at io.netty.resolver.dns.DnsResolveContext.access$700(DnsResolveContext.java:66)
+	at io.netty.resolver.dns.DnsResolveContext$2.operationComplete(DnsResolveContext.java:500)
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+	at io.netty.resolver.dns.DnsQueryContext.finishFailure(DnsQueryContext.java:348)
+	at io.netty.resolver.dns.DnsQueryContext$5.run(DnsQueryContext.java:290)
+	at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98)
+	at io.netty.util.concurrent.ScheduledFutureTask.run(ScheduledFutureTask.java:153)
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173)
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	... 1 common frames omitted
+Caused by: io.netty.resolver.dns.DnsNameResolverTimeoutException: [48195: /192.168.1.1:53] DefaultDnsQuestion(redis. IN AAAA) query '48195' via UDP timed out after 5000 milliseconds (no stack trace available)
+2026-01-17 06:53:56,288 WARN org.springframework.boot.actuate.data.redis.RedisReactiveHealthIndicator [boundedElastic-1] Redis health check failed
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.translateException(LettuceConnectionFactory.java:1805)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1736)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getNativeConnection(LettuceConnectionFactory.java:1538)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.lambda$getConnection$0(LettuceConnectionFactory.java:1518)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.doInLock(LettuceConnectionFactory.java:1478)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getConnection(LettuceConnectionFactory.java:1515)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getSharedReactiveConnection(LettuceConnectionFactory.java:1224)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:1099)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:130)
+	at reactor.core.publisher.MonoSupplier.call(MonoSupplier.java:67)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: io.lettuce.core.RedisConnectionException: Unable to connect to redis/<unresolved>:6379
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:78)
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:56)
+	at io.lettuce.core.AbstractRedisClient.getConnection(AbstractRedisClient.java:350)
+	at io.lettuce.core.RedisClient.connect(RedisClient.java:215)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.lambda$getConnection$1(StandaloneConnectionProvider.java:112)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.getConnection(StandaloneConnectionProvider.java:112)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1734)
+	... 16 common frames omitted
+Caused by: java.net.UnknownHostException: Failed to resolve 'redis' [A(1), AAAA(28)] after 6 queries 
+	at io.netty.resolver.dns.DnsResolveContext.finishResolve(DnsResolveContext.java:1097)
+	at io.netty.resolver.dns.DnsResolveContext.tryToFinishResolve(DnsResolveContext.java:1044)
+	at io.netty.resolver.dns.DnsResolveContext.query(DnsResolveContext.java:432)
+	at io.netty.resolver.dns.DnsResolveContext.access$700(DnsResolveContext.java:66)
+	at io.netty.resolver.dns.DnsResolveContext$2.operationComplete(DnsResolveContext.java:500)
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+	at io.netty.resolver.dns.DnsQueryContext.finishFailure(DnsQueryContext.java:348)
+	at io.netty.resolver.dns.DnsQueryContext$5.run(DnsQueryContext.java:290)
+	at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98)
+	at io.netty.util.concurrent.ScheduledFutureTask.run(ScheduledFutureTask.java:153)
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173)
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	... 1 common frames omitted
+Caused by: io.netty.resolver.dns.DnsNameResolverTimeoutException: [2794: /192.168.1.1:53] DefaultDnsQuestion(redis. IN AAAA) query '2794' via UDP timed out after 5000 milliseconds (no stack trace available)
+2026-01-17 06:54:30,712 DEBUG org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping [reactor-http-nio-8] Route matched: user-service
+2026-01-17 06:54:30,713 DEBUG org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping [reactor-http-nio-8] Mapping [Exchange: GET http://localhost:8080/api/users/123] to Route{id='user-service', uri=http://user-service:8081, order=0, predicate=Paths: [/api/users/**], match trailing slash: true, gatewayFilters=[[org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory$$Lambda/0x000001a205716540@7a49dbe0, order = 1], [com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory$$Lambda/0x000001a205717120@3f4b5acd, order = 1], [org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory$$Lambda/0x000001a205716540@42035884, order = 2]], metadata={}}
+2026-01-17 06:54:30,713 DEBUG org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping [reactor-http-nio-8] [a14547f0-4] Mapped to org.springframework.cloud.gateway.handler.FilteringWebHandler@e3e41d2
+2026-01-17 06:54:30,721 ERROR org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler [reactor-http-nio-8] [a14547f0-4]  500 Server Error for HTTP GET "/api/users/123"
+java.lang.IllegalArgumentException: When allowCredentials is true, allowedOrigins cannot contain the special value "*" since that cannot be set on the "Access-Control-Allow-Origin" response header. To allow credentials to a set of origins, list them explicitly or consider using "allowedOriginPatterns" instead.
+	at org.springframework.web.cors.CorsConfiguration.validateAllowCredentials(CorsConfiguration.java:538)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ org.springframework.cloud.gateway.filter.WeightCalculatorWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ HTTP GET "/api/users/123" [ExceptionHandlingWebHandler]
+Original Stack Trace:
+		at org.springframework.web.cors.CorsConfiguration.validateAllowCredentials(CorsConfiguration.java:538)
+		at org.springframework.web.reactive.handler.AbstractHandlerMapping.lambda$getHandler$1(AbstractHandlerMapping.java:198)
+		at reactor.core.publisher.FluxMap$MapSubscriber.onNext(FluxMap.java:106)
+		at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onNext(FluxSwitchIfEmpty.java:74)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:158)
+		at reactor.core.publisher.FluxMap$MapSubscriber.onNext(FluxMap.java:122)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onNext(MonoNext.java:82)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.innerNext(FluxConcatMapNoPrefetch.java:258)
+		at reactor.core.publisher.FluxConcatMap$ConcatMapInner.onNext(FluxConcatMap.java:863)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onNext(FluxOnErrorResume.java:79)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onNext(MonoPeekTerminal.java:180)
+		at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.onNext(MonoFilterWhen.java:136)
+		at reactor.core.publisher.Operators$ScalarSubscription.request(Operators.java:2571)
+		at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.request(MonoFilterWhen.java:182)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.request(MonoPeekTerminal.java:139)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.set(Operators.java:2367)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onSubscribe(FluxOnErrorResume.java:74)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onSubscribe(MonoPeekTerminal.java:152)
+		at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.onSubscribe(MonoFilterWhen.java:100)
+		at reactor.core.publisher.MonoJust.subscribe(MonoJust.java:55)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:76)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:206)
+		at reactor.core.publisher.FluxDematerialize$DematerializeSubscriber.onNext(FluxDematerialize.java:98)
+		at reactor.core.publisher.FluxDematerialize$DematerializeSubscriber.onNext(FluxDematerialize.java:44)
+		at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+		at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+		at reactor.core.publisher.FluxDematerialize$DematerializeSubscriber.request(FluxDematerialize.java:127)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.innerComplete(FluxConcatMapNoPrefetch.java:274)
+		at reactor.core.publisher.FluxConcatMap$ConcatMapInner.onComplete(FluxConcatMap.java:887)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onComplete(Operators.java:2231)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onComplete(MonoPeekTerminal.java:299)
+		at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.onNext(MonoFilterWhen.java:141)
+		at reactor.core.publisher.Operators$ScalarSubscription.request(Operators.java:2571)
+		at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.request(MonoFilterWhen.java:182)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.request(MonoPeekTerminal.java:139)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2331)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2331)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:338)
+		at reactor.core.publisher.MonoNext$NextSubscriber.request(MonoNext.java:108)
+		at reactor.core.publisher.FluxMap$MapSubscriber.request(FluxMap.java:164)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.request(MonoFlatMap.java:194)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2331)
+		at reactor.core.publisher.FluxMap$MapSubscriber.request(FluxMap.java:164)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2331)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:338)
+		at reactor.core.publisher.MonoNext$NextSubscriber.request(MonoNext.java:108)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.set(Operators.java:2367)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onSubscribe(Operators.java:2241)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onSubscribe(MonoNext.java:70)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onSubscribe(FluxConcatMapNoPrefetch.java:164)
+		at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+		at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:76)
+		at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:53)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:76)
+		at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:53)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:76)
+		at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:264)
+		at reactor.core.publisher.MonoIgnoreThen.subscribe(MonoIgnoreThen.java:51)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:76)
+		at reactor.core.publisher.MonoDeferContextual.subscribe(MonoDeferContextual.java:55)
+		at reactor.netty.http.server.HttpServer$HttpServerHandle.onStateChange(HttpServer.java:1169)
+		at reactor.netty.ReactorNetty$CompositeConnectionObserver.onStateChange(ReactorNetty.java:710)
+		at reactor.netty.transport.ServerTransport$ChildObserver.onStateChange(ServerTransport.java:481)
+		at reactor.netty.http.server.HttpServerOperations.onInboundNext(HttpServerOperations.java:652)
+		at reactor.netty.channel.ChannelOperationsHandler.channelRead(ChannelOperationsHandler.java:114)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at reactor.netty.http.server.HttpTrafficHandler.channelRead(HttpTrafficHandler.java:238)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelRead(CombinedChannelDuplexHandler.java:436)
+		at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:346)
+		at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:318)
+		at io.netty.channel.CombinedChannelDuplexHandler.channelRead(CombinedChannelDuplexHandler.java:251)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:440)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)
+		at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:788)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-01-17 07:00:56,450 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Starting ApiGatewayApplication using Java 21.0.7 with PID 19660 (C:\dev\order-processing-platform\api-gateway\build\classes\java\main started by Kukyo in C:\dev\order-processing-platform)
+2026-01-17 07:00:56,452 DEBUG com.ecommerce.gateway.ApiGatewayApplication [main] Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-01-17 07:00:56,452 INFO com.ecommerce.gateway.ApiGatewayApplication [main] No active profile set, falling back to 1 default profile: "default"
+2026-01-17 07:00:57,060 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-17 07:00:57,062 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-17 07:00:57,079 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 8 ms. Found 0 Redis repository interfaces.
+2026-01-17 07:00:57,177 INFO org.springframework.cloud.context.scope.GenericScope [main] BeanFactory id=8703dc99-e08d-37f9-96b4-344c594f513c
+2026-01-17 07:00:57,350 INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory [main] ✅ JWT конфигурация валидна (длина: 42)
+2026-01-17 07:00:57,780 DEBUG org.springframework.cloud.gateway.config.GatewayProperties [main] Routes supplied from Gateway Properties: [RouteDefinition{id='auth-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/auth/**}}], filters=[FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1}}], uri=http://auth-service:8087, order=0, metadata={}}, RouteDefinition{id='user-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/users/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://user-service:8081, order=0, metadata={}}, RouteDefinition{id='product-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/products/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://product-service:8084, order=0, metadata={}}, RouteDefinition{id='order-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/orders/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}}}], uri=http://order-service:8083, order=0, metadata={}}, RouteDefinition{id='inventory-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/inventory/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://inventory-service:8085, order=0, metadata={}}, RouteDefinition{id='notification-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/notifications/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}}}], uri=http://notification-service:8086, order=0, metadata={}}]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [After]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Before]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Between]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Cookie]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Header]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Host]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Method]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Path]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Query]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [ReadBody]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [RemoteAddr]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Weight]
+2026-01-17 07:00:57,902 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-01-17 07:00:58,069 INFO org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver [main] Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-01-17 07:01:00,397 WARN org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext [main] Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-01-17 07:01:00,416 INFO org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger [main] 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-01-17 07:01:00,433 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [main] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+2026-01-17 07:01:12,533 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Starting ApiGatewayApplication using Java 21.0.7 with PID 19700 (C:\dev\order-processing-platform\api-gateway\build\classes\java\main started by Kukyo in C:\dev\order-processing-platform)
+2026-01-17 07:01:12,534 DEBUG com.ecommerce.gateway.ApiGatewayApplication [main] Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-01-17 07:01:12,535 INFO com.ecommerce.gateway.ApiGatewayApplication [main] No active profile set, falling back to 1 default profile: "default"
+2026-01-17 07:01:13,103 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-17 07:01:13,104 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-17 07:01:13,120 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 7 ms. Found 0 Redis repository interfaces.
+2026-01-17 07:01:13,219 INFO org.springframework.cloud.context.scope.GenericScope [main] BeanFactory id=8703dc99-e08d-37f9-96b4-344c594f513c
+2026-01-17 07:01:13,386 INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory [main] ✅ JWT конфигурация валидна (длина: 42)
+2026-01-17 07:01:13,816 DEBUG org.springframework.cloud.gateway.config.GatewayProperties [main] Routes supplied from Gateway Properties: [RouteDefinition{id='auth-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/auth/**}}], filters=[FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1}}], uri=http://auth-service:8087, order=0, metadata={}}, RouteDefinition{id='user-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/users/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://user-service:8081, order=0, metadata={}}, RouteDefinition{id='product-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/products/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://product-service:8084, order=0, metadata={}}, RouteDefinition{id='order-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/orders/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}}}], uri=http://order-service:8083, order=0, metadata={}}, RouteDefinition{id='inventory-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/inventory/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://inventory-service:8085, order=0, metadata={}}, RouteDefinition{id='notification-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/notifications/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}}}], uri=http://notification-service:8086, order=0, metadata={}}]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [After]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Before]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Between]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Cookie]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Header]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Host]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Method]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Path]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Query]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [ReadBody]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [RemoteAddr]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Weight]
+2026-01-17 07:01:13,955 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-01-17 07:01:14,122 INFO org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver [main] Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-01-17 07:01:16,466 WARN org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext [main] Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-01-17 07:01:16,481 INFO org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger [main] 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-01-17 07:01:16,495 ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter [main] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+2026-01-17 07:01:33,661 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Starting ApiGatewayApplication using Java 21.0.7 with PID 20836 (C:\dev\order-processing-platform\api-gateway\build\classes\java\main started by Kukyo in C:\dev\order-processing-platform)
+2026-01-17 07:01:33,661 DEBUG com.ecommerce.gateway.ApiGatewayApplication [main] Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-01-17 07:01:33,662 INFO com.ecommerce.gateway.ApiGatewayApplication [main] No active profile set, falling back to 1 default profile: "default"
+2026-01-17 07:01:34,254 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-17 07:01:34,256 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-17 07:01:34,273 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 8 ms. Found 0 Redis repository interfaces.
+2026-01-17 07:01:34,378 INFO org.springframework.cloud.context.scope.GenericScope [main] BeanFactory id=8703dc99-e08d-37f9-96b4-344c594f513c
+2026-01-17 07:01:34,541 INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory [main] ✅ JWT конфигурация валидна (длина: 42)
+2026-01-17 07:01:34,978 DEBUG org.springframework.cloud.gateway.config.GatewayProperties [main] Routes supplied from Gateway Properties: [RouteDefinition{id='auth-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/auth/**}}], filters=[FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1}}], uri=http://auth-service:8087, order=0, metadata={}}, RouteDefinition{id='user-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/users/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://user-service:8081, order=0, metadata={}}, RouteDefinition{id='product-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/products/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://product-service:8084, order=0, metadata={}}, RouteDefinition{id='order-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/orders/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}}}], uri=http://order-service:8083, order=0, metadata={}}, RouteDefinition{id='inventory-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/inventory/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://inventory-service:8085, order=0, metadata={}}, RouteDefinition{id='notification-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/notifications/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}}}], uri=http://notification-service:8086, order=0, metadata={}}]
+2026-01-17 07:01:35,102 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [After]
+2026-01-17 07:01:35,102 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Before]
+2026-01-17 07:01:35,102 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Between]
+2026-01-17 07:01:35,102 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Cookie]
+2026-01-17 07:01:35,103 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Header]
+2026-01-17 07:01:35,103 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Host]
+2026-01-17 07:01:35,103 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Method]
+2026-01-17 07:01:35,103 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Path]
+2026-01-17 07:01:35,103 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Query]
+2026-01-17 07:01:35,103 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [ReadBody]
+2026-01-17 07:01:35,103 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [RemoteAddr]
+2026-01-17 07:01:35,103 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-01-17 07:01:35,103 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Weight]
+2026-01-17 07:01:35,103 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-01-17 07:01:35,290 INFO org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver [main] Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-01-17 07:01:35,549 INFO org.springframework.boot.web.embedded.netty.NettyWebServer [main] Netty started on port 8080
+2026-01-17 07:01:35,569 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying {_genkey_0=/auth/**} to Path
+2026-01-17 07:01:35,578 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:01:35,588 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:01:35,589 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: auth-service
+2026-01-17 07:01:35,589 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying {_genkey_0=/api/users/**} to Path
+2026-01-17 07:01:35,590 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:01:35,591 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {} to JwtValidation
+2026-01-17 07:01:35,592 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:01:35,593 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: user-service
+2026-01-17 07:01:35,594 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying {_genkey_0=/api/products/**} to Path
+2026-01-17 07:01:35,594 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:01:35,594 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {} to JwtValidation
+2026-01-17 07:01:35,595 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:01:35,596 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: product-service
+2026-01-17 07:01:35,596 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying {_genkey_0=/api/orders/**} to Path
+2026-01-17 07:01:35,596 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:01:35,597 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {} to JwtValidation
+2026-01-17 07:01:35,597 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}} to RequestRateLimiter
+2026-01-17 07:01:35,599 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: order-service
+2026-01-17 07:01:35,599 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying {_genkey_0=/api/inventory/**} to Path
+2026-01-17 07:01:35,599 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:01:35,600 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {} to JwtValidation
+2026-01-17 07:01:35,600 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:01:35,601 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: inventory-service
+2026-01-17 07:01:35,601 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying {_genkey_0=/api/notifications/**} to Path
+2026-01-17 07:01:35,602 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:01:35,602 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {} to JwtValidation
+2026-01-17 07:01:35,602 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:01:35,603 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: notification-service
+2026-01-17 07:01:35,613 DEBUG org.springframework.cloud.gateway.filter.GatewayMetricsFilter [main] New routes count: 6
+2026-01-17 07:01:35,614 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Started ApiGatewayApplication in 2.232 seconds (process running for 2.578)
+2026-01-17 07:01:41,100 WARN org.springframework.boot.actuate.data.redis.RedisReactiveHealthIndicator [boundedElastic-1] Redis health check failed
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.translateException(LettuceConnectionFactory.java:1805)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1736)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getNativeConnection(LettuceConnectionFactory.java:1538)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.lambda$getConnection$0(LettuceConnectionFactory.java:1518)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.doInLock(LettuceConnectionFactory.java:1478)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getConnection(LettuceConnectionFactory.java:1515)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getSharedReactiveConnection(LettuceConnectionFactory.java:1224)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:1099)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:130)
+	at reactor.core.publisher.MonoSupplier.call(MonoSupplier.java:67)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: io.lettuce.core.RedisConnectionException: Unable to connect to redis/<unresolved>:6379
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:78)
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:56)
+	at io.lettuce.core.AbstractRedisClient.getConnection(AbstractRedisClient.java:350)
+	at io.lettuce.core.RedisClient.connect(RedisClient.java:215)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.lambda$getConnection$1(StandaloneConnectionProvider.java:112)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.getConnection(StandaloneConnectionProvider.java:112)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1734)
+	... 16 common frames omitted
+Caused by: java.net.UnknownHostException: Failed to resolve 'redis' [A(1), AAAA(28)] after 6 queries 
+	at io.netty.resolver.dns.DnsResolveContext.finishResolve(DnsResolveContext.java:1097)
+	at io.netty.resolver.dns.DnsResolveContext.tryToFinishResolve(DnsResolveContext.java:1044)
+	at io.netty.resolver.dns.DnsResolveContext.query(DnsResolveContext.java:432)
+	at io.netty.resolver.dns.DnsResolveContext.access$700(DnsResolveContext.java:66)
+	at io.netty.resolver.dns.DnsResolveContext$2.operationComplete(DnsResolveContext.java:500)
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+	at io.netty.resolver.dns.DnsQueryContext.finishFailure(DnsQueryContext.java:348)
+	at io.netty.resolver.dns.DnsQueryContext$5.run(DnsQueryContext.java:290)
+	at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98)
+	at io.netty.util.concurrent.ScheduledFutureTask.run(ScheduledFutureTask.java:153)
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173)
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	... 1 common frames omitted
+Caused by: io.netty.resolver.dns.DnsNameResolverTimeoutException: [52718: /192.168.1.1:53] DefaultDnsQuestion(redis. IN AAAA) query '52718' via UDP timed out after 5000 milliseconds (no stack trace available)
+2026-01-17 07:01:50,750 WARN org.springframework.boot.actuate.data.redis.RedisReactiveHealthIndicator [boundedElastic-1] Redis health check failed
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.translateException(LettuceConnectionFactory.java:1805)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1736)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getNativeConnection(LettuceConnectionFactory.java:1538)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.lambda$getConnection$0(LettuceConnectionFactory.java:1518)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.doInLock(LettuceConnectionFactory.java:1478)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getConnection(LettuceConnectionFactory.java:1515)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getSharedReactiveConnection(LettuceConnectionFactory.java:1224)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:1099)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getReactiveConnection(LettuceConnectionFactory.java:130)
+	at reactor.core.publisher.MonoSupplier.call(MonoSupplier.java:67)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: io.lettuce.core.RedisConnectionException: Unable to connect to redis/<unresolved>:6379
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:78)
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:56)
+	at io.lettuce.core.AbstractRedisClient.getConnection(AbstractRedisClient.java:350)
+	at io.lettuce.core.RedisClient.connect(RedisClient.java:215)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.lambda$getConnection$1(StandaloneConnectionProvider.java:112)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.getConnection(StandaloneConnectionProvider.java:112)
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1734)
+	... 16 common frames omitted
+Caused by: java.net.UnknownHostException: Failed to resolve 'redis' [A(1), AAAA(28)] after 6 queries 
+	at io.netty.resolver.dns.DnsResolveContext.finishResolve(DnsResolveContext.java:1097)
+	at io.netty.resolver.dns.DnsResolveContext.tryToFinishResolve(DnsResolveContext.java:1044)
+	at io.netty.resolver.dns.DnsResolveContext.query(DnsResolveContext.java:432)
+	at io.netty.resolver.dns.DnsResolveContext.access$700(DnsResolveContext.java:66)
+	at io.netty.resolver.dns.DnsResolveContext$2.operationComplete(DnsResolveContext.java:500)
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+	at io.netty.resolver.dns.DnsQueryContext.finishFailure(DnsQueryContext.java:348)
+	at io.netty.resolver.dns.DnsQueryContext$5.run(DnsQueryContext.java:290)
+	at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98)
+	at io.netty.util.concurrent.ScheduledFutureTask.run(ScheduledFutureTask.java:153)
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:173)
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:166)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	... 1 common frames omitted
+Caused by: io.netty.resolver.dns.DnsNameResolverTimeoutException: [26082: /192.168.1.1:53] DefaultDnsQuestion(redis. IN A) query '26082' via UDP timed out after 5000 milliseconds (no stack trace available)
+2026-01-17 07:02:20,882 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Starting ApiGatewayApplication using Java 21.0.7 with PID 32712 (C:\dev\order-processing-platform\api-gateway\build\classes\java\main started by Kukyo in C:\dev\order-processing-platform)
+2026-01-17 07:02:20,883 DEBUG com.ecommerce.gateway.ApiGatewayApplication [main] Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-01-17 07:02:20,884 INFO com.ecommerce.gateway.ApiGatewayApplication [main] No active profile set, falling back to 1 default profile: "default"
+2026-01-17 07:02:21,444 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-17 07:02:21,445 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-17 07:02:21,462 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 8 ms. Found 0 Redis repository interfaces.
+2026-01-17 07:02:21,562 INFO org.springframework.cloud.context.scope.GenericScope [main] BeanFactory id=8703dc99-e08d-37f9-96b4-344c594f513c
+2026-01-17 07:02:21,734 INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory [main] ✅ JWT конфигурация валидна (длина: 42)
+2026-01-17 07:02:22,154 DEBUG org.springframework.cloud.gateway.config.GatewayProperties [main] Routes supplied from Gateway Properties: [RouteDefinition{id='auth-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/auth/**}}], filters=[FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1}}], uri=http://auth-service:8087, order=0, metadata={}}, RouteDefinition{id='user-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/users/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://user-service:8081, order=0, metadata={}}, RouteDefinition{id='product-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/products/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://product-service:8084, order=0, metadata={}}, RouteDefinition{id='order-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/orders/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}}}], uri=http://order-service:8083, order=0, metadata={}}, RouteDefinition{id='inventory-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/inventory/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://inventory-service:8085, order=0, metadata={}}, RouteDefinition{id='notification-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/notifications/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}}}], uri=http://notification-service:8086, order=0, metadata={}}]
+2026-01-17 07:02:22,281 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [After]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Before]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Between]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Cookie]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Header]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Host]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Method]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Path]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Query]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [ReadBody]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [RemoteAddr]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Weight]
+2026-01-17 07:02:22,282 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-01-17 07:02:22,468 INFO org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver [main] Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-01-17 07:02:22,718 INFO org.springframework.boot.web.embedded.netty.NettyWebServer [main] Netty started on port 8080
+2026-01-17 07:02:22,740 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying {_genkey_0=/auth/**} to Path
+2026-01-17 07:02:22,748 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:02:22,758 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:02:22,759 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: auth-service
+2026-01-17 07:02:22,759 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying {_genkey_0=/api/users/**} to Path
+2026-01-17 07:02:22,760 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:02:22,761 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {} to JwtValidation
+2026-01-17 07:02:22,762 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:02:22,763 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: user-service
+2026-01-17 07:02:22,764 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying {_genkey_0=/api/products/**} to Path
+2026-01-17 07:02:22,764 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:02:22,765 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {} to JwtValidation
+2026-01-17 07:02:22,766 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:02:22,767 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: product-service
+2026-01-17 07:02:22,767 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying {_genkey_0=/api/orders/**} to Path
+2026-01-17 07:02:22,768 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:02:22,769 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {} to JwtValidation
+2026-01-17 07:02:22,769 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}} to RequestRateLimiter
+2026-01-17 07:02:22,770 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: order-service
+2026-01-17 07:02:22,770 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying {_genkey_0=/api/inventory/**} to Path
+2026-01-17 07:02:22,772 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:02:22,773 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {} to JwtValidation
+2026-01-17 07:02:22,773 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:02:22,774 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: inventory-service
+2026-01-17 07:02:22,774 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying {_genkey_0=/api/notifications/**} to Path
+2026-01-17 07:02:22,774 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:02:22,775 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {} to JwtValidation
+2026-01-17 07:02:22,775 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:02:22,776 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: notification-service
+2026-01-17 07:02:22,779 DEBUG org.springframework.cloud.gateway.filter.GatewayMetricsFilter [main] New routes count: 6
+2026-01-17 07:02:22,780 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Started ApiGatewayApplication in 2.187 seconds (process running for 2.539)
+2026-01-17 07:08:39,548 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Starting ApiGatewayApplication using Java 21.0.7 with PID 36412 (C:\dev\order-processing-platform\api-gateway\build\classes\java\main started by Kukyo in C:\dev\order-processing-platform)
+2026-01-17 07:08:39,549 DEBUG com.ecommerce.gateway.ApiGatewayApplication [main] Running with Spring Boot v3.2.1, Spring v6.1.2
+2026-01-17 07:08:39,550 INFO com.ecommerce.gateway.ApiGatewayApplication [main] No active profile set, falling back to 1 default profile: "default"
+2026-01-17 07:08:40,165 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-17 07:08:40,167 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-17 07:08:40,185 INFO org.springframework.data.repository.config.RepositoryConfigurationDelegate [main] Finished Spring Data repository scanning in 9 ms. Found 0 Redis repository interfaces.
+2026-01-17 07:08:40,305 INFO org.springframework.cloud.context.scope.GenericScope [main] BeanFactory id=8703dc99-e08d-37f9-96b4-344c594f513c
+2026-01-17 07:08:40,480 INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory [main] ✅ JWT конфигурация валидна (длина: 42)
+2026-01-17 07:08:40,987 DEBUG org.springframework.cloud.gateway.config.GatewayProperties [main] Routes supplied from Gateway Properties: [RouteDefinition{id='auth-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/auth/**}}], filters=[FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1}}], uri=http://auth-service:8087, order=0, metadata={}}, RouteDefinition{id='user-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/users/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://user-service:8081, order=0, metadata={}}, RouteDefinition{id='product-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/products/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://product-service:8084, order=0, metadata={}}, RouteDefinition{id='order-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/orders/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}}}], uri=http://order-service:8083, order=0, metadata={}}, RouteDefinition{id='inventory-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/inventory/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}}}], uri=http://inventory-service:8085, order=0, metadata={}}, RouteDefinition{id='notification-service', predicates=[PredicateDefinition{name='Path', args={_genkey_0=/api/notifications/**}}], filters=[FilterDefinition{name='JwtValidation', args={}}, FilterDefinition{name='RequestRateLimiter', args={redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}}}], uri=http://notification-service:8086, order=0, metadata={}}]
+2026-01-17 07:08:41,121 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [After]
+2026-01-17 07:08:41,121 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Before]
+2026-01-17 07:08:41,121 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Between]
+2026-01-17 07:08:41,121 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Cookie]
+2026-01-17 07:08:41,121 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Header]
+2026-01-17 07:08:41,121 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Host]
+2026-01-17 07:08:41,121 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Method]
+2026-01-17 07:08:41,121 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Path]
+2026-01-17 07:08:41,121 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Query]
+2026-01-17 07:08:41,121 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [ReadBody]
+2026-01-17 07:08:41,122 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [RemoteAddr]
+2026-01-17 07:08:41,122 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-01-17 07:08:41,122 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [Weight]
+2026-01-17 07:08:41,122 INFO org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-01-17 07:08:41,300 INFO org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver [main] Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-01-17 07:08:41,558 INFO org.springframework.boot.web.embedded.netty.NettyWebServer [main] Netty started on port 8080
+2026-01-17 07:08:41,578 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying {_genkey_0=/auth/**} to Path
+2026-01-17 07:08:41,587 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:08:41,596 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition auth-service applying filter {redis-rate-limiter.replenishRate=10, redis-rate-limiter.burstCapacity=20, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:08:41,596 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: auth-service
+2026-01-17 07:08:41,596 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying {_genkey_0=/api/users/**} to Path
+2026-01-17 07:08:41,597 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:08:41,598 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {} to JwtValidation
+2026-01-17 07:08:41,599 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition user-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:08:41,600 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: user-service
+2026-01-17 07:08:41,600 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying {_genkey_0=/api/products/**} to Path
+2026-01-17 07:08:41,600 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:08:41,601 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {} to JwtValidation
+2026-01-17 07:08:41,603 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition product-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:08:41,603 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: product-service
+2026-01-17 07:08:41,603 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying {_genkey_0=/api/orders/**} to Path
+2026-01-17 07:08:41,604 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:08:41,604 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {} to JwtValidation
+2026-01-17 07:08:41,605 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition order-service applying filter {redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@userIdKeyResolver}} to RequestRateLimiter
+2026-01-17 07:08:41,606 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: order-service
+2026-01-17 07:08:41,606 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying {_genkey_0=/api/inventory/**} to Path
+2026-01-17 07:08:41,607 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:08:41,607 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {} to JwtValidation
+2026-01-17 07:08:41,608 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition inventory-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:08:41,608 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: inventory-service
+2026-01-17 07:08:41,608 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying {_genkey_0=/api/notifications/**} to Path
+2026-01-17 07:08:41,609 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {redis-rate-limiter.replenishRate=100, redis-rate-limiter.burstCapacity=200, key-resolver=#{@ipKeyResolver}, requestedTokens=1} to RequestRateLimiter
+2026-01-17 07:08:41,609 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {} to JwtValidation
+2026-01-17 07:08:41,609 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition notification-service applying filter {redis-rate-limiter.replenishRate=50, redis-rate-limiter.burstCapacity=100, key-resolver=#{@ipKeyResolver}} to RequestRateLimiter
+2026-01-17 07:08:41,610 DEBUG org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator [main] RouteDefinition matched: notification-service
+2026-01-17 07:08:41,614 DEBUG org.springframework.cloud.gateway.filter.GatewayMetricsFilter [main] New routes count: 6
+2026-01-17 07:08:41,615 INFO com.ecommerce.gateway.ApiGatewayApplication [main] Started ApiGatewayApplication in 2.384 seconds (process running for 2.719)
+2026-01-17 07:09:26,012 DEBUG org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping [reactor-http-nio-2] Route matched: user-service
+2026-01-17 07:09:26,013 DEBUG org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping [reactor-http-nio-2] Mapping [Exchange: GET http://localhost:8080/api/users] to Route{id='user-service', uri=http://user-service:8081, order=0, predicate=Paths: [/api/users/**], match trailing slash: true, gatewayFilters=[[org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory$$Lambda/0x000001c41a718fa0@36958032, order = 1], [com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory$$Lambda/0x000001c41a719b80@213d427c, order = 1], [org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory$$Lambda/0x000001c41a718fa0@100e9b03, order = 2]], metadata={}}
+2026-01-17 07:09:26,014 DEBUG org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping [reactor-http-nio-2] [e1ac6861-2] Mapped to org.springframework.cloud.gateway.handler.FilteringWebHandler@8e319c1
+2026-01-17 07:09:26,054 ERROR org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler [reactor-http-nio-2] [e1ac6861-2]  500 Server Error for HTTP GET "/api/users"
+java.lang.IllegalArgumentException: When allowCredentials is true, allowedOrigins cannot contain the special value "*" since that cannot be set on the "Access-Control-Allow-Origin" response header. To allow credentials to a set of origins, list them explicitly or consider using "allowedOriginPatterns" instead.
+	at org.springframework.web.cors.CorsConfiguration.validateAllowCredentials(CorsConfiguration.java:538)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ org.springframework.cloud.gateway.filter.WeightCalculatorWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ HTTP GET "/api/users" [ExceptionHandlingWebHandler]
+Original Stack Trace:
+		at org.springframework.web.cors.CorsConfiguration.validateAllowCredentials(CorsConfiguration.java:538)
+		at org.springframework.web.reactive.handler.AbstractHandlerMapping.lambda$getHandler$1(AbstractHandlerMapping.java:198)
+		at reactor.core.publisher.FluxMap$MapSubscriber.onNext(FluxMap.java:106)
+		at reactor.core.publisher.FluxSwitchIfEmpty$SwitchIfEmptySubscriber.onNext(FluxSwitchIfEmpty.java:74)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:158)
+		at reactor.core.publisher.FluxMap$MapSubscriber.onNext(FluxMap.java:122)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onNext(MonoNext.java:82)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.innerNext(FluxConcatMapNoPrefetch.java:258)
+		at reactor.core.publisher.FluxConcatMap$ConcatMapInner.onNext(FluxConcatMap.java:863)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onNext(FluxOnErrorResume.java:79)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onNext(MonoPeekTerminal.java:180)
+		at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.onNext(MonoFilterWhen.java:136)
+		at reactor.core.publisher.Operators$ScalarSubscription.request(Operators.java:2571)
+		at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.request(MonoFilterWhen.java:182)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.request(MonoPeekTerminal.java:139)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.set(Operators.java:2367)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onSubscribe(FluxOnErrorResume.java:74)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onSubscribe(MonoPeekTerminal.java:152)
+		at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.onSubscribe(MonoFilterWhen.java:100)
+		at reactor.core.publisher.MonoJust.subscribe(MonoJust.java:55)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:76)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:206)
+		at reactor.core.publisher.FluxDematerialize$DematerializeSubscriber.onNext(FluxDematerialize.java:98)
+		at reactor.core.publisher.FluxDematerialize$DematerializeSubscriber.onNext(FluxDematerialize.java:44)
+		at reactor.core.publisher.FluxIterable$IterableSubscription.slowPath(FluxIterable.java:335)
+		at reactor.core.publisher.FluxIterable$IterableSubscription.request(FluxIterable.java:294)
+		at reactor.core.publisher.FluxDematerialize$DematerializeSubscriber.request(FluxDematerialize.java:127)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.innerComplete(FluxConcatMapNoPrefetch.java:274)
+		at reactor.core.publisher.FluxConcatMap$ConcatMapInner.onComplete(FluxConcatMap.java:887)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onComplete(Operators.java:2231)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onComplete(MonoPeekTerminal.java:299)
+		at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.onNext(MonoFilterWhen.java:141)
+		at reactor.core.publisher.Operators$ScalarSubscription.request(Operators.java:2571)
+		at reactor.core.publisher.MonoFilterWhen$MonoFilterWhenMain.request(MonoFilterWhen.java:182)
+		at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.request(MonoPeekTerminal.java:139)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2331)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2331)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:338)
+		at reactor.core.publisher.MonoNext$NextSubscriber.request(MonoNext.java:108)
+		at reactor.core.publisher.FluxMap$MapSubscriber.request(FluxMap.java:164)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.request(MonoFlatMap.java:194)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2331)
+		at reactor.core.publisher.FluxMap$MapSubscriber.request(FluxMap.java:164)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.request(Operators.java:2331)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:338)
+		at reactor.core.publisher.MonoNext$NextSubscriber.request(MonoNext.java:108)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.set(Operators.java:2367)
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onSubscribe(Operators.java:2241)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onSubscribe(MonoNext.java:70)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onSubscribe(FluxConcatMapNoPrefetch.java:164)
+		at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:201)
+		at reactor.core.publisher.FluxIterable.subscribe(FluxIterable.java:83)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:76)
+		at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:53)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:76)
+		at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:53)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:76)
+		at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:264)
+		at reactor.core.publisher.MonoIgnoreThen.subscribe(MonoIgnoreThen.java:51)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:76)
+		at reactor.core.publisher.MonoDeferContextual.subscribe(MonoDeferContextual.java:55)
+		at reactor.netty.http.server.HttpServer$HttpServerHandle.onStateChange(HttpServer.java:1169)
+		at reactor.netty.ReactorNetty$CompositeConnectionObserver.onStateChange(ReactorNetty.java:710)
+		at reactor.netty.transport.ServerTransport$ChildObserver.onStateChange(ServerTransport.java:481)
+		at reactor.netty.http.server.HttpServerOperations.onInboundNext(HttpServerOperations.java:652)
+		at reactor.netty.channel.ChannelOperationsHandler.channelRead(ChannelOperationsHandler.java:114)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at reactor.netty.http.server.HttpTrafficHandler.channelRead(HttpTrafficHandler.java:238)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelRead(CombinedChannelDuplexHandler.java:436)
+		at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:346)
+		at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:318)
+		at io.netty.channel.CombinedChannelDuplexHandler.channelRead(CombinedChannelDuplexHandler.java:251)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412)
+		at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:440)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420)
+		at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919)
+		at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:788)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:1583)

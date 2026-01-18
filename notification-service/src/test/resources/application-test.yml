@@ -2,6 +2,13 @@ spring:
   application:
     name: notification-service-test
 
+  # Disable Vault for tests
+  cloud:
+    vault:
+      enabled: false
+  config:
+    import: ""
+
   # MongoDB + Redis в одном блоке data
   data:
     mongodb:

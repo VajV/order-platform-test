@@ -43,7 +43,7 @@ public class ProductService {
     /**
      * Получить товар по ID
      */
-    public ProductResponse getProductById(String id) {  // ← String вместо Long
+    public ProductResponse getProductById(Long id) {
         log.info("Fetching product with id: {}", id);
 
         Product product = productRepository.findByIdAndActiveTrue(id)
@@ -59,13 +59,13 @@ public class ProductService {
     /**
      * Получить товары по категории
      */
-    public List<ProductResponse> getProductsByCategory(String categoryId) {  // ← String вместо Long
+    public List<ProductResponse> getProductsByCategory(Long categoryId) {
         log.info("Fetching products for category id: {}", categoryId);
 
         // Проверяем существование категории
         validateCategoryExists(categoryId);
 
-        List<Product> products = productRepository.findByCategoryIdAndActiveTrue(categoryId);
+        List<Product> products = productRepository.findByCategory_IdAndActiveTrue(categoryId);
         log.debug("Found {} products in category {}", products.size(), categoryId);
 
         return products.stream()
@@ -84,7 +84,7 @@ public class ProductService {
             throw new InvalidProductException("Search term cannot be empty");
         }
 
-        Page<Product> products = productRepository.searchByName(name.trim(), pageable);
+        Page<Product> products = productRepository.findByActiveTrueAndNameContainingIgnoreCase(name.trim(), pageable);
         log.debug("Found {} products matching '{}'", products.getTotalElements(), name);
 
         return products.map(productMapper::toResponse);
@@ -96,7 +96,7 @@ public class ProductService {
     public List<ProductResponse> getProductsInStock() {
         log.info("Fetching products in stock");
 
-        List<Product> products = productRepository.findInStock();
+        List<Product> products = productRepository.findByActiveTrueAndStockGreaterThan(0);
         log.debug("Found {} products in stock", products.size());
 
         return products.stream()
@@ -131,21 +131,8 @@ public class ProductService {
                     return new InvalidProductException("Category not found with id: " + request.getCategoryId());
                 });
 
-        // Создание товара (MongoDB - денормализация)
-        Product product = Product.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .stock(request.getStock())
-                .categoryId(category.getId())  // ← Сохраняем ID категории
-                .categoryName(category.getName())  // ← Денормализация
-                .imageUrl(request.getImageUrl())
-                .active(request.isActive())
-                .rating(0.0)
-                .reviewCount(0)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        Product product = productMapper.toEntity(request);
+        product.setCategory(category);
 
         Product savedProduct = productRepository.save(product);
         log.info("Product created successfully with id: {}", savedProduct.getId());
@@ -159,7 +146,7 @@ public class ProductService {
     /**
      * Обновить товар (только ADMIN)
      */
-    public ProductResponse updateProduct(String id, ProductRequest request) {  // ← String вместо Long
+    public ProductResponse updateProduct(Long id, ProductRequest request) {
         log.info("Updating product with id: {}", id);
 
         // Находим существующий товар
@@ -181,11 +168,9 @@ public class ProductService {
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
-        product.setCategoryId(category.getId());
-        product.setCategoryName(category.getName());
+        product.setCategory(category);
         product.setImageUrl(request.getImageUrl());
         product.setActive(request.isActive());
-        product.setUpdatedAt(LocalDateTime.now());
 
         Product updatedProduct = productRepository.save(product);
         log.info("Product updated successfully: {}", updatedProduct.getId());
@@ -199,7 +184,7 @@ public class ProductService {
     /**
      * Удалить товар (только ADMIN) - soft delete
      */
-    public void deleteProduct(String id) {  // ← String вместо Long
+    public void deleteProduct(Long id) {
         log.info("Deleting product with id: {}", id);
 
         Product product = productRepository.findById(id)
@@ -210,7 +195,6 @@ public class ProductService {
 
         // Soft delete - помечаем как неактивный
         product.setActive(false);
-        product.setUpdatedAt(LocalDateTime.now());
         productRepository.save(product);
 
         log.info("Product marked as inactive (soft deleted): {}", id);
@@ -222,7 +206,7 @@ public class ProductService {
     /**
      * Обновить количество товара (INTERNAL - вызывается из order-service)
      */
-    public void updateStock(String id, Integer quantity) {  // ← String вместо Long
+    public void updateStock(Long id, Integer quantity) {
         log.info("Updating stock for product {}: reduce by {}", id, quantity);
 
         Product product = productRepository.findById(id)
@@ -243,7 +227,6 @@ public class ProductService {
 
         // Уменьшаем количество
         product.setStock(product.getStock() - quantity);
-        product.setUpdatedAt(LocalDateTime.now());
         productRepository.save(product);
 
         log.info("Stock updated successfully for product {}. New stock: {}", id, product.getStock());
@@ -257,7 +240,7 @@ public class ProductService {
     /**
      * Проверка существования категории
      */
-    private void validateCategoryExists(String categoryId) {
+    private void validateCategoryExists(Long categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
             log.error("Category not found with id: {}", categoryId);
             throw new InvalidProductException("Category not found with id: " + categoryId);

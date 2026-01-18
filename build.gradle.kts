@@ -7,6 +7,9 @@ plugins {
     id("io.spring.dependency-management") version "1.1.4" apply false
 }
 
+extra["springCloudVersion"] = "2023.0.1"
+extra["flywayVersion"] = "10.10.0"
+
 allprojects {
     group = "com.ecommerce"
     version = "1.0.0"
@@ -19,8 +22,8 @@ subprojects {
     apply(plugin = "io.spring.dependency-management")
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_21  // ✅ Java 21!
-        targetCompatibility = JavaVersion.VERSION_21  // ✅ Java 21!
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     tasks.withType<JavaCompile> {
@@ -37,11 +40,16 @@ subprojects {
     }
 
     dependencies {
+        // Spring Cloud BOM
+        implementation(platform("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}"))
+
+        // Lombok
         compileOnly("org.projectlombok:lombok")
         annotationProcessor("org.projectlombok:lombok")
         testCompileOnly("org.projectlombok:lombok")
         testAnnotationProcessor("org.projectlombok:lombok")
 
+        // Testing
         testImplementation("org.springframework.boot:spring-boot-starter-test")
     }
 

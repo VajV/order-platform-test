@@ -26,7 +26,7 @@ public class ProductRequest {
         private Integer stock;
 
         @NotNull(message = "Category ID is required")
-        private String categoryId;  // ← String вместо Long
+        private Long categoryId;
 
         @Size(max = 500, message = "Image URL must not exceed 500 characters")
         private String imageUrl;

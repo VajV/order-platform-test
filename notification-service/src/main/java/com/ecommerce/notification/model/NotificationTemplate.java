@@ -19,7 +19,6 @@ public class NotificationTemplate {
     @Id
     private String id;
 
-    @Indexed(unique = true)
     private String eventType;
 
     private String subjectTemplate;
