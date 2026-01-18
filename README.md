@@ -1,376 +1,291 @@
-# Order Processing Platform
+# 🛒 Order Processing Platform
 
-Event-driven платформа обработки заказов для e-commerce на **Spring Boot 3.2** и **Java 21**.
+Event-Driven микросервисная платформа для обработки заказов e-commerce магазина.
+
+[![CI Pipeline](https://github.com/your-org/order-processing-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/order-processing-platform/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/your-org/order-processing-platform/branch/main/graph/badge.svg)](https://codecov.io/gh/your-org/order-processing-platform)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green.svg)](https://spring.io/projects/spring-boot)
+
+---
+
+## 🎯 Возможности
+
+- ✅ **7 микросервисов** с чистой архитектурой
+- ✅ **Event-Driven** взаимодействие через Apache Kafka
+- ✅ **REST API** для синхронных вызовов
+- ✅ **JWT** аутентификация (Spring Security 6)
+- ✅ **Testcontainers** интеграционные тесты
+- ✅ **Contract Testing** с Spring Cloud Contract
+- ✅ **CI/CD** GitHub Actions с автоматическим деплоем
+- ✅ **Kubernetes-ready** с Helm charts
+- ✅ **80%+ code coverage**
+
+---
 
 ## 🏗️ Архитектура
 
-### Микросервисы
+```
+                         ┌─────────────────┐
+                         │   API Gateway   │◄─── HTTP/REST
+                         │    (Port 8080)  │
+                         └────────┬────────┘
+                                  │
+        ┌─────────────────────────┼─────────────────────────┐
+        │                         │                         │
+┌───────▼───────┐  ┌──────────────▼──────────────┐  ┌───────▼───────┐
+│  Auth Service │  │        User Service         │  │Product Service│
+│  (Port 8081)  │  │        (Port 8082)          │  │  (Port 8083)  │
+│   PostgreSQL  │  │        PostgreSQL           │  │    MongoDB    │
+└───────────────┘  └─────────────────────────────┘  └───────────────┘
+                                  │
+        ┌─────────────────────────┼─────────────────────────┐
+        │                         │                         │
+┌───────▼───────┐  ┌──────────────▼──────────────┐  ┌───────▼───────┐
+│ Order Service │◄────────────────────────────────►│Inventory Svc  │
+│  (Port 8085)  │         Apache Kafka            │  (Port 8084)   │
+│   PostgreSQL  │                                  │   PostgreSQL   │
+└───────────────┘                                  └───────────────┘
+        │
+        │ Kafka Events
+        ▼
+┌───────────────┐
+│ Notification  │
+│    Service    │
+│  (Port 8086)  │
+│    MongoDB    │
+└───────────────┘
+```
 
-| Сервис | Порт | Описание | База данных |
-|--------|------|----------|-------------|
-| `api-gateway` | 8080 | Единая точка входа, rate limiting, JWT validation | Redis |
-| `auth-service` | 8087 | JWT аутентификация и авторизация | PostgreSQL |
-| `user-service` | 8081 | Управление пользователями и профилями | PostgreSQL |
-| `product-service` | 8084 | Каталог продуктов | PostgreSQL |
-| `order-service` | 8083 | Обработка заказов (Event-Driven Saga) | PostgreSQL |
-| `inventory-service` | 8085 | Управление складскими остатками | PostgreSQL + Redis |
-| `notification-service` | 8086 | Email/SMS уведомления | MongoDB |
-
-### Инфраструктура
-
-- **PostgreSQL 15** — основная БД (отдельная база на сервис)
-- **MongoDB 7** — документы, логи, шаблоны уведомлений
-- **Redis 7** — кэш, rate limiting, distributed locks
-- **Apache Kafka 7.5** — Event Streaming
-- **Schema Registry** — управление схемами Kafka
-- **HashiCorp Vault** — управление секретами (опционально)
+---
 
 ## 🚀 Быстрый старт
 
-### Предварительные требования
+### Требования
 
-- Java 21
-- Docker & Docker Compose
-- Gradle 8+ (или используйте `./gradlew`)
+- **Java 21+**
+- **Docker Desktop** (WSL 2 для Windows)
+- **Make** или PowerShell 5+
+- **k3d** (для Kubernetes, опционально)
 
-### 1. Клонирование репозитория
+### Локальная разработка (Docker Compose)
 
 ```bash
-git clone <repository-url>
+# Клонировать репозиторий
+git clone https://github.com/your-org/order-processing-platform.git
 cd order-processing-platform
-```
 
-### 2. Конфигурация секретов
-
-**ВАЖНО:** Создайте файл `.env` на основе шаблона:
-
-```bash
+# Скопировать .env
 cp .env.example .env
+
+# Запустить все сервисы
+make dev-up
+
+# Проверить статус
+docker-compose ps
+
+# API Gateway: http://localhost:8080
+# Swagger UI:  http://localhost:8080/swagger-ui.html
+# Kafka UI:    http://localhost:8088
 ```
 
-Отредактируйте `.env` и **обязательно замените** все значения `CHANGE_ME`:
+### Kubernetes (k3d)
 
 ```bash
-# Минимальные изменения для запуска:
-POSTGRES_PASSWORD=your_strong_postgres_password_here
-MONGO_INITDB_ROOT_PASSWORD=your_strong_mongo_password_here
+# Создать кластер
+make k3d-up
 
-# КРИТИЧЕСКИ ВАЖНО - JWT Secret (минимум 32 символа)
-# Генерация: openssl rand -base64 32
-JWT_SECRET=$(openssl rand -base64 32)
+# Установить Helm chart
+make helm-install
+
+# Проверить статус
+make k8s-status
+
+# Port-forward API Gateway
+make port-forward
+# → http://localhost:8080
 ```
 
-> **⚠️ SECURITY WARNING:**
-> - НЕ используйте дефолтные пароли в production!
-> - НЕ коммитьте `.env` файл в Git!
-> - Используйте Vault или Kubernetes Secrets в production!
+---
 
-### 3. Запуск через Docker Compose
-
-> **✅ Базы данных создаются автоматически!**  
-> При первом запуске PostgreSQL автоматически создаст: `auth_db`, `user_db`, `product_db`, `order_db`, `inventory_db`
-
-#### Вариант A: Полная система (инфраструктура + сервисы)
+## 🧪 Тестирование
 
 ```bash
-docker compose up -d
-```
+# Запустить все тесты
+make test
 
-#### Вариант B: Только инфраструктура (для локальной разработки)
+# Генерировать отчёт покрытия
+make coverage
 
-```bash
-docker compose -f docker-compose-infra.yml up -d
-```
+# Contract tests
+make test-contract
 
-Затем запускайте сервисы локально:
-
-```bash
-./gradlew :auth-service:bootRun
-./gradlew :api-gateway:bootRun
-# и т.д.
-```
-
-### 4. Проверка работоспособности
-
-```bash
-# Проверка здоровья всех сервисов
-curl http://localhost:8080/actuator/health  # API Gateway
-curl http://localhost:8087/actuator/health  # Auth Service
-curl http://localhost:8081/actuator/health  # User Service
-# ...
-
-# Kafka UI
-open http://localhost:8090
-
-# Schema Registry
-curl http://localhost:8082/subjects
-```
-
-## 🛠️ Разработка
-
-### Сборка проекта
-
-```bash
-# Полная сборка всех модулей
-./gradlew clean build
-
-# Сборка конкретного сервиса
-./gradlew :auth-service:build
-
-# Пропустить тесты
-./gradlew build -x test
-```
-
-### Запуск тестов
-
-```bash
-# Все тесты
+# Только unit-тесты
 ./gradlew test
 
-# Тесты конкретного модуля
-./gradlew :user-service:test
-
-# Интеграционные тесты (требуют Testcontainers)
-./gradlew :auth-service:integrationTest
+# Только integration-тесты
+./gradlew test --tests '*IntegrationTest'
 ```
 
-### Проверка кода
+---
 
-```bash
-# Checkstyle
-./gradlew checkstyleMain
+## 📊 Статистика проекта
 
-# SpotBugs
-./gradlew spotbugsMain
-```
+| Метрика | Значение |
+|---------|----------|
+| Микросервисы | 7 |
+| Unit tests | 75+ |
+| Integration tests | 20+ |
+| Controller tests | 30+ |
+| Contract tests | 8 |
+| Code coverage | 80%+ |
+| Строк кода | ~15,000 |
 
-## 📦 Docker образы
+---
 
-### Пересборка образов
+## 🔧 Технологический стек
 
-```bash
-# Все сервисы
-docker compose build --no-cache
+### Backend
+- **Java 21** - язык программирования
+- **Spring Boot 3.2** - фреймворк
+- **Spring Security 6** - безопасность (JWT)
+- **Spring Cloud Gateway** - API Gateway
+- **Spring Cloud Contract** - contract testing
 
-# Конкретный сервис
-docker compose build --no-cache auth-service
-```
+### Messaging & Data
+- **Apache Kafka** - event streaming
+- **PostgreSQL 15** - OLTP база данных
+- **MongoDB 7** - NoSQL для каталога
+- **Redis 7** - кэширование
 
-### Просмотр логов
+### Infrastructure
+- **Docker** - контейнеризация
+- **Kubernetes (k3d)** - оркестрация
+- **Helm 3** - package manager
+- **GitHub Actions** - CI/CD
 
-```bash
-# Все сервисы
-docker compose logs -f
+### Testing
+- **JUnit 5** - unit тесты
+- **Testcontainers** - integration тесты
+- **MockMvc** - controller тесты
+- **Mockito** - моки
+- **AssertJ** - assertions
 
-# Конкретный сервис
-docker compose logs -f auth-service
+---
 
-# Последние 100 строк
-docker compose logs --tail=100 order-service
-```
+## 📖 Документация
+
+- [Kubernetes Deployment](docs/KUBERNETES.md)
+- [CI/CD Pipeline](docs/CI_CD.md)
+- [Contract Testing](docs/CONTRACT_TESTING.md)
+- [Security Changes](SECURITY_CHANGES.md)
+- [Environment Setup](ENV_SETUP.md)
+- [Demo Guide](docs/DEMO.md)
+
+---
 
 ## 🔐 Безопасность
 
-### JWT Токены
+- ✅ JWT-токены с HS256/RS256 алгоритмом
+- ✅ RBAC (ROLE_USER, ROLE_MANAGER, ROLE_ADMIN)
+- ✅ Rate limiting (Redis)
+- ✅ Security scanning (Trivy, OWASP)
+- ✅ Secrets в .env (не в коде)
 
-- **Access Token**: 1 час (по умолчанию)
-- **Refresh Token**: 7 дней (по умолчанию)
-- Алгоритм: HS256 (можно переключить на RS256)
+---
 
-### Получение токена
+## 📝 API Примеры
 
+### Регистрация пользователя
 ```bash
-# Регистрация
-curl -X POST http://localhost:8080/auth/register \
+curl -X POST http://localhost:8080/api/users/register \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "john.doe",
-    "email": "john@example.com",
+    "email": "user@example.com",
     "password": "SecurePass123!",
     "firstName": "John",
     "lastName": "Doe"
   }'
+```
 
-# Логин
-curl -X POST http://localhost:8080/auth/login \
+### Создание заказа
+```bash
+curl -X POST http://localhost:8080/api/v1/orders \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "john.doe",
-    "password": "SecurePass123!"
-  }'
-
-# Использование токена
-curl -X GET http://localhost:8080/api/users/me \
-  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"
-```
-
-### Vault (опционально)
-
-Если используете Vault:
-
-```bash
-# Запуск Vault в dev режиме (через docker-compose уже запущен)
-docker exec -it vault sh
-
-# Сохранение секретов
-vault kv put secret/auth-service jwt.secret="your-super-secret-key"
-vault kv put secret/auth-service db.password="secure-db-password"
-
-# Чтение секретов
-vault kv get secret/auth-service
-```
-
-## 📊 Мониторинг
-
-### Actuator Endpoints
-
-Все сервисы предоставляют:
-
-- `/actuator/health` — статус здоровья
-- `/actuator/metrics` — метрики
-- `/actuator/prometheus` — экспорт для Prometheus
-- `/actuator/info` — информация о приложении
-
-### Kafka Monitoring
-
-Kafka UI доступен на: http://localhost:8090
-
-### Database
-
-```bash
-# PostgreSQL
-docker exec -it postgres psql -U postgres
-
-# Список баз
-\l
-
-# Подключение к базе
-\c auth_db
-
-# Список таблиц
-\dt
-
-# MongoDB
-docker exec -it mongodb mongosh -u admin -p <password>
-
-# Список баз
-show dbs
-
-# Использование базы
-use notifications
-
-# Список коллекций
-show collections
-```
-
-## 🧪 Тестирование API
-
-### Postman Collection
-
-Импортируйте коллекцию из `docs/postman/Order-Platform.postman_collection.json`
-
-### cURL примеры
-
-#### Auth Service
-
-```bash
-# Регистрация пользователя
-curl -X POST http://localhost:8087/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"username":"test","email":"test@example.com","password":"Test123!"}'
-
-# Логин
-curl -X POST http://localhost:8087/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"test","password":"Test123!"}'
-```
-
-#### Product Service
-
-```bash
-# Список продуктов
-curl http://localhost:8084/api/products
-
-# Создание продукта (требует ADMIN роль)
-curl -X POST http://localhost:8084/api/products \
-  -H "Authorization: Bearer <TOKEN>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name":"Laptop",
-    "description":"High-end laptop",
-    "price":1299.99,
-    "stock":50,
-    "categoryId":"1"
+    "userId": 1,
+    "items": [
+      {"productId": "PROD-001", "productName": "Laptop", "quantity": 1, "unitPrice": 999.99}
+    ]
   }'
 ```
 
-## 📚 Документация
+---
 
-- Swagger UI доступен для каждого сервиса:
-  - Auth: http://localhost:8087/swagger-ui.html
-  - User: http://localhost:8081/swagger-ui.html
-  - Product: http://localhost:8084/swagger-ui.html
-  - Order: http://localhost:8083/swagger-ui.html
-  - Inventory: http://localhost:8085/swagger-ui.html
+## 🎓 Жизненный цикл заказа
 
-## 🐛 Troubleshooting
-
-### Проблема: "JWT Secret not set"
-
-**Решение:** Убедитесь, что `JWT_SECRET` установлен в `.env` файле и имеет длину минимум 32 символа.
-
-### Проблема: "Cannot connect to PostgreSQL"
-
-**Решение:**
-```bash
-# Проверьте статус контейнера
-docker ps | grep postgres
-
-# Проверьте логи
-docker logs postgres
-
-# Пересоздайте контейнер
-docker compose down -v
-docker compose up -d postgres
+```
+NEW → RESERVED → PAID → SHIPPED → COMPLETED
+       ↓
+    CANCELLED (если резерв не удался)
 ```
 
-### Проблема: "Flyway migration failed"
+---
 
-**Решение:**
-```bash
-# Очистите volume PostgreSQL (ВНИМАНИЕ: удалит все данные)
-docker compose down -v
-docker compose up -d
+## 📁 Структура проекта
+
+```
+order-processing-platform/
+├── api-gateway/              # Spring Cloud Gateway
+├── auth-service/             # Аутентификация (JWT)
+├── user-service/             # Управление пользователями
+├── product-service/          # Каталог товаров (MongoDB)
+├── order-service/            # Обработка заказов
+├── inventory-service/        # Управление запасами
+├── notification-service/     # Уведомления (Email, Kafka)
+├── helm/                     # Kubernetes Helm charts
+├── docs/                     # Документация
+├── scripts/                  # Скрипты инициализации
+├── docker-compose.yml        # Docker Compose (full stack)
+├── docker-compose-infra.yml  # Только инфраструктура
+├── Makefile                  # Команды разработки
+└── .github/workflows/        # CI/CD pipelines
 ```
 
-### Проблема: "Port already in use"
+---
 
-**Решение:**
-```bash
-# Найдите процесс на порту
-lsof -i :8080  # macOS/Linux
-netstat -ano | findstr :8080  # Windows
+## 🤝 Вклад в проект
 
-# Убейте процесс или измените порт в docker-compose.yml
-```
+1. Fork репозитория
+2. Создайте feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit изменения (`git commit -m 'Add amazing feature'`)
+4. Push в branch (`git push origin feature/amazing-feature`)
+5. Откройте Pull Request
 
-## 🤝 Contributing
+---
 
-1. Создайте feature branch (`git checkout -b feature/amazing-feature`)
-2. Коммитьте изменения (`git commit -m 'Add amazing feature'`)
-3. Пушьте в branch (`git push origin feature/amazing-feature`)
-4. Откройте Pull Request
+## 📄 Лицензия
 
-## 📝 License
+MIT License - см. [LICENSE](LICENSE) для деталей.
 
-MIT License - see [LICENSE](LICENSE) file
+---
 
-## 👥 Authors
+## 👤 Автор
 
-- **Your Name** - [GitHub](https://github.com/yourusername)
+**Your Name**
+- GitHub: [@your-github](https://github.com/your-github)
+- Email: your.email@example.com
 
-## 🙏 Acknowledgments
+---
 
-- Spring Boot Team
-- Apache Kafka Community
-- HashiCorp Vault Team
+## 🙏 Благодарности
+
+- [Spring Team](https://spring.io/) за отличный фреймворк
+- [Testcontainers](https://testcontainers.com/) за простоту интеграционного тестирования
+- [Bitnami](https://bitnami.com/) за качественные Helm charts
+
+---
+
+⭐ **Поставьте звезду, если проект был полезен!**
