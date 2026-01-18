@@ -45,9 +45,13 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:1.19.3")
     testImplementation("org.testcontainers:kafka:1.19.3")
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+    
+    // Contract Testing - Consumer side (stub runner)
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
 }
 
 tasks.test {
     useJUnitPlatform()
-    enabled = false
+    // Включаем тесты обратно
+    enabled = true
 }

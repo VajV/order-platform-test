@@ -1,6 +1,7 @@
 plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
+    id("org.springframework.cloud.contract") version "4.1.0"
     java
     jacoco
 }
@@ -50,6 +51,18 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:1.19.3")
     testImplementation("org.testcontainers:kafka:1.19.3")
     testImplementation("org.awaitility:awaitility:4.2.0")
+    
+    // Contract Testing
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier")
+    testImplementation("org.springframework.cloud:spring-cloud-contract-spec-kotlin")
+    testImplementation("io.rest-assured:spring-mock-mvc:5.4.0")
+}
+
+// Spring Cloud Contract configuration
+contracts {
+    testFramework.set(org.springframework.cloud.contract.verifier.config.TestFramework.JUNIT5)
+    baseClassForTests.set("com.orderplatform.order.contract.BaseContractTest")
+    contractsDslDir.set(file("src/test/resources/contracts"))
 }
 
 tasks.test {
