@@ -5,8 +5,8 @@ spring:
   application:
     name: notification-service
 
-  config:
-    import: optional:vault://
+  # config:
+    # import: optional:vault://  # Отключено для Docker
 
   data:
     mongodb:
@@ -44,12 +44,13 @@ spring:
 
   cloud:
     vault:
+      enabled: false  # Отключено для Docker
       uri: ${VAULT_URI:http://vault:8200}
       token: ${VAULT_TOKEN:}
       authentication: TOKEN
       fail-fast: false
       kv:
-        enabled: true
+        enabled: false
         backend: secret
         application-name: ${spring.application.name}
 

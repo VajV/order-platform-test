@@ -14,7 +14,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-databases.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./scripts/init-databases.sh:/docker-entrypoint-initdb.d/01-init-databases.sh
     networks:
       - order-platform-network
     healthcheck:
@@ -161,13 +161,15 @@ services:
     ports:
       - "8200:8200"
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_TOKEN}
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_TOKEN:-dev-root-token}
       VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
     cap_add:
       - IPC_LOCK
     networks:
       - order-platform-network
     restart: unless-stopped
+    profiles:
+      - with-vault  # Optional: start only when explicitly requested
 
   # ========================================
   # MICROSERVICES
@@ -179,11 +181,14 @@ services:
     ports:
       - "8080:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
+      SERVER_PORT: 8080
       REDIS_HOST: redis
       REDIS_PORT: 6379
       JWT_SECRET: ${JWT_SECRET}
-      VAULT_URI: ${VAULT_URI}
-      VAULT_TOKEN: ${VAULT_TOKEN}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      VAULT_URI: ${VAULT_URI:-}
+      VAULT_TOKEN: ${VAULT_TOKEN:-}
       # Роуты к микросервисам
       USER_SERVICE_URL: http://user-service:8081
       AUTH_SERVICE_URL: http://auth-service:8087
@@ -191,6 +196,11 @@ services:
       ORDER_SERVICE_URL: http://order-service:8083
       INVENTORY_SERVICE_URL: http://inventory-service:8085
       NOTIFICATION_SERVICE_URL: http://notification-service:8086
+      # Rate limiting
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      RATE_LIMIT_REQUESTS_PER_MINUTE: ${RATE_LIMIT_REQUESTS_PER_MINUTE:-100}
+      # CORS
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:4200}
     depends_on:
       redis:
         condition: service_healthy
@@ -204,6 +214,7 @@ services:
     ports:
       - "8087:8087"
     environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
       SPRING_APPLICATION_NAME: auth-service
       SERVER_PORT: 8087
       DB_HOST: postgres
@@ -212,10 +223,13 @@ services:
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-      VAULT_URI: ${VAULT_URI}
-      VAULT_TOKEN: ${VAULT_TOKEN}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+      VAULT_URI: ${VAULT_URI:-}
+      VAULT_TOKEN: ${VAULT_TOKEN:-}
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     depends_on:
       postgres:
         condition: service_healthy
@@ -231,6 +245,7 @@ services:
     ports:
       - "8081:8081"
     environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
       SPRING_APPLICATION_NAME: user-service
       SERVER_PORT: 8081
       DB_HOST: postgres
@@ -241,8 +256,10 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
       JWT_SECRET: ${JWT_SECRET}
-      VAULT_URI: ${VAULT_URI}
-      VAULT_TOKEN: ${VAULT_TOKEN}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      VAULT_URI: ${VAULT_URI:-}
+      VAULT_TOKEN: ${VAULT_TOKEN:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     depends_on:
       postgres:
         condition: service_healthy
@@ -258,6 +275,7 @@ services:
     ports:
       - "8084:8084"
     environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
       SPRING_APPLICATION_NAME: product-service
       SERVER_PORT: 8084
       DB_HOST: postgres
@@ -268,8 +286,10 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
       JWT_SECRET: ${JWT_SECRET}
-      VAULT_URI: ${VAULT_URI}
-      VAULT_TOKEN: ${VAULT_TOKEN}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-900000}
+      VAULT_URI: ${VAULT_URI:-}
+      VAULT_TOKEN: ${VAULT_TOKEN:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     depends_on:
       postgres:
         condition: service_healthy
@@ -285,6 +305,7 @@ services:
     ports:
       - "8083:8083"
     environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
       SPRING_APPLICATION_NAME: order-service
       SERVER_PORT: 8083
       DB_HOST: postgres
@@ -295,8 +316,9 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
       JWT_ISSUER_URI: http://auth-service:8087
-      VAULT_URI: ${VAULT_URI}
-      VAULT_TOKEN: ${VAULT_TOKEN}
+      VAULT_URI: ${VAULT_URI:-}
+      VAULT_TOKEN: ${VAULT_TOKEN:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     depends_on:
       postgres:
         condition: service_healthy
@@ -312,6 +334,7 @@ services:
     ports:
       - "8085:8085"
     environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
       SPRING_APPLICATION_NAME: inventory-service
       SERVER_PORT: 8085
       DB_HOST: postgres
@@ -323,8 +346,10 @@ services:
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      VAULT_URI: ${VAULT_URI}
-      VAULT_TOKEN: ${VAULT_TOKEN}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      VAULT_URI: ${VAULT_URI:-}
+      VAULT_TOKEN: ${VAULT_TOKEN:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     depends_on:
       postgres:
         condition: service_healthy
@@ -342,6 +367,7 @@ services:
     ports:
       - "8086:8086"
     environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
       SPRING_APPLICATION_NAME: notification-service
       SERVER_PORT: 8086
       MONGODB_HOST: mongodb
@@ -353,8 +379,15 @@ services:
       SCHEMA_REGISTRY_URL: http://schema-registry:8082
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      VAULT_URI: ${VAULT_URI}
-      VAULT_TOKEN: ${VAULT_TOKEN}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      VAULT_URI: ${VAULT_URI:-}
+      VAULT_TOKEN: ${VAULT_TOKEN:-}
+      # Email configuration
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-noreply@example.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     depends_on:
       mongodb:
         condition: service_healthy
