@@ -1,0 +1,162 @@
+# =============================================
+# Production Environment Values
+# =============================================
+
+global:
+  namespace: order-platform-prod
+  imagePullPolicy: IfNotPresent
+  imageRegistry: ghcr.io/your-org
+  imageTag: ""  # Set to specific version tag
+
+# Production-grade infrastructure
+postgresql:
+  enabled: true
+  primary:
+    persistence:
+      size: 50Gi
+      storageClass: fast-ssd
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+  metrics:
+    enabled: true
+
+mongodb:
+  enabled: true
+  architecture: replicaset
+  replicaCount: 3
+  persistence:
+    size: 50Gi
+    storageClass: fast-ssd
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+redis:
+  enabled: true
+  architecture: replication
+  replica:
+    replicaCount: 2
+  master:
+    persistence:
+      size: 10Gi
+      storageClass: fast-ssd
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+kafka:
+  enabled: true
+  replicaCount: 3
+  persistence:
+    size: 50Gi
+    storageClass: fast-ssd
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+
+# High availability for microservices
+apiGateway:
+  replicaCount: 3
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  ingress:
+    enabled: true
+    hostname: api.order-platform.com
+    tls:
+      - secretName: order-platform-tls
+        hosts:
+          - api.order-platform.com
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+
+authService:
+  replicaCount: 3
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+userService:
+  replicaCount: 2
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+productService:
+  replicaCount: 3
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+inventoryService:
+  replicaCount: 3
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+orderService:
+  replicaCount: 5
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+notificationService:
+  replicaCount: 2
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Production secrets (override via --set or external secrets)
+secrets:
+  jwtSecret: ""  # MUST be set externally
+  postgresPassword: ""  # MUST be set externally
+  mongoPassword: ""  # MUST be set externally
+

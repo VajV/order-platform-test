@@ -1,0 +1,60 @@
+{{- if .Values.notificationService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "order-platform.fullname" . }}-notification-service
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "order-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: notification
+spec:
+  replicas: {{ .Values.notificationService.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: notification-service
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: notification-service
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: notification
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "order-platform.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: notification-service
+          image: {{ include "order-platform.image" (dict "registry" .Values.global.imageRegistry "repository" .Values.notificationService.image.repository "tag" .Values.notificationService.image.tag "globalTag" .Values.global.imageTag) }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 8086
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "order-platform.fullname" . }}-config
+          env:
+            {{- include "order-platform.commonEnv" . | nindent 12 }}
+            {{- include "order-platform.mongoEnv" (dict "Release" .Release "dbName" "notificationdb") | nindent 12 }}
+            - name: MAIL_HOST
+              value: {{ .Values.notificationService.env.MAIL_HOST | quote }}
+            - name: MAIL_PORT
+              value: {{ .Values.notificationService.env.MAIL_PORT | quote }}
+          {{- include "order-platform.livenessProbe" (dict "initialDelaySeconds" 60) | nindent 10 }}
+          {{- include "order-platform.readinessProbe" (dict "initialDelaySeconds" 30) | nindent 10 }}
+          resources:
+            {{- toYaml .Values.notificationService.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}
+

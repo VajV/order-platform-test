@@ -1,0 +1,56 @@
+{{- if .Values.productService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "order-platform.fullname" . }}-product-service
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "order-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: product
+spec:
+  replicas: {{ .Values.productService.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: product-service
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: product-service
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: product
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "order-platform.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: product-service
+          image: {{ include "order-platform.image" (dict "registry" .Values.global.imageRegistry "repository" .Values.productService.image.repository "tag" .Values.productService.image.tag "globalTag" .Values.global.imageTag) }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 8083
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "order-platform.fullname" . }}-config
+          env:
+            {{- include "order-platform.commonEnv" . | nindent 12 }}
+            {{- include "order-platform.mongoEnv" (dict "Release" .Release "dbName" "productdb") | nindent 12 }}
+          {{- include "order-platform.livenessProbe" (dict "initialDelaySeconds" 60) | nindent 10 }}
+          {{- include "order-platform.readinessProbe" (dict "initialDelaySeconds" 30) | nindent 10 }}
+          resources:
+            {{- toYaml .Values.productService.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}
+
