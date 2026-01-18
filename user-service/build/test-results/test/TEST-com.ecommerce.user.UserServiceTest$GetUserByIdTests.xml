@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="getUserById()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:46:01" hostname="KUKYOUMI" time="0.012">
+  <properties/>
+  <testcase name="должен выбросить UserNotFoundException если пользователь не найден" classname="com.ecommerce.user.UserServiceTest$GetUserByIdTests" time="0.009"/>
+  <testcase name="должен вернуть пользователя по ID" classname="com.ecommerce.user.UserServiceTest$GetUserByIdTests" time="0.002"/>
+  <system-out><![CDATA[23:46:01.231 [Test worker] INFO com.ecommerce.user.service.UserService -- Getting user by id: 999
+23:46:01.236 [Test worker] INFO com.ecommerce.user.service.UserService -- Getting user by id: 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

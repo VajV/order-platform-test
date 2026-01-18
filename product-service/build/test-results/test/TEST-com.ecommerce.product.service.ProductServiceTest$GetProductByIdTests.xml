@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="getProductById()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:43:27" hostname="KUKYOUMI" time="0.006">
+  <properties/>
+  <testcase name="должен выбросить ProductNotFoundException если товар не найден" classname="com.ecommerce.product.service.ProductServiceTest$GetProductByIdTests" time="0.003"/>
+  <testcase name="должен вернуть товар по ID" classname="com.ecommerce.product.service.ProductServiceTest$GetProductByIdTests" time="0.003"/>
+  <system-out><![CDATA[23:43:27.856 [Test worker] INFO com.ecommerce.product.service.ProductService -- Fetching product with id: 999
+23:43:27.857 [Test worker] ERROR com.ecommerce.product.service.ProductService -- Product not found with id: 999
+23:43:27.859 [Test worker] INFO com.ecommerce.product.service.ProductService -- Fetching product with id: 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

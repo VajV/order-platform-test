@@ -1,0 +1,32 @@
+{
+  "orderCreated": {
+    "orderId": "ORDER-TEST-001",
+    "userId": "user-test-123",
+    "userEmail": "test@example.com",
+    "totalAmount": 1999.99,
+    "timestamp": 1736624400000
+  },
+  "orderStatusChanged": {
+    "orderId": "ORDER-TEST-001",
+    "userId": "user-test-123",
+    "userEmail": "test@example.com",
+    "status": "PAID",
+    "timestamp": 1736624500000
+  },
+  "inventoryReserved": {
+    "reservationId": "RES-TEST-001",
+    "orderId": "ORDER-TEST-001",
+    "userId": "user-test-123",
+    "userEmail": "test@example.com",
+    "itemCount": 3,
+    "timestamp": 1736624300000
+  },
+  "paymentCompleted": {
+    "paymentId": "PAY-TEST-001",
+    "orderId": "ORDER-TEST-001",
+    "userId": "user-test-123",
+    "userEmail": "test@example.com",
+    "amount": 1999.99,
+    "timestamp": 1736624600000
+  }
+}

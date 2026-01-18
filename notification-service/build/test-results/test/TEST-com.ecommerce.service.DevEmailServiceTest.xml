@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ecommerce.service.DevEmailServiceTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:49:08" hostname="KUKYOUMI" time="0.067">
+  <properties/>
+  <testcase name="testSendEmail_WithNullValues()" classname="com.ecommerce.service.DevEmailServiceTest" time="0.056"/>
+  <testcase name="testSendEmail_LogsToConsole()" classname="com.ecommerce.service.DevEmailServiceTest" time="0.009"/>
+  <system-out><![CDATA[23:49:08.377 [Test worker] INFO com.ecommerce.notification.service.DevEmailService -- 
+================================================================================
+]]>&#x1f4e7;<![CDATA[ DEV EMAIL SERVICE (Mock - not sending real email)
+================================================================================
+To:      null
+Subject: null
+================================================================================
+Body:
+null
+================================================================================
+
+23:49:08.390 [Test worker] INFO com.ecommerce.notification.service.DevEmailService -- 
+================================================================================
+]]>&#x1f4e7;<![CDATA[ DEV EMAIL SERVICE (Mock - not sending real email)
+================================================================================
+To:      test@example.com
+Subject: Test Subject
+================================================================================
+Body:
+<html><body>Test Body</body></html>
+================================================================================
+
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

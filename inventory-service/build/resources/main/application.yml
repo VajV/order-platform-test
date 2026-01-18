@@ -5,8 +5,8 @@ spring:
   application:
     name: inventory-service
 
-  config:
-    import: optional:vault://
+  # config:
+    # import: optional:vault://  # Отключено для Docker
 
   datasource:
     url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:inventory_db}

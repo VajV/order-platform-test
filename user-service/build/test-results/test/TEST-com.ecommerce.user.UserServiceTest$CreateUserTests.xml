@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="createUser()" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:46:01" hostname="KUKYOUMI" time="0.048">
+  <properties/>
+  <testcase name="должен выбросить исключение если роль не найдена" classname="com.ecommerce.user.UserServiceTest$CreateUserTests" time="0.009"/>
+  <testcase name="должен создать пользователя с указанными ролями" classname="com.ecommerce.user.UserServiceTest$CreateUserTests" time="0.011"/>
+  <testcase name="должен успешно создать пользователя с ролью по умолчанию" classname="com.ecommerce.user.UserServiceTest$CreateUserTests" time="0.013"/>
+  <testcase name="должен выбросить исключение если email уже существует" classname="com.ecommerce.user.UserServiceTest$CreateUserTests" time="0.009"/>
+  <system-out><![CDATA[23:46:01.245 [Test worker] INFO com.ecommerce.user.service.UserService -- Creating user with email: new@example.com
+23:46:01.257 [Test worker] INFO com.ecommerce.user.service.UserService -- Creating user with email: new@example.com
+23:46:01.262 [Test worker] INFO com.ecommerce.user.service.UserService -- User created successfully with id: 2
+23:46:01.273 [Test worker] INFO com.ecommerce.user.service.UserService -- Creating user with email: new@example.com
+23:46:01.276 [Test worker] INFO com.ecommerce.user.service.UserService -- User created successfully with id: 2
+23:46:01.284 [Test worker] INFO com.ecommerce.user.service.UserService -- Creating user with email: new@example.com
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

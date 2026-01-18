@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="apply() - Token Validation" tests="5" skipped="1" failures="0" errors="0" timestamp="2026-01-18T20:48:40" hostname="KUKYOUMI" time="1.073">
+  <properties/>
+  <testcase name="должен отклонить запрос с истёкшим JWT токеном" classname="com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactoryTest$TokenValidationTests" time="1.009"/>
+  <testcase name="должен отклонить запрос с невалидным JWT токеном" classname="com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactoryTest$TokenValidationTests" time="0.025"/>
+  <testcase name="должен отклонить запрос без Authorization заголовка" classname="com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactoryTest$TokenValidationTests" time="0.012"/>
+  <testcase name="должен отклонить запрос с неверным форматом Authorization" classname="com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactoryTest$TokenValidationTests" time="0.011"/>
+  <testcase name="должен пропустить запрос с валидным JWT токеном" classname="com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactoryTest$TokenValidationTests" time="0.004">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[23:48:41.162 [Test worker] ERROR com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory -- ❌ Невалидный JWT токен: JWT expired 61158 milliseconds ago at 2026-01-18T20:47:40.000Z. Current time: 2026-01-18T20:48:41.158Z. Allowed clock skew: 0 milliseconds.
+23:48:41.331 [Test worker] ERROR com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory -- ❌ Невалидный JWT токен: Malformed protected header JSON: Unable to deserialize: Unexpected character ('�' (code 65533 / 0xfffd)): expected a valid value (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: (InputStreamReader); line: 1, column: 2]
+23:48:41.357 [Test worker] WARN com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory -- ❌ Отсутствует JWT токен для: GET /api/users/me
+23:48:41.370 [Test worker] WARN com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory -- ❌ Отсутствует JWT токен для: GET /api/users/me
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

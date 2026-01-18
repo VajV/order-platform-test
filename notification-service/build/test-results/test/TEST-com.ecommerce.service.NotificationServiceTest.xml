@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ecommerce.service.NotificationServiceTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:49:08" hostname="KUKYOUMI" time="0.501">
+  <properties/>
+  <testcase name="testSendNotification_Success()" classname="com.ecommerce.service.NotificationServiceTest" time="0.474"/>
+  <testcase name="testSendNotification_RateLimitExceeded()" classname="com.ecommerce.service.NotificationServiceTest" time="0.012"/>
+  <testcase name="testSendNotification_TemplateNotFound()" classname="com.ecommerce.service.NotificationServiceTest" time="0.011"/>
+  <system-out><![CDATA[23:49:08.871 [Test worker] INFO com.ecommerce.notification.service.NotificationService -- ✅ Notification sent. Event: order.created, UserId: user-456, Email: test@example.com
+23:49:08.903 [Test worker] WARN com.ecommerce.notification.service.NotificationService -- ⚠️ Template not found or disabled for event type: order.created
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

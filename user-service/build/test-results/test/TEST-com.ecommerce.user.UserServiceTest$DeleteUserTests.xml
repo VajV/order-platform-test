@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="deleteUser()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:46:01" hostname="KUKYOUMI" time="0.027">
+  <properties/>
+  <testcase name="должен деактивировать пользователя (soft delete)" classname="com.ecommerce.user.UserServiceTest$DeleteUserTests" time="0.01"/>
+  <testcase name="должен выбросить исключение если пользователь не найден" classname="com.ecommerce.user.UserServiceTest$DeleteUserTests" time="0.015"/>
+  <system-out><![CDATA[23:46:01.094 [Test worker] INFO com.ecommerce.user.service.UserService -- Deleting user with id: 1
+23:46:01.096 [Test worker] INFO com.ecommerce.user.service.UserService -- User deactivated successfully with id: 1
+23:46:01.110 [Test worker] INFO com.ecommerce.user.service.UserService -- Deleting user with id: 999
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

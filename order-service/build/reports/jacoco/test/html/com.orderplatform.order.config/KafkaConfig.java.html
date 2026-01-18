@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KafkaConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">order-service</a> &gt; <a href="index.source.html" class="el_package">com.orderplatform.order.config</a> &gt; <span class="el_source">KafkaConfig.java</span></div><h1>KafkaConfig.java</h1><pre class="source lang-java linenums">package com.orderplatform.order.config;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.*;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Configuration
+<span class="nc" id="L18">public class KafkaConfig {</span>
+
+    @Bean
+    public ProducerFactory&lt;String, Object&gt; producerFactory() {
+<span class="nc" id="L22">        Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L23">        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);</span>
+<span class="nc" id="L24">        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);</span>
+<span class="nc" id="L25">        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);</span>
+<span class="nc" id="L26">        return new DefaultKafkaProducerFactory&lt;&gt;(props);</span>
+    }
+
+    @Bean
+    public KafkaTemplate&lt;String, Object&gt; kafkaTemplate() {
+<span class="nc" id="L31">        return new KafkaTemplate&lt;&gt;(producerFactory());</span>
+    }
+
+    @Bean
+    public ConsumerFactory&lt;String, Object&gt; consumerFactory() {
+<span class="nc" id="L36">        JsonDeserializer&lt;Object&gt; jsonDeserializer = new JsonDeserializer&lt;&gt;();</span>
+<span class="nc" id="L37">        jsonDeserializer.addTrustedPackages(&quot;*&quot;);</span>
+
+<span class="nc" id="L39">        Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L40">        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, &quot;localhost:9092&quot;);</span>
+<span class="nc" id="L41">        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);</span>
+<span class="nc" id="L42">        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, jsonDeserializer);</span>
+<span class="nc" id="L43">        props.put(ConsumerConfig.GROUP_ID_CONFIG, &quot;order-service&quot;);</span>
+
+<span class="nc" id="L45">        return new DefaultKafkaConsumerFactory&lt;&gt;(props, new StringDeserializer(), jsonDeserializer);</span>
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory&lt;String, Object&gt; kafkaListenerContainerFactory() {
+<span class="nc" id="L50">        ConcurrentKafkaListenerContainerFactory&lt;String, Object&gt; factory =</span>
+                new ConcurrentKafkaListenerContainerFactory&lt;&gt;();
+<span class="nc" id="L52">        factory.setConsumerFactory(consumerFactory());</span>
+<span class="nc" id="L53">        return factory;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

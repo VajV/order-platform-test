@@ -1,0 +1,56 @@
+spring:
+  # Используем Testcontainers для PostgreSQL
+  datasource:
+    url: jdbc:tc:postgresql:15:///test_order_db
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # Flyway отключен для тестов (используем create-drop)
+  flyway:
+    enabled: false
+  
+  # Kafka (встроенный для тестов)
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
+    consumer:
+      auto-offset-reset: earliest
+      group-id: order-service-test
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  
+  # Отключаем Vault
+  cloud:
+    vault:
+      enabled: false
+
+# Отключаем импорт внешних конфигов
+  config:
+    import: ""
+
+# JWT для тестов
+jwt:
+  secret: TestSecretKeyForUnitTests32Chars!
+  expiration: 3600000
+
+# Логирование
+logging:
+  level:
+    org.springframework.test: DEBUG
+    org.testcontainers: INFO
+    com.orderplatform: DEBUG
+
+# Отключаем management endpoints в тестах
+management:
+  endpoints:
+    enabled-by-default: false
+

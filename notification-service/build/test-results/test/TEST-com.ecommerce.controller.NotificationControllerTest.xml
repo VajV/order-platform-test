@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ecommerce.controller.NotificationControllerTest" tests="4" skipped="4" failures="0" errors="0" timestamp="2026-01-18T20:49:05" hostname="KUKYOUMI" time="0.004">
+  <properties/>
+  <testcase name="testHealthEndpoint()" classname="com.ecommerce.controller.NotificationControllerTest" time="0.001">
+    <skipped/>
+  </testcase>
+  <testcase name="testGetUserHistory()" classname="com.ecommerce.controller.NotificationControllerTest" time="0.001">
+    <skipped/>
+  </testcase>
+  <testcase name="testSendTestNotification()" classname="com.ecommerce.controller.NotificationControllerTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="testCheckRateLimit()" classname="com.ecommerce.controller.NotificationControllerTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

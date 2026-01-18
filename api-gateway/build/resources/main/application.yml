@@ -10,8 +10,8 @@ spring:
     name: api-gateway
     description: "API Gateway для Order Processing Platform"
 
-  config:
-    import: optional:vault://
+  # config:
+    # import: optional:vault://  # Отключено для Docker
 
   # ======================== REDIS ========================
   data:
@@ -29,12 +29,13 @@ spring:
   # ======================== CLOUD.GATEWAY ========================
   cloud:
     vault:
+      enabled: false  # Отключено для Docker
       uri: ${VAULT_URI:http://vault:8200}
       token: ${VAULT_TOKEN:}
       authentication: TOKEN
       fail-fast: false
       kv:
-        enabled: true
+        enabled: false
         backend: secret
         application-name: ${spring.application.name}
 

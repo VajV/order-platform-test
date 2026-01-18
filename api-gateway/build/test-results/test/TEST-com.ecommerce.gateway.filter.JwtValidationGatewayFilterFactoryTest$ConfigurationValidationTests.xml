@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="validateConfiguration()" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:48:41" hostname="KUKYOUMI" time="0.04">
+  <properties/>
+  <testcase name="должен выбросить исключение при пустом секрете" classname="com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactoryTest$ConfigurationValidationTests" time="0.012"/>
+  <testcase name="должен выбросить исключение при коротком секрете" classname="com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactoryTest$ConfigurationValidationTests" time="0.009"/>
+  <testcase name="должен пройти валидацию с корректным секретом" classname="com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactoryTest$ConfigurationValidationTests" time="0.004"/>
+  <testcase name="должен выбросить исключение при null секрете" classname="com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactoryTest$ConfigurationValidationTests" time="0.007"/>
+  <system-out><![CDATA[23:48:41.418 [Test worker] INFO com.ecommerce.gateway.filter.JwtValidationGatewayFilterFactory -- ✅ JWT конфигурация валидна (длина: 32)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

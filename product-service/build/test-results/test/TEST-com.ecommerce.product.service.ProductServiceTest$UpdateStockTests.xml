@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="updateStock()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:43:27" hostname="KUKYOUMI" time="0.04">
+  <properties/>
+  <testcase name="должен уменьшить остаток товара" classname="com.ecommerce.product.service.ProductServiceTest$UpdateStockTests" time="0.03"/>
+  <testcase name="должен выбросить исключение при недостаточном остатке" classname="com.ecommerce.product.service.ProductServiceTest$UpdateStockTests" time="0.008"/>
+  <system-out><![CDATA[23:43:27.741 [Test worker] INFO com.ecommerce.product.service.ProductService -- Updating stock for product 1: reduce by 10
+23:43:27.746 [Test worker] INFO com.ecommerce.product.service.ProductService -- Stock updated successfully for product 1. New stock: 90
+23:43:27.769 [Test worker] INFO com.ecommerce.product.service.ProductService -- Updating stock for product 1: reduce by 10
+23:43:27.769 [Test worker] ERROR com.ecommerce.product.service.ProductService -- Insufficient stock for product 1. Available: 5, Requested: 10
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

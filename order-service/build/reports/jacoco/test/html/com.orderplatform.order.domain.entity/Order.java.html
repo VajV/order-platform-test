@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Order.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">order-service</a> &gt; <a href="index.source.html" class="el_package">com.orderplatform.order.domain.entity</a> &gt; <span class="el_source">Order.java</span></div><h1>Order.java</h1><pre class="source lang-java linenums">package com.orderplatform.order.domain.entity;
+
+import com.orderplatform.order.domain.enums.OrderStatus;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = &quot;orders&quot;, indexes = {
+        @Index(name = &quot;idx_user_id&quot;, columnList = &quot;user_id&quot;),
+        @Index(name = &quot;idx_status&quot;, columnList = &quot;status&quot;),
+        @Index(name = &quot;idx_created_at&quot;, columnList = &quot;created_at&quot;)
+})
+<span class="pc bnc" id="L21" title="All 94 branches missed.">@Data</span>
+<span class="nc" id="L22">@NoArgsConstructor</span>
+<span class="fc" id="L23">@AllArgsConstructor</span>
+<span class="pc bfc" id="L24" title="All 2 branches covered.">@Builder</span>
+public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="fc" id="L29">    private Long id;</span>
+
+    @Column(nullable = false)
+<span class="fc" id="L32">    private Long userId;</span>
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+<span class="fc" id="L36">    private OrderStatus status;</span>
+
+    @OneToMany(mappedBy = &quot;order&quot;, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
+<span class="fc" id="L40">    private Set&lt;OrderItem&gt; items = new HashSet&lt;&gt;();</span>
+
+    @Column(nullable = false)
+<span class="fc" id="L43">    private BigDecimal totalPrice;</span>
+
+    @Column(name = &quot;payment_id&quot;)
+<span class="fc" id="L46">    private String paymentId;</span>
+
+    @Column(name = &quot;shipping_id&quot;)
+<span class="fc" id="L49">    private String shippingId;</span>
+
+    @Column(name = &quot;cancellation_reason&quot;)
+<span class="fc" id="L52">    private String cancellationReason;</span>
+
+    @Column(nullable = false, updatable = false)
+<span class="fc" id="L55">    private LocalDateTime createdAt;</span>
+
+    @Column(nullable = false)
+<span class="fc" id="L58">    private LocalDateTime updatedAt;</span>
+
+    @Column(name = &quot;expected_delivery&quot;)
+<span class="fc" id="L61">    private LocalDateTime expectedDelivery;</span>
+
+    @PrePersist
+    protected void onCreate() {
+<span class="nc" id="L65">        createdAt = LocalDateTime.now();</span>
+<span class="nc" id="L66">        updatedAt = LocalDateTime.now();</span>
+<span class="nc" id="L67">    }</span>
+
+    @PreUpdate
+    protected void onUpdate() {
+<span class="nc" id="L71">        updatedAt = LocalDateTime.now();</span>
+<span class="nc" id="L72">    }</span>
+
+    // Business Logic Methods
+    public boolean canTransitionTo(OrderStatus nextStatus) {
+<span class="fc" id="L76">        return this.status.canTransitionTo(nextStatus);</span>
+    }
+
+    public void transitionTo(OrderStatus newStatus) {
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (!canTransitionTo(newStatus)) {</span>
+<span class="nc" id="L81">            throw new IllegalStateException(</span>
+                    &quot;Cannot transition from &quot; + this.status + &quot; to &quot; + newStatus
+            );
+        }
+<span class="nc" id="L85">        this.status = newStatus;</span>
+<span class="nc" id="L86">    }</span>
+
+    public void addItem(OrderItem item) {
+<span class="fc" id="L89">        item.setOrder(this);</span>
+<span class="fc" id="L90">        items.add(item);</span>
+<span class="fc" id="L91">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

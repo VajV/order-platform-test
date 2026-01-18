@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="updateOrderStatus()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:42:58" hostname="KUKYOUMI" time="0.032">
+  <properties/>
+  <testcase name="должен выбросить InvalidStatusTransitionException при недопустимом переходе" classname="com.orderplatform.order.service.OrderServiceTest$UpdateOrderStatusTests" time="0.011"/>
+  <testcase name="должен обновить статус с NEW на RESERVED" classname="com.orderplatform.order.service.OrderServiceTest$UpdateOrderStatusTests" time="0.018"/>
+  <system-out><![CDATA[23:42:58.271 [Test worker] INFO com.orderplatform.order.service.OrderService -- Updating order 1 status to NEW
+23:42:58.284 [Test worker] INFO com.orderplatform.order.service.OrderService -- Updating order 1 status to RESERVED
+23:42:58.285 [Test worker] INFO com.orderplatform.order.service.OrderService -- Order 1 status updated from NEW to RESERVED
+23:42:58.285 [Test worker] INFO com.orderplatform.order.service.OrderService -- Published OrderStatusChangedEvent for order: 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ecommerce.service.RedisRateLimiterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:49:08" hostname="KUKYOUMI" time="0.388">
+  <properties/>
+  <testcase name="testAllowRequest_UnderLimit()" classname="com.ecommerce.service.RedisRateLimiterTest" time="0.345"/>
+  <testcase name="testAllowRequest_FirstRequest()" classname="com.ecommerce.service.RedisRateLimiterTest" time="0.008"/>
+  <testcase name="testAllowRequest_OverLimit()" classname="com.ecommerce.service.RedisRateLimiterTest" time="0.009"/>
+  <testcase name="testResetLimit()" classname="com.ecommerce.service.RedisRateLimiterTest" time="0.01"/>
+  <testcase name="testGetRemainingRequests()" classname="com.ecommerce.service.RedisRateLimiterTest" time="0.009"/>
+  <system-out><![CDATA[23:49:09.275 [Test worker] WARN com.ecommerce.notification.service.RedisRateLimiter -- ⚠️ Rate limit exceeded for email: test@example.com, count: 11/10
+23:49:09.287 [Test worker] INFO com.ecommerce.notification.service.RedisRateLimiter -- Rate limit reset for: test@example.com
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

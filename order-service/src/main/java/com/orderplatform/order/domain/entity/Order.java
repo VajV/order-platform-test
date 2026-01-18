@@ -36,6 +36,7 @@ public class Order {
     private OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
     private Set<OrderItem> items = new HashSet<>();
 
     @Column(nullable = false)

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="getAllProducts()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:43:27" hostname="KUKYOUMI" time="0.005">
+  <properties/>
+  <testcase name="должен вернуть пустой список если товаров нет" classname="com.ecommerce.product.service.ProductServiceTest$GetAllProductsTests" time="0.003"/>
+  <testcase name="должен вернуть список активных товаров" classname="com.ecommerce.product.service.ProductServiceTest$GetAllProductsTests" time="0.002"/>
+  <system-out><![CDATA[23:43:27.865 [Test worker] INFO com.ecommerce.product.service.ProductService -- Fetching all active products
+23:43:27.867 [Test worker] INFO com.ecommerce.product.service.ProductService -- Fetching all active products
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

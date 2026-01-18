@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ecommerce.integration.RedisIntegrationTest" tests="3" skipped="3" failures="0" errors="0" timestamp="2026-01-18T20:49:05" hostname="KUKYOUMI" time="0.002">
+  <properties/>
+  <testcase name="testRateLimiterReset()" classname="com.ecommerce.integration.RedisIntegrationTest" time="0.001">
+    <skipped/>
+  </testcase>
+  <testcase name="testRateLimiterAllowsRequestsUnderLimit()" classname="com.ecommerce.integration.RedisIntegrationTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <testcase name="testGetRemainingRequests()" classname="com.ecommerce.integration.RedisIntegrationTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

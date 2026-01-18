@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="deleteProduct()" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:43:27" hostname="KUKYOUMI" time="0.007">
+  <properties/>
+  <testcase name="должен выполнить soft delete товара" classname="com.ecommerce.product.service.ProductServiceTest$DeleteProductTests" time="0.007"/>
+  <system-out><![CDATA[23:43:27.781 [Test worker] INFO com.ecommerce.product.service.ProductService -- Deleting product with id: 1
+23:43:27.782 [Test worker] INFO com.ecommerce.product.service.ProductService -- Product marked as inactive (soft deleted): 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

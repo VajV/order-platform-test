@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ecommerce.auth.service.AuthServiceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:43:21" hostname="KUKYOUMI" time="0.479">
+  <properties/>
+  <testcase name="register: успешная регистрация" classname="com.ecommerce.auth.service.AuthServiceTest" time="0.419"/>
+  <testcase name="logout: успешный logout" classname="com.ecommerce.auth.service.AuthServiceTest" time="0.008"/>
+  <testcase name="refreshToken: ошибка - невалидный token" classname="com.ecommerce.auth.service.AuthServiceTest" time="0.011"/>
+  <testcase name="login: ошибка - неверные credentials" classname="com.ecommerce.auth.service.AuthServiceTest" time="0.01"/>
+  <testcase name="register: ошибка - username существует" classname="com.ecommerce.auth.service.AuthServiceTest" time="0.004"/>
+  <testcase name="login: успешный вход" classname="com.ecommerce.auth.service.AuthServiceTest" time="0.007"/>
+  <testcase name="register: ошибка - email существует" classname="com.ecommerce.auth.service.AuthServiceTest" time="0.006"/>
+  <testcase name="refreshToken: успешное обновление" classname="com.ecommerce.auth.service.AuthServiceTest" time="0.006"/>
+  <system-out><![CDATA[23:43:22.200 [Test worker] INFO com.ecommerce.auth.service.AuthService -- Registering new user: newuser
+23:43:22.204 [Test worker] INFO com.ecommerce.auth.service.AuthService -- User registered successfully: testuser
+23:43:22.269 [Test worker] INFO com.ecommerce.auth.service.AuthService -- Logout request
+23:43:22.269 [Test worker] INFO com.ecommerce.auth.service.AuthService -- Refresh token revoked for user: testuser
+23:43:22.282 [Test worker] INFO com.ecommerce.auth.service.AuthService -- Refresh token request
+23:43:22.293 [Test worker] INFO com.ecommerce.auth.service.AuthService -- User login attempt: testuser
+23:43:22.300 [Test worker] INFO com.ecommerce.auth.service.AuthService -- Registering new user: newuser
+23:43:22.307 [Test worker] INFO com.ecommerce.auth.service.AuthService -- User login attempt: testuser
+23:43:22.307 [Test worker] INFO com.ecommerce.auth.service.AuthService -- User logged in successfully: testuser
+23:43:22.315 [Test worker] INFO com.ecommerce.auth.service.AuthService -- Registering new user: newuser
+23:43:22.322 [Test worker] INFO com.ecommerce.auth.service.AuthService -- Refresh token request
+23:43:22.323 [Test worker] INFO com.ecommerce.auth.service.AuthService -- Access token refreshed for user: testuser
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

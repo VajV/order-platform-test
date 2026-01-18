@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="updateProduct()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:43:27" hostname="KUKYOUMI" time="0.014">
+  <properties/>
+  <testcase name="должен выбросить исключение если товар не найден" classname="com.ecommerce.product.service.ProductServiceTest$UpdateProductTests" time="0.006"/>
+  <testcase name="должен успешно обновить товар" classname="com.ecommerce.product.service.ProductServiceTest$UpdateProductTests" time="0.007"/>
+  <system-out><![CDATA[23:43:27.790 [Test worker] INFO com.ecommerce.product.service.ProductService -- Updating product with id: 999
+23:43:27.792 [Test worker] ERROR com.ecommerce.product.service.ProductService -- Product not found with id: 999
+23:43:27.798 [Test worker] INFO com.ecommerce.product.service.ProductService -- Updating product with id: 1
+23:43:27.800 [Test worker] INFO com.ecommerce.product.service.ProductService -- Product updated successfully: 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

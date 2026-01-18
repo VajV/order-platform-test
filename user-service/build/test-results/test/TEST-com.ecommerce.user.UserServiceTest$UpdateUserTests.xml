@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="updateUser()" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:46:01" hostname="KUKYOUMI" time="0.036">
+  <properties/>
+  <testcase name="не должен проверять email если он не изменился" classname="com.ecommerce.user.UserServiceTest$UpdateUserTests" time="0.01"/>
+  <testcase name="должен обновить имя пользователя" classname="com.ecommerce.user.UserServiceTest$UpdateUserTests" time="0.006"/>
+  <testcase name="должен выбросить исключение если новый email уже занят" classname="com.ecommerce.user.UserServiceTest$UpdateUserTests" time="0.007"/>
+  <testcase name="должен обновить email если он уникален" classname="com.ecommerce.user.UserServiceTest$UpdateUserTests" time="0.006"/>
+  <system-out><![CDATA[23:46:01.126 [Test worker] INFO com.ecommerce.user.service.UserService -- Updating user with id: 1
+23:46:01.129 [Test worker] INFO com.ecommerce.user.service.UserService -- User updated successfully with id: 1
+23:46:01.137 [Test worker] INFO com.ecommerce.user.service.UserService -- Updating user with id: 1
+23:46:01.138 [Test worker] INFO com.ecommerce.user.service.UserService -- User updated successfully with id: 1
+23:46:01.145 [Test worker] INFO com.ecommerce.user.service.UserService -- Updating user with id: 1
+23:46:01.155 [Test worker] INFO com.ecommerce.user.service.UserService -- Updating user with id: 1
+23:46:01.155 [Test worker] INFO com.ecommerce.user.service.UserService -- User updated successfully with id: 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
