@@ -3,14 +3,13 @@ package com.ecommerce.product.repository;
 import com.ecommerce.product.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProductRepository extends MongoRepository<Product, String> {
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // Найти все активные продукты
     List<Product> findByActiveTrueOrderByCreatedAtDesc();
@@ -19,26 +18,23 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     List<Product> findTop10ByActiveTrueOrderByRatingDesc();
 
     // Продукты по категории
-    List<Product> findByActiveTrueAndCategoryId(String categoryId);
+    List<Product> findByActiveTrueAndCategory_Id(Long categoryId);
 
     // Поиск по имени (регистронезависимый)
-    @Query("{ 'active': true, 'name': { $regex: ?0, $options: 'i' } }")
-    Page<Product> searchByName(String name, Pageable pageable);
+    Page<Product> findByActiveTrueAndNameContainingIgnoreCase(String name, Pageable pageable);
 
     // Продукты в наличии
-    @Query("{ 'active': true, 'stock': { $gt: 0 } }")
-    List<Product> findInStock();
+    List<Product> findByActiveTrueAndStockGreaterThan(Integer stock);
 
     // Найти активный продукт по ID
-    Optional<Product> findByIdAndActiveTrue(String id);
+    Optional<Product> findByIdAndActiveTrue(Long id);
 
     // Найти все активные продукты
     List<Product> findByActiveTrue();
 
     // Найти по категории и активности
-    List<Product> findByCategoryIdAndActiveTrue(String categoryId);
+    List<Product> findByCategory_IdAndActiveTrue(Long categoryId);
 
     // Поиск по диапазону цен
-    @Query("{ 'active': true, 'price': { $gte: ?0, $lte: ?1 } }")
-    List<Product> findByPriceRange(Double minPrice, Double maxPrice);
+    List<Product> findByActiveTrueAndPriceBetween(java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice);
 }

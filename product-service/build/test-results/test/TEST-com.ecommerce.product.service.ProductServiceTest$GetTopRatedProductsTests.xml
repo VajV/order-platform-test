@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="getTopRatedProducts()" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:43:27" hostname="KUKYOUMI" time="0.009">
+  <properties/>
+  <testcase name="должен вернуть топ товаров по рейтингу" classname="com.ecommerce.product.service.ProductServiceTest$GetTopRatedProductsTests" time="0.009"/>
+  <system-out><![CDATA[23:43:27.725 [Test worker] INFO com.ecommerce.product.service.ProductService -- Fetching top rated products
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

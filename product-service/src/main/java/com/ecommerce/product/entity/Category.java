@@ -1,15 +1,15 @@
 package com.ecommerce.product.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
-@Document(collection = "categories")
+@Entity
+@Table(name = "categories")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,25 +18,24 @@ import java.time.LocalDateTime;
 public class Category {
 
     @Id
-    private String id;  // MongoDB использует String для ID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Indexed(unique = true)
-    @Field("name")
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
 
-    @Field("description")
+    @Column(length = 500)
     private String description;
 
-    @Indexed
-    @Field("active")
+    @Column(nullable = false)
     @Builder.Default
     private Boolean active = true;
 
     @CreatedDate
-    @Field("created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Field("updated_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }

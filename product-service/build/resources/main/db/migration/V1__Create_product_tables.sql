@@ -1,0 +1,29 @@
+CREATE TABLE IF NOT EXISTS categories (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(500),
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS products (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    description VARCHAR(1000),
+    price NUMERIC(19, 2) NOT NULL,
+    stock INTEGER NOT NULL DEFAULT 0,
+    category_id BIGINT NOT NULL REFERENCES categories(id),
+    image_url VARCHAR(500),
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    rating DOUBLE PRECISION NOT NULL DEFAULT 0,
+    review_count INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_products_active ON products(active);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_name ON products(name);
+
+

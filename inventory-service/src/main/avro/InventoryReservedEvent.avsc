@@ -1,0 +1,66 @@
+{
+  "namespace": "com.ecommerce.inventory.avro",
+  "type": "record",
+  "name": "InventoryReservedEvent",
+  "doc": "Event published when inventory is successfully reserved for an order",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique event identifier (UUID)"
+    },
+    {
+      "name": "orderId",
+      "type": "string",
+      "doc": "Order identifier for which inventory was reserved"
+    },
+    {
+      "name": "reservationId",
+      "type": "string",
+      "doc": "Unique reservation identifier"
+    },
+    {
+      "name": "items",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "ReservedItem",
+          "fields": [
+            {"name": "productId", "type": "string"},
+            {"name": "quantity", "type": "int"},
+            {"name": "warehouseId", "type": ["null", "string"], "default": null}
+          ]
+        }
+      },
+      "doc": "List of reserved items"
+    },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "ReservationStatus",
+        "symbols": ["CONFIRMED", "PARTIAL", "FAILED", "RELEASED"]
+      },
+      "doc": "Reservation status"
+    },
+    {
+      "name": "reservedAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Reservation timestamp"
+    },
+    {
+      "name": "expiresAt",
+      "type": ["null", {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }],
+      "default": null,
+      "doc": "Reservation expiry timestamp"
+    }
+  ]
+}
+

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="registerUser()" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:46:00" hostname="KUKYOUMI" time="0.121">
+  <properties/>
+  <testcase name="должен вызывать createUser" classname="com.ecommerce.user.UserServiceTest$RegisterUserTests" time="0.121"/>
+  <system-out><![CDATA[23:46:00.952 [Test worker] INFO com.ecommerce.user.service.UserService -- Creating user with email: new@example.com
+23:46:00.978 [Test worker] INFO com.ecommerce.user.service.UserService -- User created successfully with id: 2
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderTimeoutHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">order-service</a> &gt; <a href="index.source.html" class="el_package">com.orderplatform.order.service</a> &gt; <span class="el_source">OrderTimeoutHandler.java</span></div><h1>OrderTimeoutHandler.java</h1><pre class="source lang-java linenums">package com.orderplatform.order.service;
+
+import com.orderplatform.order.domain.entity.Order;
+import com.orderplatform.order.domain.entity.OrderTimeout;
+import com.orderplatform.order.domain.enums.OrderStatus;
+import com.orderplatform.order.repository.OrderRepository;
+import com.orderplatform.order.repository.OrderTimeoutRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Component
+<span class="nc" id="L22">@Slf4j</span>
+<span class="nc" id="L23">@RequiredArgsConstructor</span>
+public class OrderTimeoutHandler {
+
+    private final OrderTimeoutRepository timeoutRepository;
+    private final OrderRepository orderRepository;
+    private final KafkaTemplate&lt;String, Object&gt; kafkaTemplate;
+
+    @Scheduled(fixedDelay = 30000) // Проверка каждые 30 сек
+    @Transactional
+    public void handleExpiredOrders() {
+<span class="nc" id="L33">        List&lt;OrderTimeout&gt; expiredTimeouts = timeoutRepository.findByExpiresAtBefore(</span>
+<span class="nc" id="L34">                LocalDateTime.now()</span>
+        );
+
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (expiredTimeouts.isEmpty()) {</span>
+<span class="nc" id="L38">            return;</span>
+        }
+
+<span class="nc" id="L41">        log.warn(&quot;Found {} expired order timeouts&quot;, expiredTimeouts.size());</span>
+
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        for (OrderTimeout timeout : expiredTimeouts) {</span>
+<span class="nc" id="L44">            handleTimeout(timeout);</span>
+<span class="nc" id="L45">        }</span>
+<span class="nc" id="L46">    }</span>
+
+    // ✅ ИСПРАВЛЕНО: Изменено на protected
+    @Transactional
+    protected void handleTimeout(OrderTimeout timeout) {
+<span class="nc" id="L51">        Order order = orderRepository.findByIdForUpdate(timeout.getOrderId())</span>
+<span class="nc" id="L52">                .orElse(null);</span>
+
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L55">            log.warn(&quot;Order not found for timeout: {}&quot;, timeout.getOrderId());</span>
+<span class="nc" id="L56">            timeoutRepository.delete(timeout);</span>
+<span class="nc" id="L57">            return;</span>
+        }
+
+<span class="nc" id="L60">        log.warn(&quot;Order {} timeout waiting for: {}&quot;,</span>
+<span class="nc" id="L61">                timeout.getOrderId(), timeout.getExpectedEvent());</span>
+
+        // Отменяем заказ
+<span class="nc" id="L64">        OrderStatus previousStatus = order.getStatus();</span>
+<span class="nc" id="L65">        order.setStatus(OrderStatus.CANCELLED);</span>
+<span class="nc" id="L66">        order.setCancellationReason(&quot;Process timeout while waiting for: &quot; + timeout.getExpectedEvent());</span>
+<span class="nc" id="L67">        orderRepository.save(order);</span>
+
+        // Отправляем сигнал отмены
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        if (previousStatus == OrderStatus.RESERVED) {</span>
+<span class="nc" id="L71">            publishInventoryReleaseEvent(order.getId());</span>
+        }
+
+<span class="nc" id="L74">        publishOrderCancelledEvent(order.getId(), &quot;Timeout&quot;);</span>
+
+        // Удаляем timeout
+<span class="nc" id="L77">        timeoutRepository.delete(timeout);</span>
+<span class="nc" id="L78">    }</span>
+
+    private void publishInventoryReleaseEvent(Long orderId) {
+<span class="nc" id="L81">        Message&lt;Long&gt; message = MessageBuilder</span>
+<span class="nc" id="L82">                .withPayload(orderId)</span>
+<span class="nc" id="L83">                .setHeader(KafkaHeaders.TOPIC, &quot;inventory.release-reservation&quot;)</span>
+<span class="nc" id="L84">                .setHeader(&quot;kafka_messageKey&quot;, orderId.toString())</span>
+<span class="nc" id="L85">                .build();</span>
+
+<span class="nc" id="L87">        kafkaTemplate.send(message);</span>
+<span class="nc" id="L88">    }</span>
+
+    private void publishOrderCancelledEvent(Long orderId, String reason) {
+<span class="nc" id="L91">        Message&lt;String&gt; message = MessageBuilder</span>
+<span class="nc" id="L92">                .withPayload(reason)</span>
+<span class="nc" id="L93">                .setHeader(KafkaHeaders.TOPIC, &quot;order.cancelled&quot;)</span>
+<span class="nc" id="L94">                .setHeader(&quot;kafka_messageKey&quot;, orderId.toString())</span>
+<span class="nc" id="L95">                .build();</span>
+
+<span class="nc" id="L97">        kafkaTemplate.send(message);</span>
+<span class="nc" id="L98">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

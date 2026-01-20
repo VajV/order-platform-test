@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="createOrder()" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:42:58" hostname="KUKYOUMI" time="0.077">
+  <properties/>
+  <testcase name="должен корректно рассчитать сумму заказа" classname="com.orderplatform.order.service.OrderServiceTest$CreateOrderTests" time="0.018"/>
+  <testcase name="должен успешно создать заказ" classname="com.orderplatform.order.service.OrderServiceTest$CreateOrderTests" time="0.051"/>
+  <testcase name="должен опубликовать событие order.created в Kafka" classname="com.orderplatform.order.service.OrderServiceTest$CreateOrderTests" time="0.005"/>
+  <system-out><![CDATA[23:42:58.365 [Test worker] INFO com.orderplatform.order.service.OrderService -- Creating order for user: 1
+23:42:58.369 [Test worker] INFO com.orderplatform.order.service.OrderService -- Order created with ID: 1
+23:42:58.374 [Test worker] INFO com.orderplatform.order.service.OrderService -- Published OrderCreatedEvent for order: 1
+23:42:58.431 [Test worker] INFO com.orderplatform.order.service.OrderService -- Creating order for user: 1
+23:42:58.431 [Test worker] INFO com.orderplatform.order.service.OrderService -- Order created with ID: 1
+23:42:58.431 [Test worker] INFO com.orderplatform.order.service.OrderService -- Published OrderCreatedEvent for order: 1
+23:42:58.437 [Test worker] INFO com.orderplatform.order.service.OrderService -- Creating order for user: 1
+23:42:58.437 [Test worker] INFO com.orderplatform.order.service.OrderService -- Order created with ID: 1
+23:42:58.437 [Test worker] INFO com.orderplatform.order.service.OrderService -- Published OrderCreatedEvent for order: 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

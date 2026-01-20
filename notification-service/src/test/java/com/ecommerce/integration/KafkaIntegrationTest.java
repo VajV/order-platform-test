@@ -23,7 +23,13 @@ import java.util.concurrent.TimeUnit;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+/**
+ * Интеграционный тест для Kafka consumers в Notification Service.
+ * Тестирует обработку событий order.created с реальным Kafka брокером.
+ * 
+ * Требования: Docker должен быть запущен.
+ */
+@SpringBootTest(classes = com.ecommerce.notification.NotificationServiceApplication.class)
 @Testcontainers
 @ActiveProfiles("test")
 class KafkaIntegrationTest {
@@ -51,6 +57,14 @@ class KafkaIntegrationTest {
     static void kafkaProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("spring.data.mongodb.uri", mongodb::getReplicaSetUrl);
+        
+        // Отключаем Vault
+        registry.add("spring.cloud.vault.enabled", () -> "false");
+        registry.add("spring.config.import", () -> "");
+        
+        // Redis mock (для rate limiter)
+        registry.add("spring.data.redis.host", () -> "localhost");
+        registry.add("spring.data.redis.port", () -> "6379");
     }
 
     @Test

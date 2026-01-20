@@ -1,6 +1,7 @@
 package com.ecommerce.kafka;
 
 import com.ecommerce.notification.kafka.NotificationKafkaListener;
+import com.ecommerce.notification.model.OrderCreatedEvent;
 import com.ecommerce.notification.service.NotificationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -8,9 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -32,13 +30,15 @@ class NotificationKafkaListenerTest {
         // Given
         String eventJson = "{\"orderId\":\"ORDER-123\",\"userId\":\"user-1\",\"userEmail\":\"test@example.com\",\"totalAmount\":99.99,\"timestamp\":1234567890}";
 
-        Map<String, Object> event = new HashMap<>();
-        event.put("orderId", "ORDER-123");
-        event.put("userId", "user-1");
-        event.put("userEmail", "test@example.com");
-        event.put("totalAmount", 99.99);
+        OrderCreatedEvent event = OrderCreatedEvent.builder()
+                .orderId("ORDER-123")
+                .userId("user-1")
+                .userEmail("test@example.com")
+                .totalAmount(99.99)
+                .timestamp(1234567890L)
+                .build();
 
-        when(objectMapper.readValue(anyString(), any(Class.class))).thenReturn(event);
+        when(objectMapper.readValue(eq(eventJson), eq(OrderCreatedEvent.class))).thenReturn(event);
         doNothing().when(notificationService).sendNotification(anyString(), anyString(), anyString(), anyMap());
 
         // When
@@ -47,8 +47,8 @@ class NotificationKafkaListenerTest {
         // Then
         verify(notificationService, times(1)).sendNotification(
                 eq("order.created"),
-                anyString(),
-                anyString(),
+                eq("user-1"),
+                eq("test@example.com"),
                 anyMap()
         );
     }

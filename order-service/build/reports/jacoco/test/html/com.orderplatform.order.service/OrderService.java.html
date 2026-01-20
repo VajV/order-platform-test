@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">order-service</a> &gt; <a href="index.source.html" class="el_package">com.orderplatform.order.service</a> &gt; <span class="el_source">OrderService.java</span></div><h1>OrderService.java</h1><pre class="source lang-java linenums">package com.orderplatform.order.service;
+
+import org.springframework.kafka.support.KafkaHeaders;
+import com.orderplatform.order.domain.entity.Order;
+import com.orderplatform.order.domain.entity.OrderItem;
+import com.orderplatform.order.domain.entity.OrderTimeout;
+import com.orderplatform.order.domain.entity.ProcessedEvent;
+import com.orderplatform.order.domain.enums.OrderStatus;
+import com.orderplatform.order.dto.event.OrderCreatedEvent;
+import com.orderplatform.order.dto.event.OrderStatusChangedEvent;
+import com.orderplatform.order.dto.request.OrderRequest;
+import com.orderplatform.order.dto.response.OrderResponse;
+import com.orderplatform.order.exception.OrderNotFoundException;
+import com.orderplatform.order.exception.InvalidStatusTransitionException;
+import com.orderplatform.order.repository.OrderRepository;
+import com.orderplatform.order.repository.OrderTimeoutRepository;
+import com.orderplatform.order.repository.ProcessedEventRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+@Service
+<span class="fc" id="L33">@Slf4j</span>
+<span class="fc" id="L34">@RequiredArgsConstructor</span>
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final OrderTimeoutRepository timeoutRepository;
+    private final ProcessedEventRepository processedEventRepository;
+    private final KafkaTemplate&lt;String, Object&gt; kafkaTemplate;
+
+    private static final long TIMEOUT_MINUTES = 5;
+
+    @Transactional
+    public OrderResponse createOrder(OrderRequest request) {
+<span class="fc" id="L46">        log.info(&quot;Creating order for user: {}&quot;, request.getUserId());</span>
+
+        // Создаем заказ
+<span class="fc" id="L49">        Order order = Order.builder()</span>
+<span class="fc" id="L50">                .userId(request.getUserId())</span>
+<span class="fc" id="L51">                .status(OrderStatus.NEW)</span>
+<span class="fc" id="L52">                .totalPrice(calculateTotal(request.getItems()))</span>
+<span class="fc" id="L53">                .build();</span>
+
+        // Добавляем товары
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        for (OrderRequest.OrderItemRequest itemRequest : request.getItems()) {</span>
+<span class="fc" id="L57">            OrderItem item = OrderItem.builder()</span>
+<span class="fc" id="L58">                    .productId(itemRequest.getProductId())</span>
+<span class="fc" id="L59">                    .productName(itemRequest.getProductName())</span>
+<span class="fc" id="L60">                    .quantity(itemRequest.getQuantity())</span>
+<span class="fc" id="L61">                    .unitPrice(itemRequest.getUnitPrice())</span>
+<span class="fc" id="L62">                    .totalPrice(itemRequest.getUnitPrice().multiply(</span>
+<span class="fc" id="L63">                            new BigDecimal(itemRequest.getQuantity())</span>
+                    ))
+<span class="fc" id="L65">                    .build();</span>
+<span class="fc" id="L66">            order.addItem(item);</span>
+<span class="fc" id="L67">        }</span>
+
+<span class="fc" id="L69">        Order savedOrder = orderRepository.save(order);</span>
+<span class="fc" id="L70">        log.info(&quot;Order created with ID: {}&quot;, savedOrder.getId());</span>
+
+        // Публикуем событие order.created
+<span class="fc" id="L73">        publishOrderCreatedEvent(savedOrder, request.getItems());</span>
+
+        // Создаем timeout для ожидания резервирования
+<span class="fc" id="L76">        createTimeout(savedOrder.getId(), &quot;inventory.reserved&quot;);</span>
+
+<span class="fc" id="L78">        return mapToResponse(savedOrder);</span>
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse getOrder(Long orderId) {
+<span class="fc" id="L83">        Order order = orderRepository.findById(orderId)</span>
+<span class="fc" id="L84">                .orElseThrow(() -&gt; new OrderNotFoundException(&quot;Order not found: &quot; + orderId));</span>
+<span class="fc" id="L85">        return mapToResponse(order);</span>
+    }
+
+    @Transactional(readOnly = true)
+    public Page&lt;OrderResponse&gt; getOrdersByUser(Long userId, Pageable pageable) {
+<span class="fc" id="L90">        return orderRepository.findByUserId(userId, pageable)</span>
+<span class="fc" id="L91">                .map(this::mapToResponse);</span>
+    }
+
+    @Transactional
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus, String reason) {
+<span class="fc" id="L96">        log.info(&quot;Updating order {} status to {}&quot;, orderId, newStatus);</span>
+
+<span class="fc" id="L98">        Order order = orderRepository.findByIdForUpdate(orderId)</span>
+<span class="pc" id="L99">                .orElseThrow(() -&gt; new OrderNotFoundException(&quot;Order not found: &quot; + orderId));</span>
+
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        if (!order.canTransitionTo(newStatus)) {</span>
+<span class="fc" id="L102">            throw new InvalidStatusTransitionException(</span>
+<span class="fc" id="L103">                    &quot;Cannot transition from &quot; + order.getStatus() + &quot; to &quot; + newStatus</span>
+            );
+        }
+
+<span class="fc" id="L107">        OrderStatus previousStatus = order.getStatus();</span>
+<span class="fc" id="L108">        order.setStatus(newStatus);</span>
+
+<span class="fc" id="L110">        Order updatedOrder = orderRepository.save(order);</span>
+<span class="fc" id="L111">        log.info(&quot;Order {} status updated from {} to {}&quot;, orderId, previousStatus, newStatus);</span>
+
+        // Публикуем событие об изменении статуса
+<span class="fc" id="L114">        publishOrderStatusChangedEvent(updatedOrder, previousStatus, reason);</span>
+
+<span class="fc" id="L116">        return mapToResponse(updatedOrder);</span>
+    }
+
+    @Transactional
+    public void cancelOrder(Long orderId, String reason) {
+<span class="fc" id="L121">        log.info(&quot;Cancelling order: {}&quot;, orderId);</span>
+
+<span class="fc" id="L123">        Order order = orderRepository.findByIdForUpdate(orderId)</span>
+<span class="pc" id="L124">                .orElseThrow(() -&gt; new OrderNotFoundException(&quot;Order not found: &quot; + orderId));</span>
+
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        if (order.getStatus() == OrderStatus.CANCELLED ||</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">                order.getStatus() == OrderStatus.COMPLETED) {</span>
+<span class="fc" id="L128">            throw new InvalidStatusTransitionException(</span>
+<span class="fc" id="L129">                    &quot;Cannot cancel order in status: &quot; + order.getStatus()</span>
+            );
+        }
+
+<span class="fc" id="L133">        OrderStatus previousStatus = order.getStatus();</span>
+<span class="fc" id="L134">        order.setStatus(OrderStatus.CANCELLED);</span>
+<span class="fc" id="L135">        order.setCancellationReason(reason);</span>
+
+<span class="fc" id="L137">        Order updatedOrder = orderRepository.save(order);</span>
+
+        // Публикуем событие
+<span class="fc" id="L140">        publishOrderStatusChangedEvent(updatedOrder, previousStatus, reason);</span>
+
+        // Если был резервирован товар, отправляем сигнал для отмены
+<span class="fc bfc" id="L143" title="All 2 branches covered.">        if (previousStatus == OrderStatus.RESERVED) {</span>
+<span class="fc" id="L144">            publishInventoryCancellationEvent(orderId);</span>
+        }
+<span class="fc" id="L146">    }</span>
+
+    @Transactional
+    public void markEventAsProcessed(String eventId) {
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        if (!processedEventRepository.existsById(eventId)) {</span>
+<span class="fc" id="L151">            processedEventRepository.save(ProcessedEvent.builder()</span>
+<span class="fc" id="L152">                    .eventId(eventId)</span>
+<span class="fc" id="L153">                    .processedAt(LocalDateTime.now())</span>
+<span class="fc" id="L154">                    .build());</span>
+        }
+<span class="fc" id="L156">    }</span>
+
+    public boolean isEventProcessed(String eventId) {
+<span class="fc" id="L159">        return processedEventRepository.existsById(eventId);</span>
+    }
+
+    private void createTimeout(Long orderId, String expectedEvent) {
+<span class="fc" id="L163">        OrderTimeout timeout = OrderTimeout.builder()</span>
+<span class="fc" id="L164">                .orderId(orderId)</span>
+<span class="fc" id="L165">                .expiresAt(LocalDateTime.now().plus(Duration.ofMinutes(TIMEOUT_MINUTES)))</span>
+<span class="fc" id="L166">                .expectedEvent(expectedEvent)</span>
+<span class="fc" id="L167">                .build();</span>
+<span class="fc" id="L168">        timeoutRepository.save(timeout);</span>
+<span class="fc" id="L169">    }</span>
+
+    private void publishOrderCreatedEvent(Order order,
+                                          java.util.List&lt;OrderRequest.OrderItemRequest&gt; items) {
+<span class="fc" id="L173">        OrderCreatedEvent event = OrderCreatedEvent.builder()</span>
+<span class="fc" id="L174">                .orderId(order.getId())</span>
+<span class="fc" id="L175">                .userId(order.getUserId())</span>
+<span class="fc" id="L176">                .items(items)</span>
+<span class="fc" id="L177">                .totalPrice(order.getTotalPrice())</span>
+<span class="fc" id="L178">                .timestamp(LocalDateTime.now())</span>
+<span class="fc" id="L179">                .build();</span>
+
+<span class="fc" id="L181">        Message&lt;OrderCreatedEvent&gt; message = MessageBuilder</span>
+<span class="fc" id="L182">                .withPayload(event)</span>
+<span class="fc" id="L183">                .setHeader(KafkaHeaders.TOPIC, &quot;order.created&quot;)</span>
+<span class="fc" id="L184">                .setHeader(&quot;kafka_messageKey&quot;, order.getId().toString())</span>
+<span class="fc" id="L185">                .build();</span>
+
+<span class="fc" id="L187">        kafkaTemplate.send(message);</span>
+<span class="fc" id="L188">        log.info(&quot;Published OrderCreatedEvent for order: {}&quot;, order.getId());</span>
+<span class="fc" id="L189">    }</span>
+
+    private void publishOrderStatusChangedEvent(Order order, OrderStatus previousStatus, String reason) {
+<span class="fc" id="L192">        OrderStatusChangedEvent event = OrderStatusChangedEvent.builder()</span>
+<span class="fc" id="L193">                .orderId(order.getId())</span>
+<span class="fc" id="L194">                .previousStatus(previousStatus)</span>
+<span class="fc" id="L195">                .newStatus(order.getStatus())</span>
+<span class="fc" id="L196">                .reason(reason)</span>
+<span class="fc" id="L197">                .timestamp(LocalDateTime.now())</span>
+<span class="fc" id="L198">                .build();</span>
+
+<span class="fc" id="L200">        Message&lt;OrderStatusChangedEvent&gt; message = MessageBuilder</span>
+<span class="fc" id="L201">                .withPayload(event)</span>
+<span class="fc" id="L202">                .setHeader(KafkaHeaders.TOPIC, &quot;order.status-changed&quot;)</span>
+<span class="fc" id="L203">                .setHeader(&quot;kafka_messageKey&quot;, order.getId().toString())</span>
+<span class="fc" id="L204">                .build();</span>
+
+<span class="fc" id="L206">        kafkaTemplate.send(message);</span>
+<span class="fc" id="L207">        log.info(&quot;Published OrderStatusChangedEvent for order: {}&quot;, order.getId());</span>
+<span class="fc" id="L208">    }</span>
+
+    private void publishInventoryCancellationEvent(Long orderId) {
+<span class="fc" id="L211">        Message&lt;Long&gt; message = MessageBuilder</span>
+<span class="fc" id="L212">                .withPayload(orderId)</span>
+<span class="fc" id="L213">                .setHeader(KafkaHeaders.TOPIC, &quot;inventory.release-reservation&quot;)</span>
+<span class="fc" id="L214">                .setHeader(&quot;kafka_messageKey&quot;, orderId.toString())</span>
+<span class="fc" id="L215">                .build();</span>
+
+<span class="fc" id="L217">        kafkaTemplate.send(message);</span>
+<span class="fc" id="L218">        log.info(&quot;Published inventory cancellation event for order: {}&quot;, orderId);</span>
+<span class="fc" id="L219">    }</span>
+
+    private BigDecimal calculateTotal(java.util.List&lt;OrderRequest.OrderItemRequest&gt; items) {
+<span class="fc" id="L222">        return items.stream()</span>
+<span class="fc" id="L223">                .map(item -&gt; item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())))</span>
+<span class="fc" id="L224">                .reduce(BigDecimal.ZERO, BigDecimal::add);</span>
+    }
+
+    private OrderResponse mapToResponse(Order order) {
+<span class="fc" id="L228">        return OrderResponse.builder()</span>
+<span class="fc" id="L229">                .id(order.getId())</span>
+<span class="fc" id="L230">                .userId(order.getUserId())</span>
+<span class="fc" id="L231">                .status(order.getStatus())</span>
+<span class="fc" id="L232">                .items(order.getItems().stream()</span>
+<span class="fc" id="L233">                        .map(item -&gt; new com.orderplatform.order.dto.response.OrderItemResponse(</span>
+<span class="fc" id="L234">                                item.getId(),</span>
+<span class="fc" id="L235">                                item.getProductId(),</span>
+<span class="fc" id="L236">                                item.getProductName(),</span>
+<span class="fc" id="L237">                                item.getQuantity(),</span>
+<span class="fc" id="L238">                                item.getUnitPrice(),</span>
+<span class="fc" id="L239">                                item.getTotalPrice()</span>
+                        ))
+<span class="fc" id="L241">                        .toList())</span>
+<span class="fc" id="L242">                .totalPrice(order.getTotalPrice())</span>
+<span class="fc" id="L243">                .paymentId(order.getPaymentId())</span>
+<span class="fc" id="L244">                .shippingId(order.getShippingId())</span>
+<span class="fc" id="L245">                .cancellationReason(order.getCancellationReason())</span>
+<span class="fc" id="L246">                .createdAt(order.getCreatedAt())</span>
+<span class="fc" id="L247">                .updatedAt(order.getUpdatedAt())</span>
+<span class="fc" id="L248">                .expectedDelivery(order.getExpectedDelivery())</span>
+<span class="fc" id="L249">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

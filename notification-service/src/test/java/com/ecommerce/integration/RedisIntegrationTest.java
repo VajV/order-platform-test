@@ -15,7 +15,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+/**
+ * Интеграционный тест для Redis Rate Limiter в Notification Service.
+ * Тестирует механизм ограничения частоты запросов.
+ * 
+ * Требования: Docker должен быть запущен.
+ */
+@SpringBootTest(classes = com.ecommerce.notification.NotificationServiceApplication.class)
 @Testcontainers
 @ActiveProfiles("test")
 class RedisIntegrationTest {
@@ -34,6 +40,12 @@ class RedisIntegrationTest {
     static void redisProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.redis.host", redis::getHost);
         registry.add("spring.data.redis.port", redis::getFirstMappedPort);
+        
+        // Отключаем Vault и внешние зависимости
+        registry.add("spring.cloud.vault.enabled", () -> "false");
+        registry.add("spring.config.import", () -> "");
+        registry.add("spring.kafka.bootstrap-servers", () -> "localhost:9092");
+        registry.add("spring.data.mongodb.uri", () -> "mongodb://localhost:27017/test");
     }
 
     @BeforeEach

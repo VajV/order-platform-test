@@ -1,3 +1,10 @@
+plugins {
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
+    java
+    jacoco
+}
+
 dependencies {
     // Spring Boot Starters
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -6,6 +13,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.cloud:spring-cloud-starter-vault-config")
 
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
@@ -29,6 +37,9 @@ dependencies {
     // Logging
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
+    // Prometheus
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+
     // Testing
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.testcontainers:testcontainers:1.19.3")
@@ -41,4 +52,28 @@ dependencies {
 
 tasks.withType<Test> {
     systemProperty("spring.profiles.active", "test")
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn(tasks.jacocoTestReport)
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
 }

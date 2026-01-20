@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cancelOrder()" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:42:58" hostname="KUKYOUMI" time="0.131">
+  <properties/>
+  <testcase name="должен отменить заказ в статусе NEW" classname="com.orderplatform.order.service.OrderServiceTest$CancelOrderTests" time="0.108"/>
+  <testcase name="должен выбросить исключение при отмене COMPLETED заказа" classname="com.orderplatform.order.service.OrderServiceTest$CancelOrderTests" time="0.013"/>
+  <testcase name="должен отправить событие отмены резервирования для RESERVED заказа" classname="com.orderplatform.order.service.OrderServiceTest$CancelOrderTests" time="0.006"/>
+  <system-out><![CDATA[23:42:58.154 [Test worker] INFO com.orderplatform.order.service.OrderService -- Cancelling order: 1
+23:42:58.217 [Test worker] INFO com.orderplatform.order.service.OrderService -- Published OrderStatusChangedEvent for order: 1
+23:42:58.244 [Test worker] INFO com.orderplatform.order.service.OrderService -- Cancelling order: 1
+23:42:58.258 [Test worker] INFO com.orderplatform.order.service.OrderService -- Cancelling order: 1
+23:42:58.258 [Test worker] INFO com.orderplatform.order.service.OrderService -- Published OrderStatusChangedEvent for order: 1
+23:42:58.259 [Test worker] INFO com.orderplatform.order.service.OrderService -- Published inventory cancellation event for order: 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

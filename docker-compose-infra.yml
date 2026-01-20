@@ -1,40 +1,46 @@
-version: '3.9'
+# =============================================================================
+# Docker Compose - ONLY Infrastructure (для локальной разработки)
+# =============================================================================
+# Использование:
+#   docker compose -f docker-compose-infra.yml up -d
+#
+# Этот файл запускает только инфраструктуру (БД, Kafka, Redis),
+# микросервисы запускаются локально через ./gradlew bootRun
+# =============================================================================
 
 services:
   # ========================================
-  # POSTGRESQL (общая БД для всех сервисов)
+  # INFRASTRUCTURE ONLY
   # ========================================
+
   postgres:
     image: postgres:15-alpine
-    container_name: postgres_db
+    container_name: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
-      POSTGRES_DB: ecommerce
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-databases.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./scripts/init-databases.sh:/docker-entrypoint-initdb.d/01-init-databases.sh
     networks:
       - order-platform-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ecommerce"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
 
-  # ========================================
-  # MONGODB (для notification-service)
-  # ========================================
   mongodb:
     image: mongo:7
     container_name: mongodb
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: mongo123
-      MONGO_INITDB_DATABASE: notifications
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     ports:
       - "27017:27017"
     volumes:
@@ -49,12 +55,10 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # ========================================
-  # REDIS (кэширование + Redlock)
-  # ========================================
   redis:
     image: redis:7-alpine
     container_name: redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-}
     ports:
       - "6379:6379"
     volumes:
@@ -68,9 +72,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # ========================================
-  # ZOOKEEPER (для Kafka)
-  # ========================================
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
@@ -91,9 +92,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # ========================================
-  # KAFKA (событийная шина)
-  # ========================================
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
@@ -102,14 +100,15 @@ services:
         condition: service_healthy
     ports:
       - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: ${KAFKA_AUTO_CREATE_TOPICS:-true}
       KAFKA_LOG_RETENTION_HOURS: 168
       KAFKA_LOG_SEGMENT_BYTES: 1073741824
     volumes:
@@ -117,28 +116,28 @@ services:
     networks:
       - order-platform-network
     healthcheck:
-      test: kafka-topics --bootstrap-server localhost:29092 --list
+      test: kafka-broker-api-versions --bootstrap-server kafka:29092 || exit 1
       interval: 10s
       timeout: 10s
-      retries: 10
+      retries: 20
+      start_period: 40s
     restart: unless-stopped
 
-  # ========================================
-  # SCHEMA REGISTRY (Avro схемы)
-  # ========================================
   schema-registry:
     image: confluentinc/cp-schema-registry:7.5.0
     container_name: schema-registry
     depends_on:
+      zookeeper:
+        condition: service_healthy
       kafka:
         condition: service_healthy
     ports:
       - "8082:8082"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8082
-      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
       SCHEMA_REGISTRY_DEBUG: "true"
     networks:
       - order-platform-network
@@ -147,30 +146,41 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+      start_period: 30s
     restart: unless-stopped
 
-  # ========================================
-  # KAFKA UI (веб-интерфейс для Kafka)
-  # ========================================
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
     depends_on:
-      kafka:
-        condition: service_healthy
-      schema-registry:
-        condition: service_healthy
+      - kafka
+      - schema-registry
     ports:
       - "8090:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: order-platform
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8082
-      KAFKA_CLUSTERS_0_METRICS_PORT: 9997
       DYNAMIC_CONFIG_ENABLED: "true"
     networks:
       - order-platform-network
     restart: unless-stopped
+
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_TOKEN:-dev-root-token}
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - order-platform-network
+    restart: unless-stopped
+    profiles:
+      - with-vault
 
 volumes:
   postgres_data:

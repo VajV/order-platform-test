@@ -28,15 +28,14 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse reserveStock(ReservationRequest request) {
-        String orderId = request.getOrderId();  // ✅ Уже String
-        String productId = request.getProductId();  // ✅ Уже String
+        Long orderId = Long.parseLong(request.getOrderId());
+        String productId = request.getProductId();
         Integer quantity = request.getQuantity();
 
         log.info("Processing stock reservation - Order: {}, Product: {}, Quantity: {}",
                 orderId, productId, quantity);
 
         try {
-            // Check if already reserved
             if (reservationRepository.findByOrderId(orderId).isPresent()) {
                 log.warn("Order already has reservation: {}", orderId);
                 throw new InventoryException(
@@ -45,29 +44,23 @@ public class ReservationService {
                 );
             }
 
-            // Get locked inventory
             Inventory inventory = inventoryService.getInventoryLockedForUpdate(productId);
 
-            // Validate sufficient stock
-            if (!inventory.hasAvailableQuantity(quantity)) {
-                Integer available = inventory.getAvailableQuantity();
+            if (!inventory.hasAvailableQuantity(quantity.longValue())) {
+                Long available = inventory.getAvailableQuantity();
                 log.warn("Insufficient stock - Product: {}, Requested: {}, Available: {}",
                         productId, quantity, available);
 
                 InventoryReservation failedReservation = InventoryReservation.builder()
-                        .inventoryId(inventory.getId())
                         .orderId(orderId)
                         .productId(inventory.getProductId())
-                        .quantity(quantity)
-                        .status(InventoryReservation.ReservationStatus.RELEASED)
+                        .quantityReserved(quantity.longValue())
+                        .reservationStatus(InventoryReservation.ReservationStatus.RELEASED)
                         .expiresAt(LocalDateTime.now().plusMinutes(15))
-                        .failureReason(String.format(
-                                "Insufficient stock. Requested: %d, Available: %d",
-                                quantity, available))
                         .build();
                 reservationRepository.save(failedReservation);
 
-                kafkaProducer.sendReservationFailed(orderId, productId, quantity,
+                kafkaProducer.sendReservationFailed(orderId.toString(), productId, quantity,
                         "Insufficient stock. Available: " + available);
 
                 return ReservationResponse.builder()
@@ -83,31 +76,30 @@ public class ReservationService {
             }
 
             InventoryReservation reservation = InventoryReservation.builder()
-                    .inventoryId(inventory.getId())
                     .orderId(orderId)
                     .productId(inventory.getProductId())
-                    .quantity(quantity)
-                    .status(InventoryReservation.ReservationStatus.RESERVED)
+                    .quantityReserved(quantity.longValue())
+                    .reservationStatus(InventoryReservation.ReservationStatus.PENDING)
                     .expiresAt(LocalDateTime.now().plusMinutes(15))
                     .build();
             InventoryReservation saved = reservationRepository.save(reservation);
 
-            // Update inventory
-            inventory.reserve(quantity);
+            inventory.reserve(quantity.longValue());
             inventoryRepository.save(inventory);
 
             log.info("Stock reserved successfully - Order: {}, Product: {}, Quantity: {}, " +
                             "Remaining available: {}", orderId, productId, quantity,
                     inventory.getAvailableQuantity());
 
-            kafkaProducer.sendReservationSuccess(orderId, productId, quantity, saved.getId());
+            kafkaProducer.sendReservationSuccess(orderId.toString(), productId, quantity,
+                    saved.getId().toString());
 
             return ReservationResponse.builder()
-                    .reservationId(saved.getId())  // ✅ String ID
-                    .orderId(orderId)
+                    .reservationId(saved.getId())
+                    .orderId(orderId.toString())
                     .productId(productId)
                     .reservedQuantity(quantity)
-                    .status(InventoryReservation.ReservationStatus.RESERVED)
+                    .status(InventoryReservation.ReservationStatus.PENDING)
                     .success(true)
                     .message("Stock reserved successfully")
                     .createdAt(saved.getCreatedAt())
@@ -126,27 +118,29 @@ public class ReservationService {
     public void releaseReservation(String orderId) {
         log.info("Releasing reservation for order: {}", orderId);
 
-        InventoryReservation reservation = reservationRepository.findByOrderId(orderId)  // ✅ String
+        Long id = Long.parseLong(orderId);
+
+        InventoryReservation reservation = reservationRepository.findByOrderId(id)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Reservation not found for order %s", orderId),
                         "RESERVATION_NOT_FOUND"
                 ));
 
-        if (reservation.getStatus() == InventoryReservation.ReservationStatus.RELEASED) {
+        if (reservation.getReservationStatus() == InventoryReservation.ReservationStatus.RELEASED) {
             log.warn("Reservation already released for order: {}", orderId);
             return;
         }
 
-        Inventory inventory = inventoryRepository.findById(reservation.getInventoryId())  // ✅ String
+        Inventory inventory = inventoryRepository.findByProductId(reservation.getProductId())
                 .orElseThrow(() -> new InventoryException(
                         "Inventory not found for release",
                         "INVENTORY_NOT_FOUND"
                 ));
 
-        inventory.release(reservation.getQuantity());
+        inventory.release(reservation.getQuantityReserved());
         inventoryRepository.save(inventory);
 
-        reservation.setStatus(InventoryReservation.ReservationStatus.RELEASED);
+        reservation.setReservationStatus(InventoryReservation.ReservationStatus.RELEASED);
         reservation.setReleasedAt(LocalDateTime.now());
         reservationRepository.save(reservation);
 
@@ -154,9 +148,9 @@ public class ReservationService {
 
         kafkaProducer.sendReservationCompensated(
                 orderId,
-                inventory.getProductId(),
-                reservation.getQuantity(),
-                reservation.getId(),
+                inventory.getProductId().toString(),
+                reservation.getQuantityReserved().intValue(),
+                reservation.getId().toString(),
                 "Order cancelled or saga rollback"
         );
     }
@@ -165,20 +159,21 @@ public class ReservationService {
     public void confirmReservation(String orderId) {
         log.info("Confirming reservation for order: {}", orderId);
 
-        InventoryReservation reservation = reservationRepository.findByOrderId(orderId)  // ✅ String
+        Long id = Long.parseLong(orderId);
+
+        InventoryReservation reservation = reservationRepository.findByOrderId(id)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Reservation not found for order %s", orderId),
                         "RESERVATION_NOT_FOUND"
                 ));
 
-        if (reservation.getStatus() != InventoryReservation.ReservationStatus.RESERVED) {
-            log.warn("Cannot confirm reservation not in RESERVED status - Order: {}, Status: {}",
-                    orderId, reservation.getStatus());
+        if (reservation.getReservationStatus() != InventoryReservation.ReservationStatus.PENDING) {
+            log.warn("Cannot confirm reservation not in PENDING status - Order: {}, Status: {}",
+                    orderId, reservation.getReservationStatus());
             return;
         }
 
-        reservation.setStatus(InventoryReservation.ReservationStatus.CONFIRMED);
-        reservation.setConfirmedAt(LocalDateTime.now());
+        reservation.setReservationStatus(InventoryReservation.ReservationStatus.CONFIRMED);
         reservationRepository.save(reservation);
 
         log.info("Reservation confirmed for order: {}", orderId);

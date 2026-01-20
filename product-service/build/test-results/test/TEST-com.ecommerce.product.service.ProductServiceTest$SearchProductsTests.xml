@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="searchProducts()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:43:27" hostname="KUKYOUMI" time="0.021">
+  <properties/>
+  <testcase name="должен выбросить исключение при пустом поисковом запросе" classname="com.ecommerce.product.service.ProductServiceTest$SearchProductsTests" time="0.008"/>
+  <testcase name="должен найти товары по названию" classname="com.ecommerce.product.service.ProductServiceTest$SearchProductsTests" time="0.011"/>
+  <system-out><![CDATA[23:43:27.827 [Test worker] INFO com.ecommerce.product.service.ProductService -- Searching products by name: '', page: 0
+23:43:27.827 [Test worker] ERROR com.ecommerce.product.service.ProductService -- Search term is empty
+23:43:27.829 [Test worker] INFO com.ecommerce.product.service.ProductService -- Searching products by name: '   ', page: 0
+23:43:27.829 [Test worker] ERROR com.ecommerce.product.service.ProductService -- Search term is empty
+23:43:27.830 [Test worker] INFO com.ecommerce.product.service.ProductService -- Searching products by name: 'null', page: 0
+23:43:27.830 [Test worker] ERROR com.ecommerce.product.service.ProductService -- Search term is empty
+23:43:27.838 [Test worker] INFO com.ecommerce.product.service.ProductService -- Searching products by name: 'Test', page: 0
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

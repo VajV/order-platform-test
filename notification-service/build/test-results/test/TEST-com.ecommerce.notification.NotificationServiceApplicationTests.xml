@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ecommerce.notification.NotificationServiceApplicationTests" tests="1" skipped="1" failures="0" errors="0" timestamp="2026-01-18T20:49:08" hostname="KUKYOUMI" time="0.0">
+  <properties/>
+  <testcase name="contextLoads()" classname="com.ecommerce.notification.NotificationServiceApplicationTests" time="0.0">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

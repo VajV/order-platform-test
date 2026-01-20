@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-15T23:35:12+0300",
+    date = "2026-01-18T05:35:27+0300",
     comments = "version: 1.5.5.Final, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.5.jar, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -23,11 +23,12 @@ public class InventoryMapperImpl implements InventoryMapper {
 
         inventoryResponse.id( inventory.getId() );
         inventoryResponse.productId( inventory.getProductId() );
-        inventoryResponse.totalQuantity( inventory.getTotalQuantity() );
-        inventoryResponse.reservedQuantity( inventory.getReservedQuantity() );
-        if ( inventory.getVersion() != null ) {
-            inventoryResponse.version( inventory.getVersion().intValue() );
-        }
+        inventoryResponse.quantityAvailable( inventory.getQuantityAvailable() );
+        inventoryResponse.quantityReserved( inventory.getQuantityReserved() );
+        inventoryResponse.reorderLevel( inventory.getReorderLevel() );
+        inventoryResponse.warehouseLocation( inventory.getWarehouseLocation() );
+        inventoryResponse.lastRestockedAt( inventory.getLastRestockedAt() );
+        inventoryResponse.createdAt( inventory.getCreatedAt() );
         inventoryResponse.updatedAt( inventory.getUpdatedAt() );
 
         inventoryResponse.availableQuantity( inventory.getAvailableQuantity() );

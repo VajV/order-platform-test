@@ -1,12 +1,13 @@
 package com.ecommerce.product.dto;
 
+import com.ecommerce.product.entity.Category;
 import com.ecommerce.product.entity.Product;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-01-15T23:35:27+0300",
+    date = "2026-01-18T05:35:59+0300",
     comments = "version: 1.5.5.Final, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.5.jar, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -20,13 +21,13 @@ public class ProductMapperImpl implements ProductMapper {
 
         ProductResponse.ProductResponseBuilder productResponse = ProductResponse.builder();
 
+        productResponse.categoryId( productCategoryId( product ) );
+        productResponse.categoryName( productCategoryName( product ) );
         productResponse.id( product.getId() );
         productResponse.name( product.getName() );
         productResponse.description( product.getDescription() );
         productResponse.price( product.getPrice() );
         productResponse.stock( product.getStock() );
-        productResponse.categoryId( product.getCategoryId() );
-        productResponse.categoryName( product.getCategoryName() );
         productResponse.imageUrl( product.getImageUrl() );
         productResponse.active( product.getActive() );
         productResponse.rating( product.getRating() );
@@ -49,7 +50,6 @@ public class ProductMapperImpl implements ProductMapper {
         product.description( request.getDescription() );
         product.price( request.getPrice() );
         product.stock( request.getStock() );
-        product.categoryId( request.getCategoryId() );
         product.imageUrl( request.getImageUrl() );
         product.active( request.isActive() );
 
@@ -57,5 +57,35 @@ public class ProductMapperImpl implements ProductMapper {
         product.reviewCount( 0 );
 
         return product.build();
+    }
+
+    private Long productCategoryId(Product product) {
+        if ( product == null ) {
+            return null;
+        }
+        Category category = product.getCategory();
+        if ( category == null ) {
+            return null;
+        }
+        Long id = category.getId();
+        if ( id == null ) {
+            return null;
+        }
+        return id;
+    }
+
+    private String productCategoryName(Product product) {
+        if ( product == null ) {
+            return null;
+        }
+        Category category = product.getCategory();
+        if ( category == null ) {
+            return null;
+        }
+        String name = category.getName();
+        if ( name == null ) {
+            return null;
+        }
+        return name;
     }
 }

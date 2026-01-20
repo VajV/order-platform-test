@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">order-service</a> &gt; <a href="index.source.html" class="el_package">com.orderplatform.order.controller</a> &gt; <span class="el_source">OrderController.java</span></div><h1>OrderController.java</h1><pre class="source lang-java linenums">package com.orderplatform.order.controller;
+
+import com.orderplatform.order.domain.enums.OrderStatus;
+import com.orderplatform.order.dto.request.OrderRequest;
+import com.orderplatform.order.dto.response.OrderResponse;
+import com.orderplatform.order.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping(&quot;/api/orders&quot;)
+@Tag(name = &quot;Orders&quot;, description = &quot;Order management endpoints&quot;)
+<span class="nc" id="L22">@Slf4j</span>
+<span class="nc" id="L23">@RequiredArgsConstructor</span>
+public class OrderController {
+
+    private final OrderService orderService;
+
+    @PostMapping
+    @PreAuthorize(&quot;hasRole('USER')&quot;)
+    @Operation(summary = &quot;Create a new order&quot;)
+    public ResponseEntity&lt;OrderResponse&gt; createOrder(@Valid @RequestBody OrderRequest request) {
+<span class="nc" id="L32">        log.info(&quot;Creating order for user: {}&quot;, request.getUserId());</span>
+<span class="nc" id="L33">        OrderResponse response = orderService.createOrder(request);</span>
+<span class="nc" id="L34">        return ResponseEntity.status(HttpStatus.CREATED).body(response);</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasRole('USER')&quot;)
+    @Operation(summary = &quot;Get order by ID&quot;)
+    public ResponseEntity&lt;OrderResponse&gt; getOrder(@PathVariable Long id) {
+<span class="nc" id="L41">        log.info(&quot;Fetching order: {}&quot;, id);</span>
+<span class="nc" id="L42">        OrderResponse response = orderService.getOrder(id);</span>
+<span class="nc" id="L43">        return ResponseEntity.ok(response);</span>
+    }
+
+    @GetMapping
+    @PreAuthorize(&quot;hasRole('USER')&quot;)
+    @Operation(summary = &quot;Get user's orders with pagination&quot;)
+    public ResponseEntity&lt;Page&lt;OrderResponse&gt;&gt; getUserOrders(
+            @RequestParam Long userId,
+            Pageable pageable
+    ) {
+<span class="nc" id="L53">        log.info(&quot;Fetching orders for user: {}&quot;, userId);</span>
+<span class="nc" id="L54">        Page&lt;OrderResponse&gt; orders = orderService.getOrdersByUser(userId, pageable);</span>
+<span class="nc" id="L55">        return ResponseEntity.ok(orders);</span>
+    }
+
+    @PutMapping(&quot;/{id}/status&quot;)
+    @PreAuthorize(&quot;hasRole('MANAGER') or hasRole('ADMIN')&quot;)
+    @Operation(summary = &quot;Update order status&quot;)
+    public ResponseEntity&lt;OrderResponse&gt; updateOrderStatus(
+            @PathVariable Long id,
+            @RequestParam OrderStatus status,
+            @RequestParam(required = false) String reason
+    ) {
+<span class="nc" id="L66">        log.info(&quot;Updating order {} status to: {}&quot;, id, status);</span>
+<span class="nc" id="L67">        OrderResponse response = orderService.updateOrderStatus(id, status, reason);</span>
+<span class="nc" id="L68">        return ResponseEntity.ok(response);</span>
+    }
+
+    @PostMapping(&quot;/{id}/cancel&quot;)
+    @PreAuthorize(&quot;hasRole('USER') or hasRole('ADMIN')&quot;)
+    @Operation(summary = &quot;Cancel order&quot;)
+    public ResponseEntity&lt;OrderResponse&gt; cancelOrder(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = &quot;User request&quot;) String reason
+    ) {
+<span class="nc" id="L78">        log.info(&quot;Cancelling order: {}&quot;, id);</span>
+<span class="nc" id="L79">        orderService.cancelOrder(id, reason);</span>
+<span class="nc" id="L80">        OrderResponse response = orderService.getOrder(id);</span>
+<span class="nc" id="L81">        return ResponseEntity.ok(response);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

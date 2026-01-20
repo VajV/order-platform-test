@@ -23,7 +23,7 @@ public class InventoryService {
     public InventoryResponse createInventory(InventoryRequest request) {
         log.info("Creating inventory for product: {}", request.getProductId());
 
-        String productId = request.getProductId();  // ✅ Уже String
+        Long productId = Long.parseLong(request.getProductId());
 
         if (inventoryRepository.existsByProductId(productId)) {
             throw new InventoryException(
@@ -34,8 +34,8 @@ public class InventoryService {
 
         Inventory inventory = Inventory.builder()
                 .productId(productId)
-                .totalQuantity(request.getTotalQuantity())
-                .reservedQuantity(0)
+                .quantityAvailable(request.getTotalQuantity().longValue())
+                .quantityReserved(0L)
                 .build();
 
         Inventory saved = inventoryRepository.save(inventory);
@@ -48,7 +48,9 @@ public class InventoryService {
     public InventoryResponse getInventory(String productId) {
         log.debug("Fetching inventory for product: {}", productId);
 
-        return inventoryRepository.findByProductId(productId)  // ✅ String
+        Long id = Long.parseLong(productId);
+
+        return inventoryRepository.findByProductId(id)
                 .map(inventoryMapper::toResponse)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Inventory not found for product %s", productId),
@@ -58,7 +60,9 @@ public class InventoryService {
 
     @Transactional
     public Inventory getInventoryLockedForUpdate(String productId) {
-        return inventoryRepository.findByProductIdWithLock(productId)  // ✅ String
+        Long id = Long.parseLong(productId);
+
+        return inventoryRepository.findByProductIdWithLock(id)
                 .orElseThrow(() -> new InventoryException(
                         String.format("Inventory not found for product %s", productId),
                         "INVENTORY_NOT_FOUND"
@@ -70,7 +74,7 @@ public class InventoryService {
         log.info("Updating inventory quantity for product: {} to: {}", productId, newQuantity);
 
         Inventory inventory = getInventoryLockedForUpdate(productId);
-        inventory.setTotalQuantity(newQuantity);
+        inventory.setQuantityAvailable(newQuantity.longValue());
         Inventory updated = inventoryRepository.save(inventory);
 
         log.info("Inventory updated for product: {}", productId);

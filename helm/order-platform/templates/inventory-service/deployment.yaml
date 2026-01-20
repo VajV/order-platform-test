@@ -1,0 +1,56 @@
+{{- if .Values.inventoryService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "order-platform.fullname" . }}-inventory-service
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "order-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: inventory
+spec:
+  replicas: {{ .Values.inventoryService.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: inventory-service
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: inventory-service
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: inventory
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "order-platform.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: inventory-service
+          image: {{ include "order-platform.image" (dict "registry" .Values.global.imageRegistry "repository" .Values.inventoryService.image.repository "tag" .Values.inventoryService.image.tag "globalTag" .Values.global.imageTag) }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 8084
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "order-platform.fullname" . }}-config
+          env:
+            {{- include "order-platform.commonEnv" . | nindent 12 }}
+            {{- include "order-platform.postgresEnv" (dict "Release" .Release "dbName" .Values.inventoryService.database.name) | nindent 12 }}
+          {{- include "order-platform.livenessProbe" (dict "initialDelaySeconds" 60) | nindent 10 }}
+          {{- include "order-platform.readinessProbe" (dict "initialDelaySeconds" 30) | nindent 10 }}
+          resources:
+            {{- toYaml .Values.inventoryService.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}
+

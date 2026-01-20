@@ -1,0 +1,33 @@
+spring:
+  # Отключаем Redis для unit тестов
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  
+  # Отключаем Gateway routes для unit тестов
+  cloud:
+    gateway:
+      routes: []
+    vault:
+      enabled: false
+  
+  # Отключаем импорт внешних конфигов
+  config:
+    import: ""
+
+# JWT для тестов
+jwt:
+  secret: TestSecretKeyForUnitTests32Chars!
+
+# Логирование
+logging:
+  level:
+    org.springframework.test: DEBUG
+    com.ecommerce.gateway: DEBUG
+
+# Отключаем management endpoints в тестах
+management:
+  endpoints:
+    enabled-by-default: false
+

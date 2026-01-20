@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="updateUserRoles()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:46:01" hostname="KUKYOUMI" time="0.079">
+  <properties/>
+  <testcase name="должен выбросить исключение если роль не найдена" classname="com.ecommerce.user.UserServiceTest$UpdateUserRolesTests" time="0.026"/>
+  <testcase name="должен обновить роли пользователя" classname="com.ecommerce.user.UserServiceTest$UpdateUserRolesTests" time="0.051"/>
+  <system-out><![CDATA[23:46:01.012 [Test worker] INFO com.ecommerce.user.service.UserService -- Updating roles for user id: 1
+23:46:01.037 [Test worker] INFO com.ecommerce.user.service.UserService -- Updating roles for user id: 1
+23:46:01.038 [Test worker] INFO com.ecommerce.user.service.UserService -- User roles updated successfully for user id: 1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

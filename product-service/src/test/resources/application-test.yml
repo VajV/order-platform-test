@@ -1,0 +1,40 @@
+spring:
+  # MongoDB - используем Testcontainers
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/test_product_db
+      database: test_product_db
+  
+  # Kafka (встроенный для тестов)
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
+    consumer:
+      auto-offset-reset: earliest
+      group-id: product-service-test
+  
+  # Отключаем Vault
+  cloud:
+    vault:
+      enabled: false
+
+  # Отключаем импорт внешних конфигов
+  config:
+    import: ""
+
+# JWT для тестов
+jwt:
+  secret: TestSecretKeyForUnitTests32Chars!
+  expiration: 3600000
+
+# Логирование
+logging:
+  level:
+    org.springframework.test: DEBUG
+    org.testcontainers: INFO
+    com.ecommerce.product: DEBUG
+
+# Отключаем management endpoints в тестах
+management:
+  endpoints:
+    enabled-by-default: false
+

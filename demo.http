@@ -1,0 +1,241 @@
+### ===================================
+### Order Processing Platform - API Demo
+### ===================================
+### Use with VS Code REST Client extension
+### or IntelliJ HTTP Client
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### ===================================
+### Health Checks
+### ===================================
+
+### 1. API Gateway Health
+GET {{baseUrl}}/actuator/health
+Accept: application/json
+
+### 2. API Gateway Info
+GET {{baseUrl}}/actuator/info
+Accept: application/json
+
+### ===================================
+### Authentication
+### ===================================
+
+### 3. Register New User
+# @name registerUser
+POST {{baseUrl}}/api/users/register
+Content-Type: {{contentType}}
+
+{
+  "email": "john.doe@example.com",
+  "password": "SecurePass123!",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+
+### 4. Login (Get JWT Token)
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "john.doe@example.com",
+  "password": "SecurePass123!"
+}
+
+### Save token from login response
+@authToken = {{login.response.body.token}}
+
+### ===================================
+### User Operations
+### ===================================
+
+### 5. Get Current User Profile
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### 6. Update User Profile
+PUT {{baseUrl}}/api/users/me
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Johnny",
+  "lastName": "Doe"
+}
+
+### ===================================
+### Product Catalog
+### ===================================
+
+### 7. Get All Products
+GET {{baseUrl}}/api/products
+Accept: application/json
+
+### 8. Get Product by ID
+GET {{baseUrl}}/api/products/1
+Accept: application/json
+
+### 9. Get Products by Category
+GET {{baseUrl}}/api/products/category/1
+Accept: application/json
+
+### 10. Search Products
+GET {{baseUrl}}/api/products/search?name=laptop&page=0&size=10
+Accept: application/json
+
+### 11. Get Products In Stock
+GET {{baseUrl}}/api/products/in-stock
+Accept: application/json
+
+### ===================================
+### Order Operations
+### ===================================
+
+### 12. Create New Order
+# @name createOrder
+POST {{baseUrl}}/api/v1/orders
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "userId": 1,
+  "items": [
+    {
+      "productId": "PROD-001",
+      "productName": "MacBook Pro 16",
+      "quantity": 1,
+      "unitPrice": 2499.99
+    },
+    {
+      "productId": "PROD-002",
+      "productName": "Magic Mouse",
+      "quantity": 2,
+      "unitPrice": 99.99
+    }
+  ]
+}
+
+### Save order ID
+@orderId = {{createOrder.response.body.id}}
+
+### 13. Get Order by ID
+GET {{baseUrl}}/api/v1/orders/{{orderId}}
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### 14. Get User Orders (Paginated)
+GET {{baseUrl}}/api/v1/orders?userId=1&page=0&size=10
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### 15. Update Order Status (Admin)
+PATCH {{baseUrl}}/api/v1/orders/{{orderId}}/status?status=RESERVED&reason=Inventory%20reserved
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### 16. Cancel Order
+DELETE {{baseUrl}}/api/v1/orders/{{orderId}}?reason=Customer%20request
+Authorization: Bearer {{authToken}}
+
+### ===================================
+### Inventory Operations
+### ===================================
+
+### 17. Get Inventory for Product
+GET {{baseUrl}}/api/inventory/PROD-001
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### 18. Update Inventory (Admin)
+PUT {{baseUrl}}/api/inventory/PROD-001
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "productId": "PROD-001",
+  "totalQuantity": 100,
+  "reservedQuantity": 0
+}
+
+### ===================================
+### Admin Operations (ROLE_ADMIN required)
+### ===================================
+
+### 19. Create Product (Admin)
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "iPhone 15 Pro",
+  "description": "Latest Apple smartphone with A17 Pro chip",
+  "price": 1199.99,
+  "stock": 50,
+  "categoryId": 1,
+  "active": true
+}
+
+### 20. Update Product (Admin)
+PUT {{baseUrl}}/api/products/1
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "iPhone 15 Pro Max",
+  "description": "Updated description",
+  "price": 1299.99,
+  "stock": 45,
+  "categoryId": 1,
+  "active": true
+}
+
+### 21. Delete Product (Admin)
+DELETE {{baseUrl}}/api/products/99
+Authorization: Bearer {{authToken}}
+
+### 22. Get All Users (Admin)
+GET {{baseUrl}}/api/users?page=0&size=20
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### ===================================
+### Kafka Event Testing
+### ===================================
+
+### After creating an order, check Kafka UI at:
+### http://localhost:8088
+### 
+### Expected topics:
+### - order.created
+### - order.status-changed
+### - inventory.reserved
+### - notification.send
+
+### ===================================
+### Swagger UI
+### ===================================
+
+### Open in browser:
+### http://localhost:8080/swagger-ui.html
+
+### ===================================
+### Actuator Endpoints
+### ===================================
+
+### 23. Prometheus Metrics
+GET {{baseUrl}}/actuator/prometheus
+Accept: text/plain
+
+### 24. Application Info
+GET {{baseUrl}}/actuator/info
+Accept: application/json
+
+### 25. Environment (if exposed)
+GET {{baseUrl}}/actuator/env
+Authorization: Bearer {{authToken}}
+Accept: application/json
+

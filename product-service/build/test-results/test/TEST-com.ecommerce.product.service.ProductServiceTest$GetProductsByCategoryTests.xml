@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="getProductsByCategory()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:43:27" hostname="KUKYOUMI" time="0.007">
+  <properties/>
+  <testcase name="должен вернуть товары по категории" classname="com.ecommerce.product.service.ProductServiceTest$GetProductsByCategoryTests" time="0.004"/>
+  <testcase name="должен выбросить исключение если категория не найдена" classname="com.ecommerce.product.service.ProductServiceTest$GetProductsByCategoryTests" time="0.002"/>
+  <system-out><![CDATA[23:43:27.849 [Test worker] INFO com.ecommerce.product.service.ProductService -- Fetching products for category id: 1
+23:43:27.853 [Test worker] INFO com.ecommerce.product.service.ProductService -- Fetching products for category id: 999
+23:43:27.853 [Test worker] ERROR com.ecommerce.product.service.ProductService -- Category not found with id: 999
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

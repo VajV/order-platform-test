@@ -1,9 +1,12 @@
 server:
-  port: 8086
+  port: ${SERVER_PORT:8086}
 
 spring:
   application:
     name: notification-service
+
+  # config:
+    # import: optional:vault://  # Отключено для Docker
 
   data:
     mongodb:
@@ -39,11 +42,23 @@ spring:
           starttls:
             enable: false
 
+  cloud:
+    vault:
+      enabled: false  # Отключено для Docker
+      uri: ${VAULT_URI:http://vault:8200}
+      token: ${VAULT_TOKEN:}
+      authentication: TOKEN
+      fail-fast: false
+      kv:
+        enabled: false
+        backend: secret
+        application-name: ${spring.application.name}
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: always
@@ -61,3 +76,5 @@ logging:
     root: INFO
     com.ecommerce.notification: DEBUG
     org.springframework.kafka: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

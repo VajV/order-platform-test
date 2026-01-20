@@ -2,13 +2,16 @@ spring:
   application:
     name: auth-service
 
+  # config:
+    # import: optional:vault://  # Отключено для Docker
+
   # ============================================================
   # DEFAULT DATASOURCE (для dev без профиля)
   # ============================================================
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:auth_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres123}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
@@ -29,11 +32,54 @@ spring:
     baseline-on-migrate: true
     validate-on-migrate: true
 
+  # OAuth 2.1 Configuration
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:}
+            client-secret: ${GOOGLE_CLIENT_SECRET:}
+            scope:
+              - email
+              - profile
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+          github:
+            client-id: ${GITHUB_CLIENT_ID:}
+            client-secret: ${GITHUB_CLIENT_SECRET:}
+            scope:
+              - user:email
+              - read:user
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: id
+
+  cloud:
+    vault:
+      enabled: false  # Отключено для Docker
+      uri: ${VAULT_URI:http://vault:8200}
+      token: ${VAULT_TOKEN:}
+      authentication: TOKEN
+      fail-fast: false
+      kv:
+        enabled: false
+        backend: secret
+        application-name: ${spring.application.name}
+
   lifecycle:
     timeout-per-shutdown-phase: 30s
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8087}
   shutdown: graceful
   compression:
     enabled: true
@@ -61,7 +107,7 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 jwt:
-  secret: ${JWT_SECRET:MySecretJwtKey256BitsLongForHS256AlgorithmChangeThisInProduction12345678901234567890}
+  secret: ${JWT_SECRET}
   access-token-expiration: 900000
   refresh-token-expiration: 604800000
 
@@ -79,9 +125,9 @@ spring:
       on-profile: dev
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecommerce
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:auth_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
@@ -91,7 +137,7 @@ spring:
     show-sql: true
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8087}
 
 logging:
   level:
@@ -122,7 +168,7 @@ spring:
       ddl-auto: validate
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8087}
   ssl:
     enabled: true
     key-store: ${SSL_KEYSTORE_PATH:/etc/ssl/keystore.p12}

@@ -1,12 +1,15 @@
 server:
-  port: 8083
+  port: ${SERVER_PORT:8083}
 
 spring:
   application:
     name: order-service
 
+  # config:
+    # import: optional:vault://  # Отключено для Docker
+
   datasource:
-    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:ecommerce}
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:order_db}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres123}
     driver-class-name: org.postgresql.Driver
@@ -45,6 +48,12 @@ spring:
       group-id: order-service
       auto-offset-reset: earliest
       max-poll-records: 100
+    properties:
+      schema.registry.url: ${SCHEMA_REGISTRY_URL:http://schema-registry:8082}
+      # Avro serializer config (when using Avro)
+      # value.serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      # value.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      specific.avro.reader: true
     listener:
       ack-mode: manual_immediate
       concurrency: 3
@@ -54,6 +63,17 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://auth-service:8087}
+
+  cloud:
+    vault:
+      uri: ${VAULT_URI:http://vault:8200}
+      token: ${VAULT_TOKEN:}
+      authentication: TOKEN
+      fail-fast: false
+      kv:
+        enabled: true
+        backend: secret
+        application-name: ${spring.application.name}
 
 management:
   endpoints:
@@ -76,3 +96,10 @@ logging:
     root: INFO
     com.orderplatform: DEBUG
     org.springframework.kafka: INFO
+
+# gRPC Client Configuration
+grpc:
+  client:
+    inventory-service:
+      address: static://${INVENTORY_GRPC_HOST:inventory-service}:${INVENTORY_GRPC_PORT:9090}
+      negotiationType: plaintext

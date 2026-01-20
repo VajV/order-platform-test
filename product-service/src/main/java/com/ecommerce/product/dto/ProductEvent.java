@@ -12,7 +12,7 @@ public class ProductEvent {
 
     private String eventType;  // CREATED, UPDATED, DELETED, STOCK_UPDATED
 
-    private String productId;  // ← String вместо Long (для MongoDB)
+    private Long productId;
 
     private String productName;
 

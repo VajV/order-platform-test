@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="getUserByEmail()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:46:01" hostname="KUKYOUMI" time="0.018">
+  <properties/>
+  <testcase name="должен выбросить UserNotFoundException если email не найден" classname="com.ecommerce.user.UserServiceTest$GetUserByEmailTests" time="0.012"/>
+  <testcase name="должен вернуть пользователя по email" classname="com.ecommerce.user.UserServiceTest$GetUserByEmailTests" time="0.004"/>
+  <system-out><![CDATA[23:46:01.210 [Test worker] INFO com.ecommerce.user.service.UserService -- Getting user by email: unknown@example.com
+23:46:01.218 [Test worker] INFO com.ecommerce.user.service.UserService -- Getting user by email: test@example.com
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

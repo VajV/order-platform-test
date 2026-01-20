@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="createProduct()" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-01-18T20:43:27" hostname="KUKYOUMI" time="0.016">
+  <properties/>
+  <testcase name="должен выбросить исключение если категория не найдена" classname="com.ecommerce.product.service.ProductServiceTest$CreateProductTests" time="0.003"/>
+  <testcase name="должен успешно создать товар" classname="com.ecommerce.product.service.ProductServiceTest$CreateProductTests" time="0.012"/>
+  <system-out><![CDATA[23:43:27.805 [Test worker] INFO com.ecommerce.product.service.ProductService -- Creating new product: New Product
+23:43:27.805 [Test worker] ERROR com.ecommerce.product.service.ProductService -- Category not found with id: 999
+23:43:27.809 [Test worker] INFO com.ecommerce.product.service.ProductService -- Creating new product: New Product
+23:43:27.809 [Test worker] INFO com.ecommerce.product.service.ProductService -- Product created successfully with id: 2
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -21,9 +21,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
 
+/**
+ * Интеграционный тест для User Service.
+ * Использует Testcontainers для PostgreSQL и Kafka.
+ * 
+ * Требования: Docker должен быть запущен.
+ * Для пропуска в CI без Docker: -DskipIntegrationTests=true
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
+@org.springframework.test.context.ActiveProfiles("test")
 class UserIntegrationTest {
 
     @Container
@@ -49,10 +57,22 @@ class UserIntegrationTest {
 
     @DynamicPropertySource
     static void overrideProps(DynamicPropertyRegistry registry) {
+        // PostgreSQL
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        registry.add("spring.flyway.enabled", () -> "false");
+        
+        // Kafka
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+        
+        // Отключаем Vault
+        registry.add("spring.cloud.vault.enabled", () -> "false");
+        registry.add("spring.config.import", () -> "");
+        
+        // JWT для тестов
+        registry.add("jwt.secret", () -> "TestSecretKeyForIntegrationTests32!");
     }
 
     @BeforeEach

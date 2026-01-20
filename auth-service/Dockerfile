@@ -1,8 +1,14 @@
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
-COPY build/libs/auth-service*.jar app.jar
+
+# Copy only the bootJar (not the -plain.jar)
+COPY build/libs/auth-service.jar app.jar
+
+# Security: run as non-root user
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring
+
 EXPOSE 8087
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,0 +1,184 @@
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  JAVA_VERSION: '21'
+
+jobs:
+  # ========================================
+  # Quick validation for PRs
+  # ========================================
+  validate:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Check code formatting
+        run: ./gradlew spotlessCheck --no-daemon || true
+
+      - name: Run Checkstyle
+        run: ./gradlew checkstyleMain --no-daemon || true
+
+      - name: Compile
+        run: ./gradlew compileJava compileTestJava --no-daemon
+
+  # ========================================
+  # Run tests on affected services only
+  # ========================================
+  test-affected:
+    name: Test Affected Services
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v42
+        with:
+          files_yaml: |
+            order:
+              - order-service/**
+            product:
+              - product-service/**
+            user:
+              - user-service/**
+            auth:
+              - auth-service/**
+            inventory:
+              - inventory-service/**
+            notification:
+              - notification-service/**
+            gateway:
+              - api-gateway/**
+
+      - name: Test order-service
+        if: steps.changed-files.outputs.order_any_changed == 'true'
+        run: ./gradlew :order-service:test --no-daemon
+
+      - name: Test product-service
+        if: steps.changed-files.outputs.product_any_changed == 'true'
+        run: ./gradlew :product-service:test --no-daemon
+
+      - name: Test user-service
+        if: steps.changed-files.outputs.user_any_changed == 'true'
+        run: ./gradlew :user-service:test --no-daemon
+
+      - name: Test auth-service
+        if: steps.changed-files.outputs.auth_any_changed == 'true'
+        run: ./gradlew :auth-service:test --no-daemon
+
+      - name: Test inventory-service
+        if: steps.changed-files.outputs.inventory_any_changed == 'true'
+        run: ./gradlew :inventory-service:test --no-daemon
+
+      - name: Test notification-service
+        if: steps.changed-files.outputs.notification_any_changed == 'true'
+        run: ./gradlew :notification-service:test --no-daemon
+
+      - name: Test api-gateway
+        if: steps.changed-files.outputs.gateway_any_changed == 'true'
+        run: ./gradlew :api-gateway:test --no-daemon
+
+  # ========================================
+  # Contract verification for affected services
+  # ========================================
+  contract-check:
+    name: Contract Verification
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v42
+        with:
+          files: |
+            **/contracts/**
+            **/contract/**
+
+      - name: Run Contract Tests
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          ./gradlew :order-service:contractTest --no-daemon || true
+          ./gradlew :product-service:contractTest --no-daemon || true
+
+      - name: Comment on PR
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **Contract changes detected!** Please ensure all consumers are compatible with the new contracts.'
+            })
+
+  # ========================================
+  # PR Summary
+  # ========================================
+  pr-summary:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [validate, test-affected, contract-check]
+    if: always()
+    
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "## PR Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Validation | ${{ needs.validate.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.test-affected.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Contracts | ${{ needs.contract-check.result }} |" >> $GITHUB_STEP_SUMMARY
+

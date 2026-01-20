@@ -1,12 +1,15 @@
 server:
-  port: 8085
+  port: ${SERVER_PORT:8085}
 
 spring:
   application:
     name: inventory-service
 
+  # config:
+    # import: optional:vault://  # Отключено для Docker
+
   datasource:
-    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:ecommerce}
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:inventory_db}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres123}
     driver-class-name: org.postgresql.Driver
@@ -46,12 +49,26 @@ spring:
       max-poll-records: 100
       properties:
         spring.json.trusted.packages: "*"
+    properties:
+      schema.registry.url: ${SCHEMA_REGISTRY_URL:http://schema-registry:8082}
+      specific.avro.reader: true
 
   data:
     redis:
       host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
       timeout: 2000ms
+
+  cloud:
+    vault:
+      uri: ${VAULT_URI:http://vault:8200}
+      token: ${VAULT_TOKEN:}
+      authentication: TOKEN
+      fail-fast: false
+      kv:
+        enabled: true
+        backend: secret
+        application-name: ${spring.application.name}
 
 management:
   endpoints:
@@ -72,3 +89,8 @@ logging:
   level:
     root: INFO
     com.ecommerce.inventory: DEBUG
+
+# gRPC Server Configuration
+grpc:
+  server:
+    port: 9090

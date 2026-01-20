@@ -2,6 +2,7 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     java
+    jacoco
 }
 
 dependencies {
@@ -11,11 +12,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.cloud:spring-cloud-starter-vault-config")
 
-    // Database & Flyway
-    implementation("org.flywaydb:flyway-core:10.4.1")
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.4.1")
-    runtimeOnly("org.postgresql:postgresql")
+    // Database: PostgreSQL + Flyway
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.postgresql:postgresql")
+    implementation("org.flywaydb:flyway-core:10.10.0")
+    implementation("org.flywaydb:flyway-database-postgresql:10.10.0")
 
     // Kafka (JSON вместо Avro на первом этапе)
     implementation("org.springframework.kafka:spring-kafka")
@@ -42,9 +45,34 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.testcontainers:testcontainers:1.19.3")
     testImplementation("org.testcontainers:postgresql:1.19.3")
+    testImplementation("org.testcontainers:kafka:1.19.3")
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
 }
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn(tasks.jacocoTestReport)
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
 }

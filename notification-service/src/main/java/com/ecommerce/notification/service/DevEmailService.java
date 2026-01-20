@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.Subject;
 
 @Service
-@Profile({"default", "dev", "test"})
+@Profile({"default", "dev", "test", "docker"})
 @Slf4j
 public class DevEmailService implements EmailService {
 

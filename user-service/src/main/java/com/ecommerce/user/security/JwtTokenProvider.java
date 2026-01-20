@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class JwtTokenProvider {
-    @Value("${jwt.secret:mysecretkeythatisatleast256bitslongandsecureforjwt12345}")
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
     @Value("${jwt.expiration:86400000}")
