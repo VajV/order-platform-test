@@ -42,10 +42,10 @@ dependencies {
 
     // Testing
     testImplementation("org.springframework.kafka:spring-kafka-test")
-    testImplementation("org.testcontainers:testcontainers:1.19.3")
-    testImplementation("org.testcontainers:mongodb:1.19.3")
-    testImplementation("org.testcontainers:kafka:1.19.3")
-    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+    testImplementation("org.testcontainers:testcontainers:2.0.3")
+    testImplementation("org.testcontainers:mongodb:2.0.3")
+    testImplementation("org.testcontainers:kafka:2.0.3")
+    testImplementation("org.testcontainers:junit-jupiter:2.0.3")
     testImplementation("com.icegreen:greenmail-junit5:2.0.1")
     testImplementation("org.awaitility:awaitility:4.2.0")
 }
