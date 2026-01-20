@@ -22,8 +22,8 @@ dependencies {
 
     // Kafka + Avro
     implementation("org.springframework.kafka:spring-kafka")
-    implementation("io.confluent:kafka-avro-serializer:7.5.0")
-    implementation("io.confluent:kafka-schema-registry-client:7.5.0")
+    implementation("io.confluent:kafka-avro-serializer:8.1.1")
+    implementation("io.confluent:kafka-schema-registry-client:8.1.1")
     implementation("org.apache.avro:avro:1.11.3")
     
     // gRPC
