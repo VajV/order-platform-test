@@ -17,8 +17,8 @@ dependencies {
     // Database: PostgreSQL + Flyway
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.postgresql:postgresql")
-    implementation("org.flywaydb:flyway-core:10.10.0")
-    implementation("org.flywaydb:flyway-database-postgresql:10.10.0")
+    implementation("org.flywaydb:flyway-core:11.20.2")
+    implementation("org.flywaydb:flyway-database-postgresql:11.20.2")
 
     // Kafka (JSON вместо Avro на первом этапе)
     implementation("org.springframework.kafka:spring-kafka")
