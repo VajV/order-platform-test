@@ -1,0 +1,52 @@
+{
+  "namespace": "com.orderplatform.order.avro",
+  "type": "record",
+  "name": "OrderStatusChangedEvent",
+  "doc": "Event published when order status changes",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique event identifier (UUID)"
+    },
+    {
+      "name": "orderId",
+      "type": "string",
+      "doc": "Order identifier"
+    },
+    {
+      "name": "userId",
+      "type": "string",
+      "doc": "User who owns the order"
+    },
+    {
+      "name": "previousStatus",
+      "type": {
+        "type": "enum",
+        "name": "OrderStatus",
+        "symbols": ["NEW", "RESERVED", "PAID", "SHIPPED", "COMPLETED", "CANCELLED"]
+      },
+      "doc": "Previous order status"
+    },
+    {
+      "name": "newStatus",
+      "type": "OrderStatus",
+      "doc": "New order status"
+    },
+    {
+      "name": "reason",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Reason for status change"
+    },
+    {
+      "name": "changedAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Status change timestamp"
+    }
+  ]
+}
+

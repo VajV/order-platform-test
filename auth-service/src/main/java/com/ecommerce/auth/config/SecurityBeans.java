@@ -2,6 +2,7 @@ package com.ecommerce.auth.config;
 
 import com.ecommerce.auth.security.JwtAuthenticationFilter;
 import com.ecommerce.auth.security.JwtExceptionFilter;
+import com.ecommerce.auth.security.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +44,7 @@ public class SecurityBeans {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
     private final UserDetailsService userDetailsService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -72,6 +74,8 @@ public class SecurityBeans {
                                 "/api/auth/login",
                                 "/api/auth/refresh",
                                 "/api/auth/logout",
+                                "/oauth2/**",
+                                "/login/oauth2/**",
                                 "/actuator/health",
                                 "/actuator/health/liveness",
                                 "/actuator/health/readiness",
@@ -84,6 +88,19 @@ public class SecurityBeans {
 
                         // All other endpoints require authentication
                         .anyRequest().authenticated()
+                )
+
+                // ============================================================
+                // OAuth 2.1 Login Configuration
+                // ============================================================
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/oauth2/authorization")
+                        )
+                        .redirectionEndpoint(redirection -> redirection
+                                .baseUri("/oauth2/callback/*")
+                        )
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
 
                 // ============================================================

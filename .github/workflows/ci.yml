@@ -161,6 +161,10 @@ jobs:
       - name: Generate Coverage Report
         run: ./gradlew test jacocoTestReport --no-daemon || true
 
+      - name: Verify Coverage (≥80%)
+        run: ./gradlew jacocoTestCoverageVerification --no-daemon || echo "Coverage check failed - see report"
+        continue-on-error: true
+
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v4
         with:

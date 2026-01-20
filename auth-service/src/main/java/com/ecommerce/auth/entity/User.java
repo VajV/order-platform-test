@@ -78,6 +78,19 @@ public class User implements UserDetails {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
+    // OAuth 2.1 fields
+    @Column(name = "oauth_provider", length = 50)
+    private String oauthProvider;
+
+    @Column(name = "oauth_id", length = 255)
+    private String oauthId;
+
+    @Column(name = "first_name", length = 50)
+    private String firstName;
+
+    @Column(name = "last_name", length = 50)
+    private String lastName;
+
     // ============================================================
     // UserDetails Implementation Methods
     // ============================================================

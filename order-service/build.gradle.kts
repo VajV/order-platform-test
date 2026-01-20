@@ -2,6 +2,7 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     id("org.springframework.cloud.contract") version "4.1.0"
+    id("com.google.protobuf") version "0.9.4"
     java
     jacoco
 }
@@ -13,6 +14,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.kafka:spring-kafka")
+    implementation("io.confluent:kafka-avro-serializer:7.5.0")
+    implementation("io.confluent:kafka-schema-registry-client:7.5.0")
+    implementation("org.apache.avro:avro:1.11.3")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.cloud:spring-cloud-starter-vault-config")
@@ -22,6 +26,12 @@ dependencies {
     implementation("org.postgresql:postgresql")
     implementation("org.flywaydb:flyway-core:10.10.0")
     implementation("org.flywaydb:flyway-database-postgresql:10.10.0")
+    
+    // gRPC Client
+    implementation("net.devh:grpc-client-spring-boot-starter:2.15.0.RELEASE")
+    implementation("io.grpc:grpc-protobuf:1.58.0")
+    implementation("io.grpc:grpc-stub:1.58.0")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
 
     // Observability
     implementation("io.micrometer:micrometer-registry-prometheus")
@@ -79,5 +89,35 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
         html.required.set(true)
+    }
+}
+
+tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn(tasks.jacocoTestReport)
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
+}
+
+// Protobuf configuration
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.24.0"
+    }
+    plugins {
+        create("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.58.0"
+        }
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.plugins {
+                create("grpc")
+            }
+        }
     }
 }

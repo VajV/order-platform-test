@@ -14,6 +14,12 @@ allprojects {
     group = "com.ecommerce"
     version = "1.0.0"
 
+    repositories {
+        mavenCentral()
+        maven {
+            url = uri("https://packages.confluent.io/maven/")
+        }
+    }
 }
 
 subprojects {

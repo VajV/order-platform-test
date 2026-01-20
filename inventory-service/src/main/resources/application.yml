@@ -49,6 +49,9 @@ spring:
       max-poll-records: 100
       properties:
         spring.json.trusted.packages: "*"
+    properties:
+      schema.registry.url: ${SCHEMA_REGISTRY_URL:http://schema-registry:8082}
+      specific.avro.reader: true
 
   data:
     redis:
@@ -86,3 +89,8 @@ logging:
   level:
     root: INFO
     com.ecommerce.inventory: DEBUG
+
+# gRPC Server Configuration
+grpc:
+  server:
+    port: 9090
