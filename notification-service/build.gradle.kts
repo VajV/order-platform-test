@@ -25,7 +25,7 @@ dependencies {
 
     // Redis Client
     implementation("io.lettuce:lettuce-core")
-    implementation("redis.clients:jedis:5.1.0")
+    implementation("redis.clients:jedis:7.2.1")
 
     // JSON Processing
     implementation("com.fasterxml.jackson.core:jackson-databind")
