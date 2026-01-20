@@ -29,8 +29,8 @@ dependencies {
     
     // gRPC Client
     implementation("net.devh:grpc-client-spring-boot-starter:2.15.0.RELEASE")
-    implementation("io.grpc:grpc-protobuf:1.58.0")
-    implementation("io.grpc:grpc-stub:1.58.0")
+    implementation("io.grpc:grpc-protobuf:1.78.0")
+    implementation("io.grpc:grpc-stub:1.78.0")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
     // Observability
@@ -110,7 +110,7 @@ protobuf {
     }
     plugins {
         create("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.58.0"
+            artifact = "io.grpc:protoc-gen-grpc-java:1.78.0"
         }
     }
     generateProtoTasks {
