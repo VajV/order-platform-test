@@ -28,7 +28,7 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql:10.10.0")
     
     // gRPC Client
-    implementation("net.devh:grpc-client-spring-boot-starter:2.15.0.RELEASE")
+    implementation("net.devh:grpc-client-spring-boot-starter:3.1.0.RELEASE")
     implementation("io.grpc:grpc-protobuf:1.58.0")
     implementation("io.grpc:grpc-stub:1.58.0")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
