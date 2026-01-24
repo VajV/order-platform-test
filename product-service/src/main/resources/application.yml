@@ -1,0 +1,66 @@
+server:
+  port: ${SERVER_PORT:8084}
+
+spring:
+  application:
+    name: product-service
+
+  # config:
+    # import: optional:vault://  # Отключено для Docker
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://${MONGODB_HOST:localhost}:${MONGODB_PORT:27017}/${MONGODB_DATABASE:product_db}}
+      auto-index-creation: false
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+  cache:
+    type: redis
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: product-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.ecommerce.*,com.orderplatform.*"
+
+  cloud:
+    vault:
+      enabled: false  # Отключено для Docker
+      uri: ${VAULT_URI:http://vault:8200}
+      token: ${VAULT_TOKEN:}
+      authentication: TOKEN
+      fail-fast: false
+      kv:
+        enabled: false
+        backend: secret
+        application-name: ${spring.application.name}
+
+jwt:
+  secret: ${JWT_SECRET:dev-jwt-secret-32-chars-minimum-required-for-security-compliance}
+  expiration: ${JWT_EXPIRATION:900000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  level:
+    root: INFO
+    com.ecommerce.product: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.kafka: WARN

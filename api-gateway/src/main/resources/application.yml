@@ -1,0 +1,209 @@
+# ======================== SERVER ========================
+server:
+  port: ${SERVER_PORT:8080}  # ✅ Порт, который слушаем
+  servlet:
+    context-path: /  # Корневой путь
+
+allowed:
+  origins: ${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:4200}
+
+# ======================== SPRING ========================
+spring:
+  application:
+    name: api-gateway
+    description: "API Gateway для Order Processing Platform"
+
+  # config:
+    # import: optional:vault://  # Отключено для Docker
+
+  # ======================== REDIS ========================
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}  # Docker: имя контейнера
+      port: ${REDIS_PORT:6379}   # Стандартный порт Redis
+      timeout: 2000ms            # Таймаут подключения
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  # ======================== CLOUD.GATEWAY ========================
+  cloud:
+    vault:
+      enabled: false  # Отключено для Docker
+      uri: ${VAULT_URI:http://vault:8200}
+      token: ${VAULT_TOKEN:}
+      authentication: TOKEN
+      fail-fast: false
+      kv:
+        enabled: false
+        backend: secret
+        application-name: ${spring.application.name}
+
+    gateway:
+      # Global default filters for all routes
+      default-filters:
+        - name: CircuitBreaker
+          args:
+            name: gatewayCircuitBreaker
+            fallbackUri: forward:/fallback
+
+      # 🔐 МАРШРУТЫ (где какой сервис находится)
+      routes:
+        # ═══════════════════════════════════════════
+        # 1️⃣ AUTH SERVICE (БЕЗ JWT - сюда приходят регистрироваться)
+        # ═══════════════════════════════════════════
+        - id: auth-service
+          uri: ${AUTH_SERVICE_URL:http://auth-service:8087}
+          predicates:
+            - Path=/api/auth/**
+          # ВРЕМЕННО БЕЗ ФИЛЬТРОВ для отладки
+        # ═══════════════════════════════════════════
+        # 2️⃣ USER SERVICE (С JWT ЗАЩИТОЙ)
+        # ═══════════════════════════════════════════
+        - id: user-service
+          uri: ${USER_SERVICE_URL:http://user-service:8081}
+          predicates:
+            - Path=/api/users/**
+          filters:
+            # ✅ ПРОВЕРЯЕМ JWT ТОКЕН
+            - name: JwtValidation
+            # Стандартный rate-limit
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 200
+                key-resolver: "#{@ipKeyResolver}"
+
+        # ═══════════════════════════════════════════
+        # 3️⃣ PRODUCT SERVICE
+        #    - GET: public catalog (no JWT)
+        #    - WRITE: JWT required (to propagate X-User-* headers for RBAC)
+        # ═══════════════════════════════════════════
+        - id: product-service-public
+          uri: ${PRODUCT_SERVICE_URL:http://product-service:8084}
+          predicates:
+            - Path=/api/products/**
+            - Method=GET
+          # NO FILTERS - public access for product catalog
+
+        - id: product-service-protected
+          uri: ${PRODUCT_SERVICE_URL:http://product-service:8084}
+          predicates:
+            - Path=/api/products/**
+            - Method=POST,PUT,PATCH,DELETE
+          filters:
+            - name: JwtValidation
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 200
+                key-resolver: "#{@userIdKeyResolver}"
+
+        # ═══════════════════════════════════════════
+        # 4️⃣ ORDER SERVICE (ВАЖНЫЙ - БОЛЕЕ ПЛОТНЫЙ LIMIT)
+        # ═══════════════════════════════════════════
+        - id: order-service
+          uri: ${ORDER_SERVICE_URL:http://order-service:8083}
+          predicates:
+            - Path=/api/orders/**
+          filters:
+            - name: JwtValidation
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 50  # Менее частые заказы
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userIdKeyResolver}"  # По пользователю!
+
+        # ═══════════════════════════════════════════
+        # 5️⃣ INVENTORY SERVICE
+        # ═══════════════════════════════════════════
+        - id: inventory-service
+          uri: ${INVENTORY_SERVICE_URL:http://inventory-service:8085}
+          predicates:
+            - Path=/api/inventory/**
+          filters:
+            - name: JwtValidation
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 200
+                key-resolver: "#{@ipKeyResolver}"
+
+        # ═══════════════════════════════════════════
+        # 6️⃣ NOTIFICATION SERVICE
+        # ═══════════════════════════════════════════
+        - id: notification-service
+          uri: ${NOTIFICATION_SERVICE_URL:http://notification-service:8086}
+          predicates:
+            - Path=/api/v1/notifications/**
+          filters:
+            - name: JwtValidation
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 50
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@ipKeyResolver}"
+
+      # CORS Configuration
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOriginPatterns:
+              - "http://localhost:*"
+              - "http://127.0.0.1:*"
+              - "${FRONTEND_URL:http://localhost:3000}"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+# ======================== JWT ========================
+jwt:
+  secret: ${JWT_SECRET:dev-jwt-secret-32-chars-minimum-required-for-security-compliance}
+  expiration: ${JWT_EXPIRATION:3600000}  # 1 час
+  algorithm: HS256
+
+# ======================== MANAGEMENT/ACTUATOR ========================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,gateway,routes,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# ======================== LOGGING ========================
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: TRACE  # Максимальное логирование
+    reactor.netty.http.client: DEBUG
+    com.ecommerce.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d %p %c{1.} [%t] %m%n"
+  file:
+    name: logs/api-gateway.log
+    max-size: 10MB
+    max-history: 10
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      gatewayCircuitBreaker:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 5

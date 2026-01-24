@@ -1,0 +1,70 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Gradle
+.gradle
+**/build/
+!**/build/libs/*.jar
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# Documentation
+*.md
+docs/
+
+# Scripts (local development only)
+*.bat
+*.sh
+*.ps1
+!gradlew
+!gradlew.bat
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Test data
+test-data/
+samples/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Build artifacts (except JARs in libs)
+**/build/classes/
+**/build/generated/
+**/build/resources/
+**/build/tmp/
+**/build/reports/
+
+# Kubernetes/Helm (not needed in Docker build)
+**/k8s/
+**/helm/
+
+# Terraform
+*.tf
+*.tfstate
+*.tfvars
+
+# Environment files (secrets)
+.env
+.env.*
+!.env.example
+

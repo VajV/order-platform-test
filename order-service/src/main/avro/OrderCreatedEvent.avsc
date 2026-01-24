@@ -1,0 +1,70 @@
+{
+  "namespace": "com.orderplatform.order.avro",
+  "type": "record",
+  "name": "OrderCreatedEvent",
+  "doc": "Event published when a new order is created",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string",
+      "doc": "Unique event identifier (UUID)"
+    },
+    {
+      "name": "orderId",
+      "type": "string",
+      "doc": "Order identifier"
+    },
+    {
+      "name": "userId",
+      "type": "string",
+      "doc": "User who placed the order"
+    },
+    {
+      "name": "items",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "OrderItem",
+          "fields": [
+            {"name": "productId", "type": "string"},
+            {"name": "productName", "type": "string"},
+            {"name": "quantity", "type": "int"},
+            {"name": "unitPrice", "type": "string"},
+            {"name": "totalPrice", "type": "string"}
+          ]
+        }
+      },
+      "doc": "List of order items"
+    },
+    {
+      "name": "totalAmount",
+      "type": "string",
+      "doc": "Total order amount (decimal as string)"
+    },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "OrderStatus",
+        "symbols": ["NEW", "RESERVED", "PAID", "SHIPPED", "COMPLETED", "CANCELLED"]
+      },
+      "doc": "Current order status"
+    },
+    {
+      "name": "shippingAddress",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Shipping address"
+    },
+    {
+      "name": "createdAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Event creation timestamp"
+    }
+  ]
+}
+

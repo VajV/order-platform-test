@@ -1,0 +1,291 @@
+# =============================================
+# Order Platform - Helm Values
+# =============================================
+
+# Global settings
+global:
+  namespace: order-platform
+  imagePullPolicy: IfNotPresent
+  imageRegistry: ghcr.io/your-org
+  imageTag: latest
+  
+  # Database credentials (override in secrets)
+  postgresql:
+    host: "{{ .Release.Name }}-postgresql"
+    port: 5432
+    username: postgres
+    password: ""  # Set via secrets
+    
+  mongodb:
+    host: "{{ .Release.Name }}-mongodb"
+    port: 27017
+    
+  redis:
+    host: "{{ .Release.Name }}-redis-master"
+    port: 6379
+    
+  kafka:
+    bootstrapServers: "{{ .Release.Name }}-kafka:9092"
+
+# =============================================
+# Infrastructure Components
+# =============================================
+
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "postgres123"
+    username: postgres
+    password: "postgres123"
+    database: orderdb
+  primary:
+    persistence:
+      size: 8Gi
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+    initdb:
+      scripts:
+        init-databases.sql: |
+          CREATE DATABASE IF NOT EXISTS auth_db;
+          CREATE DATABASE IF NOT EXISTS user_db;
+          CREATE DATABASE IF NOT EXISTS product_db;
+          CREATE DATABASE IF NOT EXISTS order_db;
+          CREATE DATABASE IF NOT EXISTS inventory_db;
+
+mongodb:
+  enabled: true
+  auth:
+    enabled: true
+    rootUser: root
+    rootPassword: "mongodb123"
+  persistence:
+    size: 8Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      size: 2Gi
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+
+kafka:
+  enabled: true
+  replicaCount: 1
+  persistence:
+    size: 8Gi
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  zookeeper:
+    enabled: true
+    replicaCount: 1
+    persistence:
+      size: 2Gi
+
+# =============================================
+# Microservices
+# =============================================
+
+apiGateway:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: order-platform-api-gateway
+    tag: ""  # Uses global.imageTag if empty
+  service:
+    type: ClusterIP
+    port: 8080
+  ingress:
+    enabled: true
+    className: nginx
+    hostname: api.order-platform.local
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    tls: []
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env: {}
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+
+authService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: order-platform-auth-service
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 8081
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    JWT_EXPIRATION: "3600000"
+    JWT_REFRESH_EXPIRATION: "86400000"
+  database:
+    name: auth_db
+
+userService:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: order-platform-user-service
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 8082
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env: {}
+  database:
+    name: user_db
+
+productService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: order-platform-product-service
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 8083
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env: {}
+
+inventoryService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: order-platform-inventory-service
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 8084
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env: {}
+  database:
+    name: inventory_db
+
+orderService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: order-platform-order-service
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 8085
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env: {}
+  database:
+    name: order_db
+
+notificationService:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: order-platform-notification-service
+    tag: ""
+  service:
+    type: ClusterIP
+    port: 8086
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  env:
+    MAIL_HOST: "smtp.gmail.com"
+    MAIL_PORT: "587"
+
+# =============================================
+# Common Settings
+# =============================================
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+# Secrets (should be overridden)
+secrets:
+  jwtSecret: "change-me-in-production-minimum-32-chars!"
+  postgresPassword: "postgres123"
+  mongoPassword: "mongodb123"
+  redisPassword: ""
+

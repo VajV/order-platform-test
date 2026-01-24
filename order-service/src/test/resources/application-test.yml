@@ -1,0 +1,71 @@
+spring:
+  # H2 in-memory database for tests (no Docker required)
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # Flyway disabled for tests
+  flyway:
+    enabled: false
+  
+  # Kafka mock config
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: earliest
+      group-id: order-service-test
+      enable-auto-commit: false
+      properties:
+        spring.json.trusted.packages: "com.orderplatform.*,com.ecommerce.*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+  
+  # Disable Vault
+  cloud:
+    vault:
+      enabled: false
+
+  # Disable external config imports
+  config:
+    import: ""
+
+  # OAuth2 Resource Server mock
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8087
+
+# JWT for tests
+jwt:
+  secret: TestSecretKeyForUnitTests32Chars!
+  expiration: 3600000
+
+# Logging
+logging:
+  level:
+    org.springframework.test: DEBUG
+    com.orderplatform: DEBUG
+
+# Management endpoints
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    enabled-by-default: false
+

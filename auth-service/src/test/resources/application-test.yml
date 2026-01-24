@@ -1,0 +1,48 @@
+spring:
+  # H2 in-memory database for tests (no Docker required)
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # Flyway disabled for tests
+  flyway:
+    enabled: false
+  
+  # Disable Vault
+  cloud:
+    vault:
+      enabled: false
+
+  # Disable external config imports
+  config:
+    import: ""
+
+# JWT for tests
+jwt:
+  secret: TestSecretKeyForUnitTests32Chars!
+  expiration: 3600000
+
+# Logging
+logging:
+  level:
+    org.springframework.test: DEBUG
+    com.ecommerce.auth: DEBUG
+
+# Management endpoints
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    enabled-by-default: false

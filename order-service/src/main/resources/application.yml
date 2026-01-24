@@ -1,0 +1,112 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: order-service
+
+  # config:
+    # import: optional:vault://  # Отключено для Docker
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:order_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres_dev_password_2024}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    baseline-version: 0
+    validate-on-migrate: false
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: order-service
+      auto-offset-reset: earliest
+      max-poll-records: 100
+    properties:
+      schema.registry.url: ${SCHEMA_REGISTRY_URL:http://schema-registry:8082}
+      # Avro serializer config (when using Avro)
+      # value.serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      # value.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      specific.avro.reader: true
+    listener:
+      ack-mode: manual_immediate
+      concurrency: 3
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://auth-service:8087}
+
+  cloud:
+    vault:
+      enabled: false
+      uri: ${VAULT_URI:http://vault:8200}
+      token: ${VAULT_TOKEN:}
+      authentication: TOKEN
+      fail-fast: false
+      kv:
+        enabled: false
+        backend: secret
+        application-name: ${spring.application.name}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.orderplatform: DEBUG
+    org.springframework.kafka: INFO
+
+# gRPC Client Configuration
+grpc:
+  client:
+    inventory-service:
+      address: static://${INVENTORY_GRPC_HOST:inventory-service}:${INVENTORY_GRPC_PORT:9090}
+      negotiationType: plaintext
+
+# Mock Payment Service (auto-completes payments for testing)
+mock:
+  payment:
+    delay-ms: 1000
+    success-rate: 1.0
