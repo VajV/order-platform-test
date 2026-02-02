@@ -39,8 +39,8 @@ dependencies {
 
     // Observability
     implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("io.opentelemetry:opentelemetry-api:1.32.0")
-    implementation("io.opentelemetry:opentelemetry-sdk:1.32.0")
+    implementation("io.opentelemetry:opentelemetry-api:1.58.0")
+    implementation("io.opentelemetry:opentelemetry-sdk:1.58.0")
 
     // JSON
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
