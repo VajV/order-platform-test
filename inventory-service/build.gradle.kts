@@ -46,7 +46,7 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
     // OpenAPI/Swagger
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
 
     // Prometheus
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
