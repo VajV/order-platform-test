@@ -29,7 +29,7 @@ dependencies {
     implementation("org.apache.avro:avro:1.11.3")
     
     // gRPC
-    implementation("net.devh:grpc-spring-boot-starter:2.15.0.RELEASE")
+    implementation("net.devh:grpc-spring-boot-starter:3.1.0.RELEASE")
     implementation("io.grpc:grpc-protobuf:1.58.0")
     implementation("io.grpc:grpc-stub:1.58.0")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
