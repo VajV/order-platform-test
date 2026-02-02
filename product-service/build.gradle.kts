@@ -50,7 +50,7 @@ dependencies {
     
     // Contract Testing
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier")
-    testImplementation("io.rest-assured:spring-mock-mvc:5.4.0")
+    testImplementation("io.rest-assured:spring-mock-mvc:6.0.0")
 }
 
 // Spring Cloud Contract configuration
