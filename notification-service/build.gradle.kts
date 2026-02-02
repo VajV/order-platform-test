@@ -21,8 +21,8 @@ dependencies {
 
     // Kafka Avro + Schema Registry
     implementation("org.apache.kafka:kafka-clients:3.6.1")
-    implementation("io.confluent:kafka-avro-serializer:7.5.0")
-    implementation("io.confluent:kafka-schema-registry-client:7.5.0")
+    implementation("io.confluent:kafka-avro-serializer:8.1.1")
+    implementation("io.confluent:kafka-schema-registry-client:8.1.1")
 
     // Redis Client
     implementation("io.lettuce:lettuce-core")
