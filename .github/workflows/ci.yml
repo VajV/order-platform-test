@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew test --no-daemon -x :order-service:contractTest -x :product-service:contractTest
         
       - name: Upload Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: test-results
@@ -47,7 +47,7 @@ jobs:
           retention-days: 7
 
       - name: Upload JARs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: jars
           path: '**/build/libs/*.jar'
@@ -89,7 +89,7 @@ jobs:
           ./gradlew :product-service:publishToMavenLocal --no-daemon || true
 
       - name: Upload Contract Stubs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: contract-stubs
           path: ~/.m2/repository/com/ecommerce/*/
@@ -129,7 +129,7 @@ jobs:
           ./gradlew :notification-service:test --tests '*IntegrationTest' --no-daemon || true
 
       - name: Upload Integration Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: integration-test-results
@@ -173,7 +173,7 @@ jobs:
           verbose: true
 
       - name: Upload Coverage Reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-reports
           path: '**/build/reports/jacoco/'
